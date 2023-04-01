@@ -1,4 +1,4 @@
-package com.yabancikelimedefteri.ui.theme
+package com.yabancikelimedefteri.core.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Shapes

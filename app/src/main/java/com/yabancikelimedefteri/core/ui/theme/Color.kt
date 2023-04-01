@@ -1,4 +1,4 @@
-package com.yabancikelimedefteri.ui.theme
+package com.yabancikelimedefteri.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
