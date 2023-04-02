@@ -43,7 +43,7 @@ class AddWordViewModel @Inject constructor(
             try {
                 _addWordState.value = AddWordState.Success(
                     sharedPreferences.edit {
-                        saveWord(foreignWord, meaning)
+                        saveWord(foreignWord.lowercase(), meaning.lowercase())
                     }
                 )
 
