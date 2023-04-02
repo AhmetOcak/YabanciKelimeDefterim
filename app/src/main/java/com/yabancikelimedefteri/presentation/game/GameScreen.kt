@@ -2,6 +2,7 @@ package com.yabancikelimedefteri.presentation.game
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -246,7 +247,8 @@ private fun GameResultSubTitle(modifier: Modifier, correctCount: Int, inCorrectC
         )
         Text(
             modifier = modifier.padding(start = 4.dp),
-            text = "$correctCount doğru $inCorrectCount yanlış"
+            text = "$correctCount doğru $inCorrectCount yanlış",
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -255,7 +257,7 @@ private fun GameResultSubTitle(modifier: Modifier, correctCount: Int, inCorrectC
 private fun RowScope.TableCell(
     modifier: Modifier,
     text: String,
-    textColor: Color = Color.Black,
+    textColor: Color = if (isSystemInDarkTheme()) Color.White else Color.Black,
     style: TextStyle = MaterialTheme.typography.body2,
     isTextLowerCase: Boolean = true
 ) {
@@ -263,7 +265,7 @@ private fun RowScope.TableCell(
         modifier = modifier
             .fillMaxWidth()
             .weight(1f)
-            .border(1.dp, Color.Black)
+            .border(1.dp, if (isSystemInDarkTheme()) Color.Gray else Color.Black)
             .padding(8.dp),
         text = if (isTextLowerCase) text.lowercase() else text,
         color = textColor,
