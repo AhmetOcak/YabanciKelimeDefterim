@@ -73,7 +73,11 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    fun isGameStillGoing() = wordIndex <= (words?.size ?: 0) - 1
+    fun isGameStillGoing(): Boolean {
+        return if (words.isNullOrEmpty()) {
+            true
+        } else wordIndex <= (words?.size ?: 0) - 1
+    }
 
     private fun getAllWords() = viewModelScope.launch(Dispatchers.IO) {
         _gameState.value = GameState.Loading
