@@ -14,7 +14,12 @@ import androidx.compose.ui.unit.dp
 import com.yabancikelimedefteri.R
 
 @Composable
-fun WordCard(modifier: Modifier, foreignWord: String, meaning: String) {
+fun WordCard(
+    modifier: Modifier,
+    foreignWord: String,
+    meaning: String,
+    onDeleteClick: (String) -> Unit
+) {
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -22,7 +27,7 @@ fun WordCard(modifier: Modifier, foreignWord: String, meaning: String) {
         shape = RoundedCornerShape(10),
         elevation = 4.dp
     ) {
-        DeleteWord(modifier = modifier, onClick = {})
+        DeleteWord(modifier = modifier, onClick = { onDeleteClick(foreignWord) })
         Column(
             modifier = modifier
                 .fillMaxSize()
