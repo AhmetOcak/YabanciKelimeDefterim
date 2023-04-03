@@ -5,6 +5,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 private val DarkColorPalette = darkColors(
@@ -26,7 +28,9 @@ fun YabanciKelimeDefteriTheme(
 ) {
     val systemUiController = rememberSystemUiController()
 
-    if (darkTheme) {
+    val isDark = ThemeState.isDark.value ?: darkTheme
+
+    if (isDark) {
         systemUiController.setStatusBarColor(
             color = CustomDarkGray,
             darkIcons = false
@@ -38,7 +42,7 @@ fun YabanciKelimeDefteriTheme(
         )
     }
 
-    val colors = if (darkTheme) {
+    val colors = if (isDark) {
         DarkColorPalette
     } else {
         LightColorPalette
@@ -50,4 +54,8 @@ fun YabanciKelimeDefteriTheme(
         shapes = Shapes,
         content = content
     )
+}
+
+object ThemeState {
+    var isDark: MutableState<Boolean?> = mutableStateOf(null)
 }

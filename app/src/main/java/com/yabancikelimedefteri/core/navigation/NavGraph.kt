@@ -1,10 +1,12 @@
 package com.yabancikelimedefteri.core.navigation
 
 import android.app.Activity
+import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
@@ -19,10 +21,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.core.content.edit
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.core.common.getCurrentTheme
+import com.yabancikelimedefteri.core.common.saveTheme
+import com.yabancikelimedefteri.core.ui.theme.ThemeState
 import com.yabancikelimedefteri.presentation.add_word.AddWordScreen
 import com.yabancikelimedefteri.presentation.game.GameScreen
 import com.yabancikelimedefteri.presentation.home.HomeScreen
@@ -32,7 +38,8 @@ import com.yabancikelimedefteri.presentation.home.HomeScreen
 fun NavGraph(
     modifier: Modifier = Modifier,
     startDestination: String = NavScreen.HomeScreen.route,
-    activity: Activity
+    activity: Activity,
+    sharedPreferences: SharedPreferences
 ) {
     val navController = rememberAnimatedNavController()
 
@@ -61,7 +68,17 @@ fun NavGraph(
                     pageTitle = PageTitles.game
                 },
                 onDarkModeClick = {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                    // eğer tema kodu 1 ise tam karşıtı yapılır
+                    val theme = when(sharedPreferences.getCurrentTheme()) {
+                        1 -> AppCompatDelegate.MODE_NIGHT_YES
+                        2 -> AppCompatDelegate.MODE_NIGHT_NO
+                        else -> { -1 }
+                    }
+                    sharedPreferences.edit {
+                        saveTheme(theme)
+                    }
+                    AppCompatDelegate.setDefaultNightMode(theme)
+                    ThemeState.isDark.value = sharedPreferences.getCurrentTheme() == 2
                 },
                 onBackClick = {
                     navController.navigate(NavScreen.HomeScreen.route)

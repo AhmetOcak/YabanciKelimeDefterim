@@ -16,3 +16,11 @@ fun SharedPreferences.Editor.removeWord(foreignWord: String) {
     apply()
 }
 
+fun SharedPreferences.Editor.saveTheme(themeCode: Int) {
+    putInt("current_theme", themeCode)
+    apply()
+}
+
+fun SharedPreferences.getCurrentTheme(): Int {
+    return getInt("current_theme", -1)
+}
