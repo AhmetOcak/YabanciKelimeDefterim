@@ -17,9 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.yabancikelimedefteri.core.ui.component.CustomButton
@@ -120,9 +123,7 @@ private fun GameResultSection(
     inCorrectCount: Int
 ) {
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         GameResultSubTitle(
@@ -144,7 +145,7 @@ private fun GameResultTable(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(bottom = 16.dp)
+        contentPadding = PaddingValues(bottom = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         items(answers.keys.toList()) {
             Row(
@@ -170,7 +171,7 @@ private fun GameResultTableHeaders(modifier: Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 4.dp),
+            .padding(top = 4.dp, start = 16.dp, end = 16.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -191,45 +192,21 @@ private fun GameResultTableHeaders(modifier: Modifier) {
 
 @Composable
 private fun InfoAboutResultTable(modifier: Modifier) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(top = 32.dp),
-        horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Row {
-            Text(
-                text = "Doğru ",
-                style = MaterialTheme.typography.caption,
-                textAlign = TextAlign.Start,
-                color = Color.Green
-            )
-            Text(
-                text = "cevaplar yeşil, ",
-                style = MaterialTheme.typography.caption,
-                textAlign = TextAlign.Start
-            )
-            Text(
-                text = "yanlış ",
-                style = MaterialTheme.typography.caption,
-                textAlign = TextAlign.Start,
-                color = Color.Red
-            )
-            Text(
-                text = "cevaplar kırmızı renkte ",
-                style = MaterialTheme.typography.caption,
-                textAlign = TextAlign.Start
-            )
-        }
-        Row {
-            Text(
-                text = "gösterilmiştir.",
-                style = MaterialTheme.typography.caption,
-                textAlign = TextAlign.Start
-            )
-        }
-    }
+    Text(
+        buildAnnotatedString {
+            withStyle(style = SpanStyle(color = Color.Green)) {
+                append("Doğru ")
+            }
+            append("cevaplar yeşil, ")
+            withStyle(style = SpanStyle(color = Color.Red)) {
+                append("yanlış ")
+            }
+            append("cevaplar kırmızı renkte gösterilmiştir.")
+        },
+        style = MaterialTheme.typography.caption,
+        textAlign = TextAlign.Start,
+        modifier = modifier.fillMaxWidth().padding(top = 32.dp, start = 16.dp, end = 16.dp)
+    )
 }
 
 @Composable
@@ -237,18 +214,19 @@ private fun GameResultSubTitle(modifier: Modifier, correctCount: Int, inCorrectC
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 32.dp),
+            .padding(top = 32.dp, start = 16.dp, end = 16.dp),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = "Oyun Sonucun:",
-            style = MaterialTheme.typography.h5.copy(fontWeight = FontWeight.SemiBold)
+            style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.SemiBold)
         )
         Text(
             modifier = modifier.padding(start = 4.dp),
             text = "$correctCount doğru $inCorrectCount yanlış",
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.body2
         )
     }
 }
