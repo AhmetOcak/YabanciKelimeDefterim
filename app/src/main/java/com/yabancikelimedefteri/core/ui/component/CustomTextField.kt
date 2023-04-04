@@ -2,6 +2,8 @@ package com.yabancikelimedefteri.core.ui.component
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -20,7 +22,9 @@ fun CustomTextField(
     value: String,
     onValueChange: (String) -> Unit,
     labelText: String,
-    isError: Boolean = false
+    isError: Boolean = false,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(),
+    keyboardActions: KeyboardActions = KeyboardActions()
 ) {
     OutlinedTextField(
         modifier = modifier,
@@ -39,7 +43,9 @@ fun CustomTextField(
                     tint = MaterialTheme.colors.error
                 )
             }
-        } else null
+        } else null,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions
     )
     if (isError) {
         Text(
