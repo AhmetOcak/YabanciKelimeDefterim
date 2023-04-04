@@ -4,7 +4,6 @@ import android.content.SharedPreferences
 import androidx.activity.compose.BackHandler
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.border
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -27,11 +26,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.yabancikelimedefteri.core.common.getCurrentTheme
+import com.yabancikelimedefteri.core.helpers.getCurrentTheme
 import com.yabancikelimedefteri.core.ui.component.CustomButton
 import com.yabancikelimedefteri.core.ui.component.CustomTextField
 import com.yabancikelimedefteri.core.ui.component.CustomToast
-import com.yabancikelimedefteri.core.ui.theme.ThemeState
 
 @Composable
 fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {

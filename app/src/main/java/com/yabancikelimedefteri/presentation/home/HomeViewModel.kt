@@ -5,8 +5,8 @@ import android.util.Log
 import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yabancikelimedefteri.core.common.getWords
-import com.yabancikelimedefteri.core.common.removeWord
+import com.yabancikelimedefteri.core.helpers.getWords
+import com.yabancikelimedefteri.core.helpers.removeWord
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

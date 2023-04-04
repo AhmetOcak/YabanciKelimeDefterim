@@ -1,4 +1,4 @@
-package com.yabancikelimedefteri.core.common
+package com.yabancikelimedefteri.core.helpers
 
 import android.content.SharedPreferences
 

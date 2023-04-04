@@ -12,8 +12,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.content.edit
-import com.yabancikelimedefteri.core.common.getCurrentTheme
-import com.yabancikelimedefteri.core.common.saveTheme
+import com.yabancikelimedefteri.core.helpers.getCurrentTheme
+import com.yabancikelimedefteri.core.helpers.saveTheme
 import com.yabancikelimedefteri.core.navigation.NavGraph
 import com.yabancikelimedefteri.core.ui.theme.YabanciKelimeDefteriTheme
 import dagger.hilt.android.AndroidEntryPoint

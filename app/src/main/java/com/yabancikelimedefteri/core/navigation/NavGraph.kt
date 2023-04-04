@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
@@ -26,8 +25,8 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.yabancikelimedefteri.R
-import com.yabancikelimedefteri.core.common.getCurrentTheme
-import com.yabancikelimedefteri.core.common.saveTheme
+import com.yabancikelimedefteri.core.helpers.getCurrentTheme
+import com.yabancikelimedefteri.core.helpers.saveTheme
 import com.yabancikelimedefteri.core.ui.theme.ThemeState
 import com.yabancikelimedefteri.presentation.add_word.AddWordScreen
 import com.yabancikelimedefteri.presentation.game.GameScreen
