@@ -1,6 +1,8 @@
 package com.yabancikelimedefteri.presentation.game
 
+import android.content.SharedPreferences
 import androidx.activity.compose.BackHandler
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
@@ -25,9 +27,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.yabancikelimedefteri.core.common.getCurrentTheme
 import com.yabancikelimedefteri.core.ui.component.CustomButton
 import com.yabancikelimedefteri.core.ui.component.CustomTextField
 import com.yabancikelimedefteri.core.ui.component.CustomToast
+import com.yabancikelimedefteri.core.ui.theme.ThemeState
 
 @Composable
 fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
@@ -61,7 +65,10 @@ fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
         answers = viewModel.answers,
         words = viewModel.words ?: mutableMapOf<String, String>(),
         correctCount = viewModel.correctAnswerCount,
-        inCorrectCount = viewModel.inCorrectAnswerCount
+        inCorrectCount = viewModel.inCorrectAnswerCount,
+        sharedPreferences = LocalContext.current.getSharedPreferences("current_theme", -1),
+        isCurrentThemeDark = LocalContext.current.getSharedPreferences("current_theme", -1)
+            .getCurrentTheme() == AppCompatDelegate.MODE_NIGHT_YES
     )
 }
 
@@ -78,9 +85,10 @@ private fun GameScreenContent(
     answers: MutableMap<String, String>,
     words: MutableMap<String, *>,
     correctCount: Int,
-    inCorrectCount: Int
+    inCorrectCount: Int,
+    sharedPreferences: SharedPreferences,
+    isCurrentThemeDark: Boolean
 ) {
-
     when (gameState) {
         is GameState.Loading -> {
             Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -88,15 +96,7 @@ private fun GameScreenContent(
             }
         }
         is GameState.Success -> {
-            if (isGameOver) {
-                GameResultSection(
-                    modifier = modifier,
-                    answers = answers,
-                    words = words,
-                    correctCount = correctCount,
-                    inCorrectCount = inCorrectCount
-                )
-            } else {
+            if (!isGameOver) {
                 GameSection(
                     modifier = modifier,
                     gameState = gameState,
@@ -105,6 +105,16 @@ private fun GameScreenContent(
                     onValueChanged = onValueChanged,
                     isError = isError,
                     onGuessClicked = onGuessClicked
+                )
+            } else {
+                GameResultSection(
+                    modifier = modifier,
+                    answers = answers,
+                    words = words,
+                    correctCount = correctCount,
+                    inCorrectCount = inCorrectCount,
+                    sharedPreferences = sharedPreferences,
+                    isCurrentThemeDark = isCurrentThemeDark
                 )
             }
         }
@@ -120,7 +130,9 @@ private fun GameResultSection(
     answers: MutableMap<String, String>,
     words: MutableMap<String, *>,
     correctCount: Int,
-    inCorrectCount: Int
+    inCorrectCount: Int,
+    sharedPreferences: SharedPreferences,
+    isCurrentThemeDark: Boolean
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -132,8 +144,26 @@ private fun GameResultSection(
             inCorrectCount = inCorrectCount
         )
         InfoAboutResultTable(modifier = modifier)
-        GameResultTableHeaders(modifier = modifier)
-        GameResultTable(modifier = modifier, answers = answers, words = words)
+        GameResultTableHeaders(
+            modifier = modifier,
+            tableCellTextColor = if (
+                sharedPreferences.getCurrentTheme() == AppCompatDelegate.MODE_NIGHT_YES
+            ) Color.White
+            else
+                Color.Black,
+            isCurrentThemeDark = isCurrentThemeDark
+        )
+        GameResultTable(
+            modifier = modifier,
+            answers = answers,
+            words = words,
+            tableCellTextColor = if (
+                sharedPreferences.getCurrentTheme() == AppCompatDelegate.MODE_NIGHT_YES
+            ) Color.White
+            else
+                Color.Black,
+            isCurrentThemeDark = isCurrentThemeDark
+        )
     }
 }
 
@@ -141,7 +171,9 @@ private fun GameResultSection(
 private fun GameResultTable(
     modifier: Modifier,
     answers: MutableMap<String, String>,
-    words: MutableMap<String, *>
+    words: MutableMap<String, *>,
+    tableCellTextColor: Color,
+    isCurrentThemeDark: Boolean
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
@@ -153,13 +185,19 @@ private fun GameResultTable(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TableCell(modifier = modifier, text = it)
+                TableCell(
+                    modifier = modifier,
+                    text = it,
+                    textColor = tableCellTextColor,
+                    isCurrentThemeDark = isCurrentThemeDark
+                )
                 TableCell(
                     modifier = modifier,
                     text = answers[it] ?: "",
                     textColor = if (
                         words[it].toString().uppercase() == (answers[it]?.uppercase() ?: "")
-                    ) Color.Green else Color.Red
+                    ) Color.Green else Color.Red,
+                    isCurrentThemeDark = isCurrentThemeDark
                 )
             }
         }
@@ -167,7 +205,11 @@ private fun GameResultTable(
 }
 
 @Composable
-private fun GameResultTableHeaders(modifier: Modifier) {
+private fun GameResultTableHeaders(
+    modifier: Modifier,
+    tableCellTextColor: Color,
+    isCurrentThemeDark: Boolean
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -179,13 +221,17 @@ private fun GameResultTableHeaders(modifier: Modifier) {
             modifier = modifier,
             text = "Doğru Cevap",
             style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.SemiBold),
-            isTextLowerCase = false
+            isTextLowerCase = false,
+            textColor = tableCellTextColor,
+            isCurrentThemeDark = isCurrentThemeDark
         )
         TableCell(
             modifier = modifier,
             text = "Senin Cevabın",
             style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.SemiBold),
-            isTextLowerCase = false
+            isTextLowerCase = false,
+            textColor = tableCellTextColor,
+            isCurrentThemeDark = isCurrentThemeDark
         )
     }
 }
@@ -205,7 +251,9 @@ private fun InfoAboutResultTable(modifier: Modifier) {
         },
         style = MaterialTheme.typography.caption,
         textAlign = TextAlign.Start,
-        modifier = modifier.fillMaxWidth().padding(top = 32.dp, start = 16.dp, end = 16.dp)
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = 32.dp, start = 16.dp, end = 16.dp)
     )
 }
 
@@ -235,15 +283,16 @@ private fun GameResultSubTitle(modifier: Modifier, correctCount: Int, inCorrectC
 private fun RowScope.TableCell(
     modifier: Modifier,
     text: String,
-    textColor: Color = if (isSystemInDarkTheme()) Color.White else Color.Black,
+    textColor: Color,
     style: TextStyle = MaterialTheme.typography.body2,
-    isTextLowerCase: Boolean = true
+    isTextLowerCase: Boolean = true,
+    isCurrentThemeDark: Boolean
 ) {
     Text(
         modifier = modifier
             .fillMaxWidth()
             .weight(1f)
-            .border(1.dp, if (isSystemInDarkTheme()) Color.Gray else Color.Black)
+            .border(1.dp, if (isCurrentThemeDark) Color.Gray else Color.Black)
             .padding(8.dp),
         text = if (isTextLowerCase) text.lowercase() else text,
         color = textColor,
@@ -330,7 +379,6 @@ private fun ForeignWord(modifier: Modifier, word: String) {
         }
     }
 }
-
 
 @Composable
 private fun Space(modifier: Modifier) {
