@@ -10,6 +10,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.yabancikelimedefteri.R
 
@@ -18,12 +19,20 @@ fun WordCard(
     modifier: Modifier,
     foreignWord: String,
     meaning: String,
-    onDeleteClick: (String) -> Unit
+    onDeleteClick: (String) -> Unit,
+    height: Dp = LocalConfiguration.current.screenWidthDp.dp / 2,
+    width: Dp = 0.dp
 ) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(LocalConfiguration.current.screenWidthDp.dp / 2),
+        modifier = if (width == 0.dp) {
+            modifier
+                .fillMaxWidth()
+                .height(height)
+        } else {
+            modifier
+                .width(width)
+                .height(height)
+        },
         shape = RoundedCornerShape(10),
         elevation = 4.dp
     ) {

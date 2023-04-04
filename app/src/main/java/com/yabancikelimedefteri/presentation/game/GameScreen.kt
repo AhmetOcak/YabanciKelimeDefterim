@@ -1,13 +1,18 @@
 package com.yabancikelimedefteri.presentation.game
 
 import android.content.SharedPreferences
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
@@ -22,6 +27,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
@@ -30,6 +36,7 @@ import com.yabancikelimedefteri.core.helpers.getCurrentTheme
 import com.yabancikelimedefteri.core.ui.component.CustomButton
 import com.yabancikelimedefteri.core.ui.component.CustomTextField
 import com.yabancikelimedefteri.core.ui.component.CustomToast
+import com.yabancikelimedefteri.presentation.main.OrientationState
 
 @Composable
 fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
@@ -308,35 +315,87 @@ private fun GameSection(
     isError: Boolean,
     onGuessClicked: (String) -> Unit
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        if (gameState.data.isEmpty()) {
-            EmptyWordMessage(modifier = modifier)
-        } else if (gameState.data.size < 2) {
-            AtLeastTwoWordMessage(modifier = modifier)
-        } else {
-            ForeignWord(modifier = modifier, word = gameState.data[wordIndex])
-            Space(modifier = modifier)
-            CustomTextField(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 48.dp),
-                value = value,
-                onValueChange = { onValueChanged(it) },
-                labelText = "Tahminin",
-                isError = isError
-            )
-            Space(modifier = modifier)
-            CustomButton(
-                modifier = modifier,
-                onClick = { onGuessClicked(gameState.data[wordIndex]) },
-                buttonText = "Tahmin et"
-            )
+    if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            if (gameState.data.isEmpty()) {
+                EmptyWordMessage(modifier = modifier)
+            } else if (gameState.data.size < 2) {
+                AtLeastTwoWordMessage(modifier = modifier)
+            } else {
+                ForeignWord(
+                    modifier = modifier,
+                    word = gameState.data[wordIndex],
+                    isOrientPortrait = true
+                )
+                Space(modifier = modifier)
+                CustomTextField(
+                    modifier = modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 48.dp),
+                    value = value,
+                    onValueChange = { onValueChanged(it) },
+                    labelText = "Tahminin",
+                    isError = isError,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex]) })
+                )
+                Space(modifier = modifier)
+                CustomButton(
+                    modifier = modifier,
+                    onClick = { onGuessClicked(gameState.data[wordIndex]) },
+                    buttonText = "Tahmin et"
+                )
+            }
+        }
+    } else {
+        Row(
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (gameState.data.isEmpty()) {
+                EmptyWordMessage(modifier = modifier)
+            } else if (gameState.data.size < 2) {
+                AtLeastTwoWordMessage(modifier = modifier)
+            } else {
+                ForeignWord(
+                    modifier = modifier.weight(1f),
+                    word = gameState.data[wordIndex],
+                    isOrientPortrait = false
+                )
+                Column(
+                    modifier = modifier.weight(1f),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    CustomTextField(
+                        modifier = modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 48.dp),
+                        value = value,
+                        onValueChange = { onValueChanged(it) },
+                        labelText = "Tahminin",
+                        isError = isError,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                        keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex]) })
+                    )
+                    Space(modifier = modifier)
+                    CustomButton(
+                        modifier = modifier,
+                        onClick = { onGuessClicked(gameState.data[wordIndex]) },
+                        buttonText = "Tahmin et"
+                    )
+                }
+            }
         }
     }
 }
@@ -364,16 +423,23 @@ private fun AtLeastTwoWordMessage(modifier: Modifier) {
 }
 
 @Composable
-private fun ForeignWord(modifier: Modifier, word: String) {
+private fun ForeignWord(modifier: Modifier, word: String, isOrientPortrait: Boolean) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(LocalConfiguration.current.screenWidthDp.dp / 2),
+        modifier = if (isOrientPortrait) {
+            modifier
+                .fillMaxWidth()
+                .height(LocalConfiguration.current.screenWidthDp.dp / 2)
+        } else {
+            modifier
+                .fillMaxWidth()
+                .height(LocalConfiguration.current.screenWidthDp.dp / 3)
+                .padding(32.dp)
+        },
         shape = RoundedCornerShape(10),
         elevation = 8.dp
     ) {
-        Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text(modifier = modifier.fillMaxWidth(), text = word, textAlign = TextAlign.Center)
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Text(modifier = Modifier.fillMaxWidth(), text = word, textAlign = TextAlign.Center)
         }
     }
 }
