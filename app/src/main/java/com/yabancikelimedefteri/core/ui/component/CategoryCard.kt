@@ -6,7 +6,6 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -14,15 +13,16 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.yabancikelimedefteri.R
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun WordCard(
+fun CategoryCard(
     modifier: Modifier,
-    foreignWord: String,
-    meaning: String,
+    categoryName: String,
+    categoryId: Int,
     onDeleteClick: (Int) -> Unit,
     height: Dp = LocalConfiguration.current.screenWidthDp.dp / 2,
     width: Dp = 0.dp,
-    wordId: Int
+    onCategoryCardClick: (Int) -> Unit
 ) {
     Card(
         modifier = if (width == 0.dp) {
@@ -35,25 +35,24 @@ fun WordCard(
                 .height(height)
         },
         shape = RoundedCornerShape(10),
+        onClick = { onCategoryCardClick(categoryId) },
         elevation = 4.dp
     ) {
-        DeleteWord(modifier = modifier, onClick = { onDeleteClick(wordId) })
+        DeleteCategory(modifier = modifier, onClick = { onDeleteClick(categoryId) })
         Column(
             modifier = modifier
                 .fillMaxSize()
                 .padding(vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
+            verticalArrangement = Arrangement.Center
         ) {
-            Word(modifier = modifier, word = foreignWord)
-            CompareIcon(modifier = modifier)
-            Word(modifier = modifier, word = meaning)
+            Word(modifier = modifier, word = categoryName)
         }
     }
 }
 
 @Composable
-private fun DeleteWord(modifier: Modifier, onClick: () -> Unit) {
+private fun DeleteCategory(modifier: Modifier, onClick: () -> Unit) {
     Box(
         modifier = modifier.fillMaxWidth(),
         contentAlignment = Alignment.TopEnd
@@ -71,13 +70,4 @@ private fun DeleteWord(modifier: Modifier, onClick: () -> Unit) {
 @Composable
 private fun Word(modifier: Modifier, word: String) {
     Text(modifier = modifier.fillMaxWidth(), text = word, textAlign = TextAlign.Center)
-}
-
-@Composable
-private fun CompareIcon(modifier: Modifier) {
-    Icon(
-        modifier = modifier.rotate(90f),
-        painter = painterResource(id = R.drawable.ic_baseline_compare_arrows),
-        contentDescription = "compare word"
-    )
 }

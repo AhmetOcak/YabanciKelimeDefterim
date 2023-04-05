@@ -1,4 +1,4 @@
-package com.yabancikelimedefteri.presentation.home
+package com.yabancikelimedefteri.presentation.word
 
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
@@ -15,119 +15,111 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.yabancikelimedefteri.core.ui.component.CategoryCard
 import com.yabancikelimedefteri.core.ui.component.CustomToast
-import com.yabancikelimedefteri.domain.model.CategoryWithId
+import com.yabancikelimedefteri.core.ui.component.WordCard
+import com.yabancikelimedefteri.domain.model.WordWithId
 import com.yabancikelimedefteri.presentation.main.OrientationState
 
 @Composable
-fun HomeScreen(
-    modifier: Modifier = Modifier,
-    onNavigateBack: () -> Unit,
-    onNavigateNext: (Int) -> Unit
-) {
+fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
 
-    val viewModel: HomeViewModel = hiltViewModel()
-    val getCategoriesState by viewModel.getCategoriesState.collectAsState()
-    val deleteCategoryState by viewModel.deleteCategoryState.collectAsState()
+    val viewModel: WordViewModel = hiltViewModel()
+
+    val getWordsState by viewModel.getWordState.collectAsState()
+    val deleteWordState by viewModel.deleteWordState.collectAsState()
 
     BackHandler {
         onNavigateBack()
     }
 
-    HomeScreenContent(
+    WordScreenContent(
         modifier = modifier,
-        onDeleteClick = { viewModel.deleteCategories(it) },
-        getCategoriesState = getCategoriesState,
-        deleteCategoryState = deleteCategoryState,
-        resetDeleteWordState = { viewModel.resetDeleteWordState() },
-        onCategoryCardClick = { onNavigateNext(it) }
+        getWordsState = getWordsState,
+        deleteWordState = deleteWordState,
+        onDeleteClick = { viewModel.deleteWord(it) },
+        resetDeleteWordState = { viewModel.resetDeleteWordState() }
     )
 }
 
 @Composable
-private fun HomeScreenContent(
+private fun WordScreenContent(
     modifier: Modifier,
+    getWordsState: GetWordState,
+    deleteWordState: DeleteWordState,
     onDeleteClick: (Int) -> Unit,
-    getCategoriesState: GetCategoriesState,
-    deleteCategoryState: DeleteCategoryState,
-    resetDeleteWordState: () -> Unit,
-    onCategoryCardClick: (Int) -> Unit
+    resetDeleteWordState: () -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        when (getCategoriesState) {
-            is GetCategoriesState.Loading -> {
+        when (getWordsState) {
+            is GetWordState.Loading -> {
                 Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
-            is GetCategoriesState.Success -> {
-                CategoryList(
-                    deleteCategoryState,
-                    getCategoriesState,
+            is GetWordState.Success -> {
+                WordList(
+                    deleteWordState,
+                    getWordsState,
                     modifier,
                     onDeleteClick,
-                    resetDeleteWordState,
-                    onCategoryCardClick
+                    resetDeleteWordState
                 )
             }
-            is GetCategoriesState.Error -> {
-                CustomToast(context = LocalContext.current, message = getCategoriesState.message)
+            is GetWordState.Error -> {
+                CustomToast(context = LocalContext.current, message = getWordsState.message)
             }
         }
     }
 }
 
 @Composable
-private fun CategoryList(
-    deleteCategoryState: DeleteCategoryState,
-    getCategoriesState: GetCategoriesState.Success,
+private fun WordList(
+    deleteWordState: DeleteWordState,
+    getWordsState: GetWordState.Success,
     modifier: Modifier,
     onDeleteClick: (Int) -> Unit,
-    resetDeleteWordState: () -> Unit,
-    onCategoryCardClick: (Int) -> Unit
+    resetDeleteWordState: () -> Unit
 ) {
-    when (deleteCategoryState) {
-        is DeleteCategoryState.Nothing -> {
-            if (getCategoriesState.data.isEmpty()) {
-                NoCategoryMessage(modifier = modifier)
+    when (deleteWordState) {
+        is DeleteWordState.Nothing -> {
+            if (getWordsState.data.isEmpty()) {
+                EmptyWordListMessage(modifier = modifier)
             } else {
-                ResponsiveCategoryList(
+                ResponsiveWordList(
                     modifier = modifier,
-                    data = getCategoriesState.data,
-                    onDeleteClick = onDeleteClick,
-                    onCategoryCardClick = onCategoryCardClick
+                    data = getWordsState.data,
+                    onDeleteClick = onDeleteClick
                 )
             }
         }
-        is DeleteCategoryState.Loading -> {
+        is DeleteWordState.Loading -> {
             Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
-        is DeleteCategoryState.Success -> {
-            CustomToast(context = LocalContext.current, message = "Kategori kaldırıldı")
+        is DeleteWordState.Success -> {
+            CustomToast(context = LocalContext.current, message = "Kelime kaldırıldı")
             resetDeleteWordState()
         }
-        is DeleteCategoryState.Error -> {
-            CustomToast(context = LocalContext.current, message = deleteCategoryState.message)
+        is DeleteWordState.Error -> {
+            CustomToast(context = LocalContext.current, message = deleteWordState.message)
         }
     }
 }
 
 @Composable
-private fun ResponsiveCategoryList(
+private fun ResponsiveWordList(
     modifier: Modifier,
-    data: List<CategoryWithId>,
-    onDeleteClick: (Int) -> Unit,
-    onCategoryCardClick: (Int) -> Unit
+    data: List<WordWithId>,
+    onDeleteClick: (Int) -> Unit
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         LazyColumn(
@@ -136,12 +128,12 @@ private fun ResponsiveCategoryList(
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
         ) {
             items(data) {
-                CategoryCard(
+                WordCard(
                     modifier = modifier,
-                    categoryName = it.categoryName,
-                    categoryId = it.categoryId,
+                    foreignWord = it.foreignWord,
+                    meaning = it.meaning,
+                    wordId = it.wordId,
                     onDeleteClick = onDeleteClick,
-                    onCategoryCardClick = onCategoryCardClick
                 )
             }
         }
@@ -154,12 +146,13 @@ private fun ResponsiveCategoryList(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(data) {
-                CategoryCard(
+                WordCard(
                     modifier = modifier,
-                    categoryName = it.categoryName,
-                    categoryId = it.categoryId,
+                    foreignWord = it.foreignWord,
+                    meaning = it.meaning,
+                    wordId = it.wordId,
                     onDeleteClick = onDeleteClick,
-                    onCategoryCardClick = onCategoryCardClick
+                    height = LocalConfiguration.current.screenWidthDp.dp / 3
                 )
             }
         }
@@ -167,13 +160,13 @@ private fun ResponsiveCategoryList(
 }
 
 @Composable
-private fun NoCategoryMessage(modifier: Modifier) {
+private fun EmptyWordListMessage(modifier: Modifier) {
     Box(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 32.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = "Kelime defterinde hiç kategori yok 😥", textAlign = TextAlign.Center)
+        Text(text = "Kelime defterinde hiç kelime yok 😥", textAlign = TextAlign.Center)
     }
 }

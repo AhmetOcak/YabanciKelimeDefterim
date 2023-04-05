@@ -1,12 +1,13 @@
 package com.yabancikelimedefteri.presentation.game
 
-import android.content.SharedPreferences
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yabancikelimedefteri.core.helpers.getWords
+import com.yabancikelimedefteri.core.helpers.Response
+import com.yabancikelimedefteri.domain.model.WordWithId
+import com.yabancikelimedefteri.domain.usecase.word.GetAllWordsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
-    private val sharedPreferences: SharedPreferences
+    private val getAllWordsUseCase: GetAllWordsUseCase
 ) : ViewModel() {
 
     private val _gameState = MutableStateFlow<GameState>(GameState.Loading)
@@ -28,7 +29,7 @@ class GameViewModel @Inject constructor(
     var guessWordFieldError by mutableStateOf(false)
         private set
 
-    var words: MutableMap<String, *>? = null
+    var words: List<WordWithId>? = null
         private set
 
     var correctAnswerCount by mutableStateOf(0)
@@ -80,22 +81,30 @@ class GameViewModel @Inject constructor(
     }
 
     private fun getAllWords() = viewModelScope.launch(Dispatchers.IO) {
-        _gameState.value = GameState.Loading
-        try {
-            words = sharedPreferences.getWords()
-            _gameState.value = GameState.Success(data = words?.keys?.toList()?.shuffled() ?: arrayListOf())
-        } catch (e: Exception) {
-            _gameState.value = GameState.Error(message = e.message ?: e.stackTraceToString())
+        getAllWordsUseCase().collect() {
+            when(it) {
+                is Response.Loading -> {}
+                is Response.Success -> {
+                    words = it.data
+                    words?.let { words ->
+                        _gameState.value = GameState.Success(data = words.shuffled())
+                    }
+                }
+                is Response.Error -> {
+                    _gameState.value = GameState.Error(message = it.message)
+                }
+            }
         }
     }
 
     fun calculateResult() {
         answers.keys.forEach {
-            if ((words?.get(it)?.toString()?.uppercase()) == (answers[it]?.uppercase())) {
+            if (answers[it]?.uppercase() == words?.find { word -> word.foreignWord == it }?.meaning) {
                 correctAnswerCount++
             } else {
                 inCorrectAnswerCount++
             }
         }
     }
+
 }

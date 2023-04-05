@@ -1,13 +1,15 @@
 package com.yabancikelimedefteri.presentation.add_word
 
-import android.content.SharedPreferences
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.core.content.edit
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yabancikelimedefteri.core.helpers.saveWord
+import com.yabancikelimedefteri.core.helpers.Response
+import com.yabancikelimedefteri.domain.model.Word
+import com.yabancikelimedefteri.domain.usecase.word.CreateWordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,11 +19,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AddWordViewModel @Inject constructor(
-    private val sharedPreferences: SharedPreferences
+    private val createWordUseCase: CreateWordUseCase,
+    savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _addWordState = MutableStateFlow<AddWordState>(AddWordState.Nothing)
+    private val _addWordState = MutableStateFlow<CreateWordState>(CreateWordState.Nothing)
     val addWordState = _addWordState.asStateFlow()
+
+    private var categoryId: String? = null
+
+    init {
+        categoryId = savedStateHandle["categoryId"]
+    }
 
     var foreignWord by mutableStateOf("")
         private set
@@ -33,23 +42,37 @@ class AddWordViewModel @Inject constructor(
     var meaningFieldError by mutableStateOf(false)
         private set
 
-    fun updateForeignWord(newValue: String) { foreignWord = newValue }
+    fun updateForeignWord(newValue: String) {
+        foreignWord = newValue
+    }
 
-    fun updateMeaning(newValue: String) { meaning = newValue }
+    fun updateMeaning(newValue: String) {
+        meaning = newValue
+    }
 
     fun addForeignWord() = viewModelScope.launch(Dispatchers.IO) {
         if (foreignWord.isNotBlank() && meaning.isNotBlank()) {
-            _addWordState.value = AddWordState.Loading
-            try {
-                _addWordState.value = AddWordState.Success(
-                    sharedPreferences.edit {
-                        saveWord(foreignWord.lowercase(), meaning.lowercase())
+            categoryId?.let {
+                createWordUseCase(
+                    word = Word(
+                        categoryId = it.toInt(),
+                        foreignWord = foreignWord,
+                        meaning = meaning
+                    )
+                ).collect() { response ->
+                    when (response) {
+                        is Response.Loading -> {
+                            _addWordState.value = CreateWordState.Loading
+                        }
+                        is Response.Success -> {
+                            _addWordState.value = CreateWordState.Success(data = response.data)
+                            resetTextFields()
+                        }
+                        is Response.Error -> {
+                            _addWordState.value = CreateWordState.Error(message = response.message)
+                        }
                     }
-                )
-
-                resetTextFields()
-            } catch (e: Exception) {
-                _addWordState.value = AddWordState.Error(message = e.message ?: e.localizedMessage)
+                }
             }
         } else if (foreignWord.isBlank() && meaning.isBlank()) {
             foreignWordFieldError = true
@@ -63,7 +86,9 @@ class AddWordViewModel @Inject constructor(
         }
     }
 
-    fun resetAddWordState() { _addWordState.value = AddWordState.Nothing }
+    fun resetAddWordState() {
+        _addWordState.value = CreateWordState.Nothing
+    }
 
     private fun resetTextFields() {
         foreignWord = ""

@@ -1,4 +1,4 @@
-package com.yabancikelimedefteri.presentation.home
+package com.yabancikelimedefteri.presentation.word
 
 sealed interface DeleteWordState {
     object Nothing : DeleteWordState
