@@ -36,6 +36,7 @@ import com.yabancikelimedefteri.core.helpers.getCurrentTheme
 import com.yabancikelimedefteri.core.ui.component.CustomButton
 import com.yabancikelimedefteri.core.ui.component.CustomTextField
 import com.yabancikelimedefteri.core.ui.component.CustomToast
+import com.yabancikelimedefteri.domain.model.WordWithId
 import com.yabancikelimedefteri.presentation.main.OrientationState
 
 @Composable
@@ -68,7 +69,7 @@ fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
         isError = viewModel.guessWordFieldError,
         isGameOver = !viewModel.isGameStillGoing(),
         answers = viewModel.answers,
-        words = viewModel.words ?: mutableMapOf<String, String>(),
+        words = viewModel.words ?: mutableListOf(),
         correctCount = viewModel.correctAnswerCount,
         inCorrectCount = viewModel.inCorrectAnswerCount,
         sharedPreferences = LocalContext.current.getSharedPreferences("current_theme", -1),
@@ -88,7 +89,7 @@ private fun GameScreenContent(
     isError: Boolean,
     isGameOver: Boolean,
     answers: MutableMap<String, String>,
-    words: MutableMap<String, *>,
+    words: List<WordWithId>,
     correctCount: Int,
     inCorrectCount: Int,
     sharedPreferences: SharedPreferences,
@@ -133,7 +134,7 @@ private fun GameScreenContent(
 private fun GameResultSection(
     modifier: Modifier,
     answers: MutableMap<String, String>,
-    words: MutableMap<String, *>,
+    words: List<WordWithId>,
     correctCount: Int,
     inCorrectCount: Int,
     sharedPreferences: SharedPreferences,
@@ -176,7 +177,7 @@ private fun GameResultSection(
 private fun GameResultTable(
     modifier: Modifier,
     answers: MutableMap<String, String>,
-    words: MutableMap<String, *>,
+    words: List<WordWithId>,
     tableCellTextColor: Color,
     isCurrentThemeDark: Boolean
 ) {
@@ -200,7 +201,11 @@ private fun GameResultTable(
                     modifier = modifier,
                     text = answers[it] ?: "",
                     textColor = if (
-                        words[it].toString().uppercase() == (answers[it]?.uppercase() ?: "")
+                        (words.find { word ->
+                            word.foreignWord == it
+                        }?.meaning?.uppercase() ?: "")
+                        ==
+                        (answers[it]?.uppercase() ?: "")
                     ) Color.Green else Color.Red,
                     isCurrentThemeDark = isCurrentThemeDark
                 )
@@ -330,7 +335,7 @@ private fun GameSection(
             } else {
                 ForeignWord(
                     modifier = modifier,
-                    word = gameState.data[wordIndex],
+                    word = gameState.data[wordIndex].foreignWord,
                     isOrientPortrait = true
                 )
                 Space(modifier = modifier)
@@ -343,12 +348,12 @@ private fun GameSection(
                     labelText = "Tahminin",
                     isError = isError,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex]) })
+                    keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex].foreignWord) })
                 )
                 Space(modifier = modifier)
                 CustomButton(
                     modifier = modifier,
-                    onClick = { onGuessClicked(gameState.data[wordIndex]) },
+                    onClick = { onGuessClicked(gameState.data[wordIndex].foreignWord) },
                     buttonText = "Tahmin et"
                 )
             }
@@ -369,7 +374,7 @@ private fun GameSection(
             } else {
                 ForeignWord(
                     modifier = modifier.weight(1f),
-                    word = gameState.data[wordIndex],
+                    word = gameState.data[wordIndex].foreignWord,
                     isOrientPortrait = false
                 )
                 Column(
@@ -386,12 +391,12 @@ private fun GameSection(
                         labelText = "Tahminin",
                         isError = isError,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex]) })
+                        keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex].foreignWord) })
                     )
                     Space(modifier = modifier)
                     CustomButton(
                         modifier = modifier,
-                        onClick = { onGuessClicked(gameState.data[wordIndex]) },
+                        onClick = { onGuessClicked(gameState.data[wordIndex].foreignWord) },
                         buttonText = "Tahmin et"
                     )
                 }

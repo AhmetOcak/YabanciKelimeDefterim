@@ -2,6 +2,7 @@ package com.yabancikelimedefteri.core.navigation
 
 import android.app.Activity
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -21,6 +22,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.core.content.edit
+import androidx.navigation.NavType
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
@@ -28,9 +32,11 @@ import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.helpers.getCurrentTheme
 import com.yabancikelimedefteri.core.helpers.saveTheme
 import com.yabancikelimedefteri.core.ui.theme.ThemeState
+import com.yabancikelimedefteri.presentation.add_category.AddCategoryScreen
 import com.yabancikelimedefteri.presentation.add_word.AddWordScreen
 import com.yabancikelimedefteri.presentation.game.GameScreen
 import com.yabancikelimedefteri.presentation.home.HomeScreen
+import com.yabancikelimedefteri.presentation.word.WordScreen
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -46,6 +52,8 @@ fun NavGraph(
 
     var showFab by rememberSaveable { mutableStateOf(true) }
 
+    var categoryId: Int? = null
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         floatingActionButtonPosition = FabPosition.End,
@@ -54,8 +62,19 @@ fun NavGraph(
                 Fab(
                     modifier = modifier,
                     onClick = {
-                        navController.navigate(NavScreen.AddWordScreen.route)
-                        pageTitle = PageTitles.add_word
+                        if (
+                            navController.currentBackStackEntry?.destination?.route != null
+                            &&
+                            navController.currentBackStackEntry?.destination?.route == NavScreen.HomeScreen.route
+                        ) {
+                            navController.navigate(NavScreen.AddCategoryScreen.route)
+                            pageTitle = PageTitles.add_category
+                        } else {
+                            categoryId?.let {
+                                navController.navigate("${NavNames.add_word_screen}/$it")
+                                pageTitle = PageTitles.add_word
+                            }
+                        }
                     }
                 )
             }
@@ -68,10 +87,12 @@ fun NavGraph(
                 },
                 onDarkModeClick = {
                     // eğer tema kodu 1 ise tam karşıtı yapılır
-                    val theme = when(sharedPreferences.getCurrentTheme()) {
+                    val theme = when (sharedPreferences.getCurrentTheme()) {
                         1 -> AppCompatDelegate.MODE_NIGHT_YES
                         2 -> AppCompatDelegate.MODE_NIGHT_NO
-                        else -> { -1 }
+                        else -> {
+                            -1
+                        }
                     }
                     sharedPreferences.edit {
                         saveTheme(theme)
@@ -106,13 +127,24 @@ fun NavGraph(
         ) {
             composable(route = NavScreen.HomeScreen.route) {
                 showFab = true
-                HomeScreen(onNavigateBack = { activity.finish() })
+                HomeScreen(
+                    onNavigateBack = { activity.finish() },
+                    onNavigateNext = { id ->
+                        categoryId = id
+                        navController.navigate("${NavNames.word_screen}/$id")
+                    }
+                )
             }
-            composable(route = NavScreen.AddWordScreen.route) {
+            composable(
+                route = NavScreen.AddWordScreen.route,
+                arguments = listOf(
+                    navArgument("categoryId") { NavType.IntType }
+                )
+            ) {
                 showFab = false
                 AddWordScreen(
                     onNavigateBack = {
-                        navController.navigate(NavScreen.HomeScreen.route)
+                        navController.navigate("${NavNames.word_screen}/$categoryId")
                         pageTitle = PageTitles.home
                     }
                 )
@@ -120,6 +152,29 @@ fun NavGraph(
             composable(route = NavScreen.GameScreen.route) {
                 showFab = false
                 GameScreen(
+                    onNavigateBack = {
+                        navController.navigate(NavScreen.HomeScreen.route)
+                        pageTitle = PageTitles.home
+                    }
+                )
+            }
+            composable(route = NavScreen.AddCategoryScreen.route) {
+                showFab = false
+                AddCategoryScreen(
+                    onNavigateBack = {
+                        navController.navigate(NavScreen.HomeScreen.route)
+                        pageTitle = PageTitles.home
+                    }
+                )
+            }
+            composable(
+                route = NavScreen.WordScreen.route,
+                arguments = listOf(
+                    navArgument("categoryId") { type = NavType.IntType }
+                )
+            ) {
+                showFab = true
+                WordScreen(
                     onNavigateBack = {
                         navController.navigate(NavScreen.HomeScreen.route)
                         pageTitle = PageTitles.home
