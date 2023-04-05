@@ -140,7 +140,7 @@ private fun ResponsiveWordList(
     } else {
         LazyVerticalGrid(
             modifier = modifier.fillMaxSize(),
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Fixed(3),
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -152,7 +152,8 @@ private fun ResponsiveWordList(
                     meaning = it.meaning,
                     wordId = it.wordId,
                     onDeleteClick = onDeleteClick,
-                    height = LocalConfiguration.current.screenWidthDp.dp / 3
+                    height = LocalConfiguration.current.screenWidthDp.dp / 3,
+                    width = LocalConfiguration.current.screenWidthDp.dp / 3
                 )
             }
         }

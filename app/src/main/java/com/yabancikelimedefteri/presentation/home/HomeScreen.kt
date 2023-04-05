@@ -15,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -148,7 +149,7 @@ private fun ResponsiveCategoryList(
     } else {
         LazyVerticalGrid(
             modifier = modifier.fillMaxSize(),
-            columns = GridCells.Fixed(2),
+            columns = GridCells.Fixed(3),
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -159,7 +160,9 @@ private fun ResponsiveCategoryList(
                     categoryName = it.categoryName,
                     categoryId = it.categoryId,
                     onDeleteClick = onDeleteClick,
-                    onCategoryCardClick = onCategoryCardClick
+                    onCategoryCardClick = onCategoryCardClick,
+                    height = LocalConfiguration.current.screenWidthDp.dp / 3,
+                    width = LocalConfiguration.current.screenWidthDp.dp / 3
                 )
             }
         }
