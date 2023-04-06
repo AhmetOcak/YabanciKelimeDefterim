@@ -126,7 +126,7 @@ private fun GameScreenContent(
 ) {
     when (gameState) {
         is GameState.Nothing -> {
-            when(categoriesState) {
+            when (categoriesState) {
                 is GetGameCategoriesState.Loading -> {
                     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator()
@@ -198,76 +198,143 @@ private fun ChooseGameCategorySection(
     isButtonEnabled: Boolean,
     launchTheGame: () -> Unit
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(vertical = 16.dp, horizontal = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            modifier = modifier.fillMaxWidth(),
-            text = "Oyunu oynamak istediğin kategoriyi seç",
-            textAlign = TextAlign.Center
-        )
-        Space(modifier = modifier.height(16.dp))
-        Space(
+    if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
+        Column(
             modifier = modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(color = MaterialTheme.colors.primary)
-        )
-        LazyVerticalGrid(
-            modifier = modifier
-                .fillMaxWidth()
-                .height(LocalConfiguration.current.screenWidthDp.dp),
-            columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                .fillMaxSize()
+                .padding(vertical = 16.dp, horizontal = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            items(categories) {
-                GameCategory(
-                    modifier = modifier,
-                    categoryName = it.categoryName,
-                    isAllCatSelected = isAllCatSelected,
-                    categoryId = it.categoryId,
-                    addSelectedCategory = addSelectedCategory,
-                    removeSelectedCategory = removeSelectedCategory
-                )
+            Text(
+                modifier = modifier.fillMaxWidth(),
+                text = "Oyunu oynamak istediğin kategoriyi seç",
+                textAlign = TextAlign.Center
+            )
+            Space(modifier = modifier.height(16.dp))
+            Space(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(color = MaterialTheme.colors.primary)
+            )
+            LazyVerticalGrid(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(LocalConfiguration.current.screenWidthDp.dp),
+                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                items(categories) {
+                    GameCategory(
+                        modifier = modifier,
+                        categoryName = it.categoryName,
+                        isAllCatSelected = isAllCatSelected,
+                        categoryId = it.categoryId,
+                        addSelectedCategory = addSelectedCategory,
+                        removeSelectedCategory = removeSelectedCategory
+                    )
+                }
+                item {
+                    GameCategory(
+                        modifier = modifier,
+                        categoryName = "Hepsi",
+                        allClicked = {
+                            setAllCateSelected(it)
+                            if (it) {
+                                addAllCategory()
+                            } else {
+                                removeAllCategory()
+                            }
+                        },
+                        isAllCatSelected = isAllCatSelected,
+                        categoryId = -1,
+                        addSelectedCategory = addSelectedCategory,
+                        removeSelectedCategory = removeSelectedCategory
+                    )
+                }
             }
-            item {
-                GameCategory(
+            Space(
+                modifier = modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(color = MaterialTheme.colors.primary)
+            )
+            Space(modifier = modifier.height(16.dp))
+            CustomButton(
+                modifier = modifier,
+                onClick = launchTheGame,
+                buttonText = "Oyunu Başlat",
+                enabled = isButtonEnabled
+            )
+        }
+    } else {
+        Row(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = 32.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(modifier = modifier.weight(1f)) {
+                LazyVerticalGrid(
+                    modifier = modifier.height(LocalConfiguration.current.screenWidthDp.dp),
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(categories) {
+                        GameCategory(
+                            modifier = modifier,
+                            categoryName = it.categoryName,
+                            isAllCatSelected = isAllCatSelected,
+                            categoryId = it.categoryId,
+                            addSelectedCategory = addSelectedCategory,
+                            removeSelectedCategory = removeSelectedCategory
+                        )
+                    }
+                    item {
+                        GameCategory(
+                            modifier = modifier,
+                            categoryName = "Hepsi",
+                            allClicked = {
+                                setAllCateSelected(it)
+                                if (it) {
+                                    addAllCategory()
+                                } else {
+                                    removeAllCategory()
+                                }
+                            },
+                            isAllCatSelected = isAllCatSelected,
+                            categoryId = -1,
+                            addSelectedCategory = addSelectedCategory,
+                            removeSelectedCategory = removeSelectedCategory
+                        )
+                    }
+                }
+            }
+            Column(
+                modifier = modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    modifier = modifier.fillMaxWidth(),
+                    text = "Oyunu oynamak istediğin kategoriyi seç",
+                    textAlign = TextAlign.Center
+                )
+                Space(modifier = modifier.height(16.dp))
+                CustomButton(
                     modifier = modifier,
-                    categoryName = "Hepsi",
-                    allClicked = {
-                        setAllCateSelected(it)
-                        if (it) {
-                            addAllCategory()
-                        } else {
-                            removeAllCategory()
-                        }
-                    },
-                    isAllCatSelected = isAllCatSelected,
-                    categoryId = -1,
-                    addSelectedCategory = addSelectedCategory,
-                    removeSelectedCategory = removeSelectedCategory
+                    onClick = launchTheGame,
+                    buttonText = "Oyunu Başlat",
+                    enabled = isButtonEnabled
                 )
             }
         }
-        Space(
-            modifier = modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(color = MaterialTheme.colors.primary)
-        )
-        Space(modifier = modifier.height(16.dp))
-        CustomButton(
-            modifier = modifier,
-            onClick = launchTheGame,
-            buttonText = "Oyunu Başlat",
-            enabled = isButtonEnabled
-        )
     }
 }
 
