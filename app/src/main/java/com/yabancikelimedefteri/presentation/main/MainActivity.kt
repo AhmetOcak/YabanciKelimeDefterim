@@ -33,7 +33,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        sharedPreferences = getSharedPreferences("current_theme", Context.MODE_PRIVATE)
+        sharedPreferences = getSharedPreferences(THEME_KEY, Context.MODE_PRIVATE)
 
         val currentTheme = sharedPreferences.getCurrentTheme()
 

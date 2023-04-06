@@ -63,7 +63,7 @@ fun AddWordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
 private fun AddWordScreenContent(
     modifier: Modifier,
     addWordOnClick: () -> Unit,
-    addWordState: AddWordState,
+    addWordState: CreateWordState,
     resetAddWordState: () -> Unit,
     onForeignWordChanged: (String) -> Unit,
     foreignWordVal: String,
@@ -74,7 +74,7 @@ private fun AddWordScreenContent(
     focusManager: FocusManager
 ) {
     when (addWordState) {
-        is AddWordState.Nothing -> {
+        is CreateWordState.Nothing -> {
             ResponsiveContent(
                 modifier = modifier,
                 foreignWordVal = foreignWordVal,
@@ -87,19 +87,19 @@ private fun AddWordScreenContent(
                 focusManager = focusManager
             )
         }
-        is AddWordState.Loading -> {
+        is CreateWordState.Loading -> {
             Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
-        is AddWordState.Success -> {
+        is CreateWordState.Success -> {
             CustomToast(
                 context = LocalContext.current,
-                message = "Kelime defterine yeni bir kelime ekledin"
+                message = "Kelime defterine yeni bir kelime ekledin."
             )
             resetAddWordState()
         }
-        is AddWordState.Error -> {
+        is CreateWordState.Error -> {
             CustomToast(context = LocalContext.current, message = addWordState.message)
             resetAddWordState()
         }

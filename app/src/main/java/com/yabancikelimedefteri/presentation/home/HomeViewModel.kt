@@ -1,12 +1,10 @@
 package com.yabancikelimedefteri.presentation.home
 
-import android.content.SharedPreferences
-import android.util.Log
-import androidx.core.content.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yabancikelimedefteri.core.helpers.getWords
-import com.yabancikelimedefteri.core.helpers.removeWord
+import com.yabancikelimedefteri.core.helpers.Response
+import com.yabancikelimedefteri.domain.usecase.category.DeleteCategoryUseCase
+import com.yabancikelimedefteri.domain.usecase.category.GetCategoriesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,43 +13,56 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(private val sharedPreferences: SharedPreferences) :
+class HomeViewModel @Inject constructor(
+    private val getCategoriesUseCase: GetCategoriesUseCase,
+    private val deleteCategoryUseCase: DeleteCategoryUseCase
+) :
     ViewModel() {
 
-    private val _homeState = MutableStateFlow<HomeState>(HomeState.Loading)
-    val homeState = _homeState.asStateFlow()
+    private val _getCategoriesState = MutableStateFlow<GetCategoriesState>(GetCategoriesState.Loading)
+    val getCategoriesState = _getCategoriesState.asStateFlow()
 
-    private val _deleteWordState = MutableStateFlow<DeleteWordState>(DeleteWordState.Nothing)
-    val deleteWordState = _deleteWordState.asStateFlow()
+    private val _deleteCategoryState = MutableStateFlow<DeleteCategoryState>(DeleteCategoryState.Nothing)
+    val deleteCategoryState = _deleteCategoryState.asStateFlow()
 
     init {
-        getAllWords()
+        getCategories()
     }
 
-    private fun getAllWords() = viewModelScope.launch(Dispatchers.IO) {
-        _homeState.value = HomeState.Loading
-        try {
-            _homeState.value = HomeState.Success(data = sharedPreferences.getWords())
-            Log.d("SAVED DATA", sharedPreferences.getWords().toString())
-        } catch (e: Exception) {
-            _homeState.value = HomeState.Error(message = e.message ?: e.stackTraceToString())
+    private fun getCategories() = viewModelScope.launch(Dispatchers.IO) {
+        getCategoriesUseCase().collect() {
+            when(it) {
+                is Response.Loading -> {
+                    _getCategoriesState.value = GetCategoriesState.Loading
+                }
+                is Response.Success -> {
+                    _getCategoriesState.value = GetCategoriesState.Success(data = it.data)
+                }
+                is Response.Error -> {
+                    _getCategoriesState.value = GetCategoriesState.Error(message = it.message)
+                }
+            }
         }
     }
 
-    fun deleteForeignWord(foreignWord: String) = viewModelScope.launch(Dispatchers.IO) {
-        _deleteWordState.value = DeleteWordState.Loading
-        try {
-            _deleteWordState.value =
-                DeleteWordState.Success(
-                    data = sharedPreferences.edit {
-                        removeWord(foreignWord)
-                    }
-                )
-            getAllWords()
-        } catch (e: Exception) {
-            _deleteWordState.value = DeleteWordState.Error(message = e.message ?: e.localizedMessage)
+    fun deleteCategories(categoryId: Int) = viewModelScope.launch(Dispatchers.IO) {
+        deleteCategoryUseCase(categoryId).collect() {
+            when(it) {
+                is Response.Loading -> {
+                    _deleteCategoryState.value = DeleteCategoryState.Loading
+                }
+                is Response.Success -> {
+                    _deleteCategoryState.value = DeleteCategoryState.Success(it.data)
+                    getCategories()
+                }
+                is Response.Error -> {
+                    _deleteCategoryState.value = DeleteCategoryState.Error(it.message)
+                }
+            }
         }
     }
 
-    fun resetDeleteWordState() { _deleteWordState.value = DeleteWordState.Nothing }
+    fun resetDeleteWordState() {
+        _deleteCategoryState.value = DeleteCategoryState.Nothing
+    }
 }

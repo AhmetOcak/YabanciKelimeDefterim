@@ -19,9 +19,10 @@ fun WordCard(
     modifier: Modifier,
     foreignWord: String,
     meaning: String,
-    onDeleteClick: (String) -> Unit,
+    onDeleteClick: (Int) -> Unit,
     height: Dp = LocalConfiguration.current.screenWidthDp.dp / 2,
-    width: Dp = 0.dp
+    width: Dp = 0.dp,
+    wordId: Int
 ) {
     Card(
         modifier = if (width == 0.dp) {
@@ -36,7 +37,7 @@ fun WordCard(
         shape = RoundedCornerShape(10),
         elevation = 4.dp
     ) {
-        DeleteWord(modifier = modifier, onClick = { onDeleteClick(foreignWord) })
+        DeleteWord(modifier = modifier, onClick = { onDeleteClick(wordId) })
         Column(
             modifier = modifier
                 .fillMaxSize()

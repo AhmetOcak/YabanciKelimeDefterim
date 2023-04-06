@@ -1,23 +1,25 @@
 package com.yabancikelimedefteri.presentation.game
 
+import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import android.util.Log
+import android.widget.Space
 import androidx.activity.compose.BackHandler
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,7 +38,11 @@ import com.yabancikelimedefteri.core.helpers.getCurrentTheme
 import com.yabancikelimedefteri.core.ui.component.CustomButton
 import com.yabancikelimedefteri.core.ui.component.CustomTextField
 import com.yabancikelimedefteri.core.ui.component.CustomToast
+import com.yabancikelimedefteri.domain.model.CategoryWithId
+import com.yabancikelimedefteri.domain.model.WordWithId
 import com.yabancikelimedefteri.presentation.main.OrientationState
+
+// TODO: Hata mesajları yazılacak
 
 @Composable
 fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
@@ -44,6 +50,7 @@ fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
     val viewModel: GameViewModel = hiltViewModel()
 
     val gameState by viewModel.gameState.collectAsState()
+    val categoriesState by viewModel.categoriesState.collectAsState()
 
     BackHandler {
         onNavigateBack()
@@ -68,12 +75,26 @@ fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
         isError = viewModel.guessWordFieldError,
         isGameOver = !viewModel.isGameStillGoing(),
         answers = viewModel.answers,
-        words = viewModel.words ?: mutableMapOf<String, String>(),
+        words = viewModel.words ?: mutableListOf(),
         correctCount = viewModel.correctAnswerCount,
         inCorrectCount = viewModel.inCorrectAnswerCount,
-        sharedPreferences = LocalContext.current.getSharedPreferences("current_theme", -1),
-        isCurrentThemeDark = LocalContext.current.getSharedPreferences("current_theme", -1)
-            .getCurrentTheme() == AppCompatDelegate.MODE_NIGHT_YES
+        sharedPreferences = LocalContext.current.getSharedPreferences(
+            "current_theme",
+            Context.MODE_PRIVATE
+        ),
+        isCurrentThemeDark = LocalContext.current.getSharedPreferences(
+            "current_theme",
+            Context.MODE_PRIVATE
+        ).getCurrentTheme() == AppCompatDelegate.MODE_NIGHT_YES,
+        setAllCateSelected = { viewModel.setAllCategorySelect(it) },
+        isAllCatSelected = viewModel.isAllCategorySelected,
+        categoriesState = categoriesState,
+        addAllCategory = { viewModel.addAllCategories() },
+        addSelectedCategory = { viewModel.addSelectedCategory(it) },
+        removeSelectedCategory = { viewModel.removeSelectedCategory(it) },
+        removeAllCategory = { viewModel.removeAllCategories() },
+        isButtonEnabled = viewModel.isGameReadyToLaunch,
+        launchTheGame = { viewModel.launchTheGame() }
     )
 }
 
@@ -88,13 +109,48 @@ private fun GameScreenContent(
     isError: Boolean,
     isGameOver: Boolean,
     answers: MutableMap<String, String>,
-    words: MutableMap<String, *>,
+    words: List<WordWithId>,
     correctCount: Int,
     inCorrectCount: Int,
     sharedPreferences: SharedPreferences,
-    isCurrentThemeDark: Boolean
+    isCurrentThemeDark: Boolean,
+    setAllCateSelected: (Boolean) -> Unit,
+    isAllCatSelected: Boolean,
+    categoriesState: GetGameCategoriesState,
+    addAllCategory: () -> Unit,
+    addSelectedCategory: (Int) -> Unit,
+    removeSelectedCategory: (Int) -> Unit,
+    removeAllCategory: () -> Unit,
+    isButtonEnabled: Boolean,
+    launchTheGame: () -> Unit
 ) {
     when (gameState) {
+        is GameState.Nothing -> {
+            when (categoriesState) {
+                is GetGameCategoriesState.Loading -> {
+                    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+                is GetGameCategoriesState.Success -> {
+                    ChooseGameCategorySection(
+                        modifier = modifier,
+                        setAllCateSelected = setAllCateSelected,
+                        isAllCatSelected = isAllCatSelected,
+                        categories = categoriesState.data,
+                        addAllCategory = addAllCategory,
+                        addSelectedCategory = addSelectedCategory,
+                        removeSelectedCategory = removeSelectedCategory,
+                        removeAllCategory = removeAllCategory,
+                        isButtonEnabled = isButtonEnabled,
+                        launchTheGame = launchTheGame
+                    )
+                }
+                is GetGameCategoriesState.Error -> {
+                    CustomToast(context = LocalContext.current, message = categoriesState.message)
+                }
+            }
+        }
         is GameState.Loading -> {
             Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
@@ -130,10 +186,208 @@ private fun GameScreenContent(
 }
 
 @Composable
+private fun ChooseGameCategorySection(
+    modifier: Modifier,
+    setAllCateSelected: (Boolean) -> Unit,
+    isAllCatSelected: Boolean,
+    categories: List<CategoryWithId>,
+    addAllCategory: () -> Unit,
+    addSelectedCategory: (Int) -> Unit,
+    removeSelectedCategory: (Int) -> Unit,
+    removeAllCategory: () -> Unit,
+    isButtonEnabled: Boolean,
+    launchTheGame: () -> Unit
+) {
+    if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
+        Column(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(vertical = 16.dp, horizontal = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            CategoryDescription(modifier)
+            Space(modifier = modifier.height(16.dp))
+            CategoriesList(
+                modifier,
+                categories,
+                isAllCatSelected,
+                addSelectedCategory,
+                removeSelectedCategory,
+                setAllCateSelected,
+                addAllCategory,
+                removeAllCategory
+            )
+            Space(modifier = modifier.height(16.dp))
+            LaunchTheGameButton(modifier, launchTheGame, isButtonEnabled)
+        }
+    } else {
+        Row(
+            modifier = modifier
+                .fillMaxSize()
+                .padding(horizontal = 32.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(modifier = modifier.weight(1f)) {
+                CategoriesList(
+                    modifier,
+                    categories,
+                    isAllCatSelected,
+                    addSelectedCategory,
+                    removeSelectedCategory,
+                    setAllCateSelected,
+                    addAllCategory,
+                    removeAllCategory
+                )
+            }
+            Column(
+                modifier = modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CategoryDescription(modifier)
+                Space(modifier = modifier.height(16.dp))
+                LaunchTheGameButton(modifier, launchTheGame, isButtonEnabled)
+            }
+        }
+    }
+}
+
+@Composable
+private fun LaunchTheGameButton(
+    modifier: Modifier,
+    launchTheGame: () -> Unit,
+    isButtonEnabled: Boolean
+) {
+    CustomButton(
+        modifier = modifier,
+        onClick = launchTheGame,
+        buttonText = "Oyunu Başlat",
+        enabled = isButtonEnabled
+    )
+}
+
+@Composable
+private fun CategoriesList(
+    modifier: Modifier,
+    categories: List<CategoryWithId>,
+    isAllCatSelected: Boolean,
+    addSelectedCategory: (Int) -> Unit,
+    removeSelectedCategory: (Int) -> Unit,
+    setAllCateSelected: (Boolean) -> Unit,
+    addAllCategory: () -> Unit,
+    removeAllCategory: () -> Unit
+) {
+    LazyVerticalGrid(
+        modifier = modifier.height(LocalConfiguration.current.screenWidthDp.dp),
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(categories) {
+            GameCategory(
+                modifier = modifier,
+                categoryName = it.categoryName,
+                isAllCatSelected = isAllCatSelected,
+                categoryId = it.categoryId,
+                addSelectedCategory = addSelectedCategory,
+                removeSelectedCategory = removeSelectedCategory
+            )
+        }
+        item {
+            GameCategory(
+                modifier = modifier,
+                categoryName = "Hepsi",
+                allClicked = {
+                    setAllCateSelected(it)
+                    if (it) {
+                        addAllCategory()
+                    } else {
+                        removeAllCategory()
+                    }
+                },
+                isAllCatSelected = isAllCatSelected,
+                categoryId = -1,
+                addSelectedCategory = addSelectedCategory,
+                removeSelectedCategory = removeSelectedCategory
+            )
+        }
+    }
+}
+
+@Composable
+private fun CategoryDescription(modifier: Modifier) {
+    Text(
+        modifier = modifier.fillMaxWidth(),
+        text = "Oyunu oynamak istediğin kategoriyi seç",
+        textAlign = TextAlign.Center
+    )
+}
+
+@Composable
+private fun GameCategory(
+    modifier: Modifier,
+    categoryName: String,
+    categoryId: Int,
+    allClicked: (Boolean) -> Unit = {},
+    isAllCatSelected: Boolean,
+    addSelectedCategory: (Int) -> Unit,
+    removeSelectedCategory: (Int) -> Unit
+) {
+    var clicked by rememberSaveable { mutableStateOf(false) }
+
+    Card(
+        modifier = modifier
+            .size(96.dp)
+            .clickable(
+                enabled = if (categoryName == "Hepsi") {
+                    true
+                } else !isAllCatSelected,
+                onClick = {
+                    clicked = !clicked
+                    if (categoryName == "Hepsi") {
+                        allClicked(clicked)
+                    } else {
+                        if (clicked) {
+                            addSelectedCategory(categoryId)
+                        } else {
+                            removeSelectedCategory(categoryId)
+                        }
+                    }
+                }
+            ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colors.primary
+        ),
+        shape = RoundedCornerShape(10),
+        backgroundColor = if (isAllCatSelected)
+            MaterialTheme.colors.secondary.copy(alpha = 0.5f)
+        else if (clicked) {
+            MaterialTheme.colors.secondary.copy(alpha = 0.5f)
+        } else
+            MaterialTheme.colors.surface
+    ) {
+        Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = categoryName,
+                style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Bold),
+                textAlign = TextAlign.Center
+            )
+        }
+    }
+}
+
+@Composable
 private fun GameResultSection(
     modifier: Modifier,
     answers: MutableMap<String, String>,
-    words: MutableMap<String, *>,
+    words: List<WordWithId>,
     correctCount: Int,
     inCorrectCount: Int,
     sharedPreferences: SharedPreferences,
@@ -176,7 +430,7 @@ private fun GameResultSection(
 private fun GameResultTable(
     modifier: Modifier,
     answers: MutableMap<String, String>,
-    words: MutableMap<String, *>,
+    words: List<WordWithId>,
     tableCellTextColor: Color,
     isCurrentThemeDark: Boolean
 ) {
@@ -200,7 +454,11 @@ private fun GameResultTable(
                     modifier = modifier,
                     text = answers[it] ?: "",
                     textColor = if (
-                        words[it].toString().uppercase() == (answers[it]?.uppercase() ?: "")
+                        (words.find { word ->
+                            word.foreignWord == it
+                        }?.meaning?.uppercase() ?: "")
+                        ==
+                        (answers[it]?.uppercase() ?: "")
                     ) Color.Green else Color.Red,
                     isCurrentThemeDark = isCurrentThemeDark
                 )
@@ -330,25 +588,23 @@ private fun GameSection(
             } else {
                 ForeignWord(
                     modifier = modifier,
-                    word = gameState.data[wordIndex],
+                    word = gameState.data[wordIndex].foreignWord,
                     isOrientPortrait = true
                 )
                 Space(modifier = modifier)
-                CustomTextField(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 48.dp),
-                    value = value,
-                    onValueChange = { onValueChanged(it) },
-                    labelText = "Tahminin",
-                    isError = isError,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex]) })
+                AnswerField(
+                    modifier,
+                    value,
+                    onValueChanged,
+                    isError,
+                    onGuessClicked,
+                    gameState,
+                    wordIndex
                 )
                 Space(modifier = modifier)
                 CustomButton(
                     modifier = modifier,
-                    onClick = { onGuessClicked(gameState.data[wordIndex]) },
+                    onClick = { onGuessClicked(gameState.data[wordIndex].foreignWord) },
                     buttonText = "Tahmin et"
                 )
             }
@@ -369,7 +625,7 @@ private fun GameSection(
             } else {
                 ForeignWord(
                     modifier = modifier.weight(1f),
-                    word = gameState.data[wordIndex],
+                    word = gameState.data[wordIndex].foreignWord,
                     isOrientPortrait = false
                 )
                 Column(
@@ -377,27 +633,48 @@ private fun GameSection(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    CustomTextField(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 48.dp),
-                        value = value,
-                        onValueChange = { onValueChanged(it) },
-                        labelText = "Tahminin",
-                        isError = isError,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex]) })
+                    AnswerField(
+                        modifier,
+                        value,
+                        onValueChanged,
+                        isError,
+                        onGuessClicked,
+                        gameState,
+                        wordIndex
                     )
                     Space(modifier = modifier)
                     CustomButton(
                         modifier = modifier,
-                        onClick = { onGuessClicked(gameState.data[wordIndex]) },
+                        onClick = { onGuessClicked(gameState.data[wordIndex].foreignWord) },
                         buttonText = "Tahmin et"
                     )
                 }
             }
         }
     }
+}
+
+@Composable
+private fun AnswerField(
+    modifier: Modifier,
+    value: String,
+    onValueChanged: (String) -> Unit,
+    isError: Boolean,
+    onGuessClicked: (String) -> Unit,
+    gameState: GameState.Success,
+    wordIndex: Int
+) {
+    CustomTextField(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 48.dp),
+        value = value,
+        onValueChange = { onValueChanged(it) },
+        labelText = "Tahminin",
+        isError = isError,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex].foreignWord) })
+    )
 }
 
 @Composable
