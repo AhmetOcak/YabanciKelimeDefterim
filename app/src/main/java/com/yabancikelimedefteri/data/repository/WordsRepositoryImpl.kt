@@ -29,8 +29,8 @@ class WordsRepositoryImpl @Inject constructor(private val localDataSource: Words
     override suspend fun getAllWords(): List<WordWithId> =
         localDataSource.getAllWords().toListWord()
 
-    override suspend fun getWords(categoryId: Int): List<WordWithId> =
-        localDataSource.getWords(categoryId).toListWord()
+    override suspend fun getWords(categoryIds: List<Int>): List<WordWithId> =
+        localDataSource.getWords(categoryIds).toListWord()
 
     override suspend fun deleteWord(wordId: Int) =
         localDataSource.deleteWord(wordId)

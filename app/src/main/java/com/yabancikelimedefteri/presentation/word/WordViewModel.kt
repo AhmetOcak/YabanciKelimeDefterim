@@ -34,7 +34,7 @@ class WordViewModel @Inject constructor(
     }
 
     private fun getWords(categoryId: Int) = viewModelScope.launch(Dispatchers.IO) {
-        getWordsUseCase(categoryId).collect() {
+        getWordsUseCase(listOf(categoryId)).collect() {
             when (it) {
                 is Response.Loading -> {
                     _getWordsState.value = GetWordState.Loading

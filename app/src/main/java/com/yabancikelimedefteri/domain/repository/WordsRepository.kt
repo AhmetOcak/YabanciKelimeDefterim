@@ -17,7 +17,7 @@ interface WordsRepository {
 
     suspend fun getAllWords(): List<WordWithId>
 
-    suspend fun getWords(categoryId: Int): List<WordWithId>
+    suspend fun getWords(categoryIds: List<Int>): List<WordWithId>
 
     suspend fun deleteWord(wordId: Int)
 }

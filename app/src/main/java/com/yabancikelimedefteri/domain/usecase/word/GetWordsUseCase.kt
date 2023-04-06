@@ -9,11 +9,11 @@ import javax.inject.Inject
 
 class GetWordsUseCase @Inject constructor(private val repository: WordsRepository) {
 
-    suspend operator fun invoke(categoryId: Int): Flow<Response<List<WordWithId>>> = flow {
+    suspend operator fun invoke(categoryIds: List<Int>): Flow<Response<List<WordWithId>>> = flow {
         try {
             emit(Response.Loading)
 
-            emit(Response.Success(data = repository.getWords(categoryId)))
+            emit(Response.Success(data = repository.getWords(categoryIds)))
         } catch (e: Exception) {
             emit(Response.Error(message = e.message ?: e.localizedMessage))
         }

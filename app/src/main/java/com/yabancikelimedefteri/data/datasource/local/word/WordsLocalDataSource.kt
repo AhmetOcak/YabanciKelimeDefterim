@@ -15,7 +15,7 @@ interface WordsLocalDataSource {
 
     suspend fun getAllWords(): List<WordEntity>
 
-    suspend fun getWords(categoryId: Int): List<WordEntity>
+    suspend fun getWords(categoryIds: List<Int>): List<WordEntity>
 
     suspend fun deleteWord(wordId: Int)
 }

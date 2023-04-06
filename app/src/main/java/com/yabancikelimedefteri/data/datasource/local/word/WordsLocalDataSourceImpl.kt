@@ -25,8 +25,15 @@ class WordsLocalDataSourceImpl @Inject constructor(
     override suspend fun getAllWords(): List<WordEntity> =
         wordDao.getAllWords()
 
-    override suspend fun getWords(categoryId: Int): List<WordEntity> =
-        wordDao.getWords(categoryId)
+    override suspend fun getWords(categoryIds: List<Int>): List<WordEntity> {
+        val words: MutableList<WordEntity> = mutableListOf()
+
+        categoryIds.forEach {
+            words += wordDao.getWords(it).toMutableList()
+        }
+
+        return words
+    }
 
     override suspend fun deleteWord(wordId: Int) =
         wordDao.deleteWord(wordId)
