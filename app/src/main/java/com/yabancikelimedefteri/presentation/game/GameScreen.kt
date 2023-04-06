@@ -206,69 +206,20 @@ private fun ChooseGameCategorySection(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                modifier = modifier.fillMaxWidth(),
-                text = "Oyunu oynamak istediğin kategoriyi seç",
-                textAlign = TextAlign.Center
+            CategoryDescription(modifier)
+            Space(modifier = modifier.height(16.dp))
+            CategoriesList(
+                modifier,
+                categories,
+                isAllCatSelected,
+                addSelectedCategory,
+                removeSelectedCategory,
+                setAllCateSelected,
+                addAllCategory,
+                removeAllCategory
             )
             Space(modifier = modifier.height(16.dp))
-            Space(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(color = MaterialTheme.colors.primary)
-            )
-            LazyVerticalGrid(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(LocalConfiguration.current.screenWidthDp.dp),
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                items(categories) {
-                    GameCategory(
-                        modifier = modifier,
-                        categoryName = it.categoryName,
-                        isAllCatSelected = isAllCatSelected,
-                        categoryId = it.categoryId,
-                        addSelectedCategory = addSelectedCategory,
-                        removeSelectedCategory = removeSelectedCategory
-                    )
-                }
-                item {
-                    GameCategory(
-                        modifier = modifier,
-                        categoryName = "Hepsi",
-                        allClicked = {
-                            setAllCateSelected(it)
-                            if (it) {
-                                addAllCategory()
-                            } else {
-                                removeAllCategory()
-                            }
-                        },
-                        isAllCatSelected = isAllCatSelected,
-                        categoryId = -1,
-                        addSelectedCategory = addSelectedCategory,
-                        removeSelectedCategory = removeSelectedCategory
-                    )
-                }
-            }
-            Space(
-                modifier = modifier
-                    .fillMaxWidth()
-                    .height(1.dp)
-                    .background(color = MaterialTheme.colors.primary)
-            )
-            Space(modifier = modifier.height(16.dp))
-            CustomButton(
-                modifier = modifier,
-                onClick = launchTheGame,
-                buttonText = "Oyunu Başlat",
-                enabled = isButtonEnabled
-            )
+            LaunchTheGameButton(modifier, launchTheGame, isButtonEnabled)
         }
     } else {
         Row(
@@ -279,63 +230,100 @@ private fun ChooseGameCategorySection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(modifier = modifier.weight(1f)) {
-                LazyVerticalGrid(
-                    modifier = modifier.height(LocalConfiguration.current.screenWidthDp.dp),
-                    columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(categories) {
-                        GameCategory(
-                            modifier = modifier,
-                            categoryName = it.categoryName,
-                            isAllCatSelected = isAllCatSelected,
-                            categoryId = it.categoryId,
-                            addSelectedCategory = addSelectedCategory,
-                            removeSelectedCategory = removeSelectedCategory
-                        )
-                    }
-                    item {
-                        GameCategory(
-                            modifier = modifier,
-                            categoryName = "Hepsi",
-                            allClicked = {
-                                setAllCateSelected(it)
-                                if (it) {
-                                    addAllCategory()
-                                } else {
-                                    removeAllCategory()
-                                }
-                            },
-                            isAllCatSelected = isAllCatSelected,
-                            categoryId = -1,
-                            addSelectedCategory = addSelectedCategory,
-                            removeSelectedCategory = removeSelectedCategory
-                        )
-                    }
-                }
+                CategoriesList(
+                    modifier,
+                    categories,
+                    isAllCatSelected,
+                    addSelectedCategory,
+                    removeSelectedCategory,
+                    setAllCateSelected,
+                    addAllCategory,
+                    removeAllCategory
+                )
             }
             Column(
                 modifier = modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    modifier = modifier.fillMaxWidth(),
-                    text = "Oyunu oynamak istediğin kategoriyi seç",
-                    textAlign = TextAlign.Center
-                )
+                CategoryDescription(modifier)
                 Space(modifier = modifier.height(16.dp))
-                CustomButton(
-                    modifier = modifier,
-                    onClick = launchTheGame,
-                    buttonText = "Oyunu Başlat",
-                    enabled = isButtonEnabled
-                )
+                LaunchTheGameButton(modifier, launchTheGame, isButtonEnabled)
             }
         }
     }
+}
+
+@Composable
+private fun LaunchTheGameButton(
+    modifier: Modifier,
+    launchTheGame: () -> Unit,
+    isButtonEnabled: Boolean
+) {
+    CustomButton(
+        modifier = modifier,
+        onClick = launchTheGame,
+        buttonText = "Oyunu Başlat",
+        enabled = isButtonEnabled
+    )
+}
+
+@Composable
+private fun CategoriesList(
+    modifier: Modifier,
+    categories: List<CategoryWithId>,
+    isAllCatSelected: Boolean,
+    addSelectedCategory: (Int) -> Unit,
+    removeSelectedCategory: (Int) -> Unit,
+    setAllCateSelected: (Boolean) -> Unit,
+    addAllCategory: () -> Unit,
+    removeAllCategory: () -> Unit
+) {
+    LazyVerticalGrid(
+        modifier = modifier.height(LocalConfiguration.current.screenWidthDp.dp),
+        columns = GridCells.Fixed(2),
+        contentPadding = PaddingValues(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(categories) {
+            GameCategory(
+                modifier = modifier,
+                categoryName = it.categoryName,
+                isAllCatSelected = isAllCatSelected,
+                categoryId = it.categoryId,
+                addSelectedCategory = addSelectedCategory,
+                removeSelectedCategory = removeSelectedCategory
+            )
+        }
+        item {
+            GameCategory(
+                modifier = modifier,
+                categoryName = "Hepsi",
+                allClicked = {
+                    setAllCateSelected(it)
+                    if (it) {
+                        addAllCategory()
+                    } else {
+                        removeAllCategory()
+                    }
+                },
+                isAllCatSelected = isAllCatSelected,
+                categoryId = -1,
+                addSelectedCategory = addSelectedCategory,
+                removeSelectedCategory = removeSelectedCategory
+            )
+        }
+    }
+}
+
+@Composable
+private fun CategoryDescription(modifier: Modifier) {
+    Text(
+        modifier = modifier.fillMaxWidth(),
+        text = "Oyunu oynamak istediğin kategoriyi seç",
+        textAlign = TextAlign.Center
+    )
 }
 
 @Composable
@@ -604,16 +592,14 @@ private fun GameSection(
                     isOrientPortrait = true
                 )
                 Space(modifier = modifier)
-                CustomTextField(
-                    modifier = modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 48.dp),
-                    value = value,
-                    onValueChange = { onValueChanged(it) },
-                    labelText = "Tahminin",
-                    isError = isError,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex].foreignWord) })
+                AnswerField(
+                    modifier,
+                    value,
+                    onValueChanged,
+                    isError,
+                    onGuessClicked,
+                    gameState,
+                    wordIndex
                 )
                 Space(modifier = modifier)
                 CustomButton(
@@ -647,16 +633,14 @@ private fun GameSection(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
-                    CustomTextField(
-                        modifier = modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 48.dp),
-                        value = value,
-                        onValueChange = { onValueChanged(it) },
-                        labelText = "Tahminin",
-                        isError = isError,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                        keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex].foreignWord) })
+                    AnswerField(
+                        modifier,
+                        value,
+                        onValueChanged,
+                        isError,
+                        onGuessClicked,
+                        gameState,
+                        wordIndex
                     )
                     Space(modifier = modifier)
                     CustomButton(
@@ -668,6 +652,29 @@ private fun GameSection(
             }
         }
     }
+}
+
+@Composable
+private fun AnswerField(
+    modifier: Modifier,
+    value: String,
+    onValueChanged: (String) -> Unit,
+    isError: Boolean,
+    onGuessClicked: (String) -> Unit,
+    gameState: GameState.Success,
+    wordIndex: Int
+) {
+    CustomTextField(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 48.dp),
+        value = value,
+        onValueChange = { onValueChanged(it) },
+        labelText = "Tahminin",
+        isError = isError,
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex].foreignWord) })
+    )
 }
 
 @Composable
