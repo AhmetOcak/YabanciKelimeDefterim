@@ -3,8 +3,6 @@ package com.yabancikelimedefteri.presentation.game
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
-import android.util.Log
-import android.widget.Space
 import androidx.activity.compose.BackHandler
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.*
@@ -41,8 +39,6 @@ import com.yabancikelimedefteri.core.ui.component.CustomToast
 import com.yabancikelimedefteri.domain.model.CategoryWithId
 import com.yabancikelimedefteri.domain.model.WordWithId
 import com.yabancikelimedefteri.presentation.main.OrientationState
-
-// TODO: Hata mesajları yazılacak
 
 @Composable
 fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
