@@ -2,7 +2,6 @@ package com.yabancikelimedefteri.core.navigation
 
 import android.app.Activity
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -23,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.core.content.edit
 import androidx.navigation.NavType
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
@@ -101,8 +99,13 @@ fun NavGraph(
                     ThemeState.isDark.value = sharedPreferences.getCurrentTheme() == 2
                 },
                 onBackClick = {
-                    navController.navigate(NavScreen.HomeScreen.route)
-                    pageTitle = PageTitles.home
+                    if (navController.currentBackStackEntry?.destination?.route != NavScreen.AddWordScreen.route) {
+                        navController.navigate(NavScreen.HomeScreen.route)
+                        pageTitle = PageTitles.home
+                    } else {
+                        navController.navigate("${NavNames.word_screen}/$categoryId")
+                        pageTitle = PageTitles.word
+                    }
                 },
                 pageTitle = pageTitle
             )
@@ -132,6 +135,7 @@ fun NavGraph(
                     onNavigateNext = { id ->
                         categoryId = id
                         navController.navigate("${NavNames.word_screen}/$id")
+                        pageTitle = PageTitles.word
                     }
                 )
             }
@@ -145,7 +149,7 @@ fun NavGraph(
                 AddWordScreen(
                     onNavigateBack = {
                         navController.navigate("${NavNames.word_screen}/$categoryId")
-                        pageTitle = PageTitles.home
+                        pageTitle = PageTitles.word
                     }
                 )
             }
