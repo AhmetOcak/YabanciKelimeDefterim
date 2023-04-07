@@ -359,6 +359,7 @@ private fun GameCategory(
             color = MaterialTheme.colors.primary
         ),
         shape = RoundedCornerShape(10),
+        elevation = 0.dp,
         backgroundColor = if (isAllCatSelected)
             MaterialTheme.colors.secondary.copy(alpha = 0.5f)
         else if (clicked) {
