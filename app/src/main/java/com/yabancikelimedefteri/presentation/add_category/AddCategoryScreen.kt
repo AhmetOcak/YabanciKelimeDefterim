@@ -10,13 +10,12 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -32,63 +31,68 @@ fun AddCategoryScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit)
 
     val viewModel: AddCategoryViewModel = hiltViewModel()
 
+    var isStateLoading by remember { mutableStateOf(false) }
+
+    val createCategoryState by viewModel.createCategoryState.collectAsState()
+
+    val focusManager = LocalFocusManager.current
+
     BackHandler {
         onNavigateBack()
     }
 
-    val createCategoryState by viewModel.createCategoryState.collectAsState()
-
-    AddCategoryScreenContent(
-        modifier = modifier,
-        createCategoryState = createCategoryState,
-        resetCategoryState = { viewModel.resetCategoryState() },
-        categoryNameVal = viewModel.categoryNameVal,
-        onCategoryChanged = { viewModel.updateCategoryName(it) },
-        categoryFieldError = viewModel.categoryFieldError,
-        createCategoryOnClick = { viewModel.createCategory() }
-    )
-}
-
-@Composable
-private fun AddCategoryScreenContent(
-    modifier: Modifier,
-    createCategoryState: CreateCategoryState,
-    resetCategoryState: () -> Unit,
-    categoryNameVal: String,
-    onCategoryChanged: (String) -> Unit,
-    categoryFieldError: Boolean,
-    createCategoryOnClick: () -> Unit
-) {
     when (createCategoryState) {
-        is CreateCategoryState.Nothing -> {
-            ResponsiveContent(
-                modifier = modifier,
-                categoryNameVal = categoryNameVal,
-                onCategoryChanged = onCategoryChanged,
-                categoryFieldError = categoryFieldError,
-                createCategoryOnClick = createCategoryOnClick
-            )
-        }
         is CreateCategoryState.Loading -> {
-            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
+            isStateLoading = true
         }
         is CreateCategoryState.Success -> {
             CustomToast(
                 context = LocalContext.current,
                 message = "Kelime defterinize başarılı bir şekilde bir kategori eklediniz."
             )
-            resetCategoryState()
+            viewModel.resetCategoryState()
+            isStateLoading = false
         }
         is CreateCategoryState.Error -> {
             CustomToast(
                 context = LocalContext.current,
                 message = "Hay aksi!! Bir şeyler ters gitti. Lütfen daha sonra tekrar dene."
             )
-            resetCategoryState()
+            viewModel.resetCategoryState()
         }
+        else -> {}
     }
+
+    AddCategoryScreenContent(
+        modifier = modifier,
+        categoryNameVal = viewModel.categoryNameVal,
+        onCategoryChanged = { viewModel.updateCategoryName(it) },
+        categoryFieldError = viewModel.categoryFieldError,
+        createCategoryOnClick = {
+            viewModel.createCategory()
+            focusManager.clearFocus()
+        },
+        isStateLoading = isStateLoading
+    )
+}
+
+@Composable
+private fun AddCategoryScreenContent(
+    modifier: Modifier,
+    categoryNameVal: String,
+    onCategoryChanged: (String) -> Unit,
+    categoryFieldError: Boolean,
+    createCategoryOnClick: () -> Unit,
+    isStateLoading: Boolean
+) {
+    ResponsiveContent(
+        modifier = modifier,
+        categoryNameVal = categoryNameVal,
+        onCategoryChanged = onCategoryChanged,
+        categoryFieldError = categoryFieldError,
+        createCategoryOnClick = createCategoryOnClick,
+        isStateLoading = isStateLoading
+    )
 }
 
 @Composable
@@ -97,7 +101,8 @@ private fun ResponsiveContent(
     categoryNameVal: String,
     onCategoryChanged: (String) -> Unit,
     categoryFieldError: Boolean,
-    createCategoryOnClick: () -> Unit
+    createCategoryOnClick: () -> Unit,
+    isStateLoading: Boolean
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         Column(
@@ -128,7 +133,8 @@ private fun ResponsiveContent(
             CustomButton(
                 modifier = modifier,
                 onClick = createCategoryOnClick,
-                buttonText = "Kategoriyi oluştur"
+                buttonText = "Kategoriyi oluştur",
+                enabled = !isStateLoading
             )
         }
     } else {
@@ -164,7 +170,8 @@ private fun ResponsiveContent(
                 CustomButton(
                     modifier = modifier,
                     onClick = createCategoryOnClick,
-                    buttonText = "Kategoriyi oluştur"
+                    buttonText = "Kategoriyi oluştur",
+                    enabled = !isStateLoading
                 )
             }
         }

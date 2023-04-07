@@ -8,10 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -39,22 +36,48 @@ fun AddWordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
 
     val focusManager = LocalFocusManager.current
 
+    var isStateLoading by remember { mutableStateOf(false) }
+
     BackHandler {
         onNavigateBack()
     }
 
+    when (addWordState) {
+        is CreateWordState.Loading -> {
+            isStateLoading = true
+        }
+        is CreateWordState.Success -> {
+            CustomToast(
+                context = LocalContext.current,
+                message = "Kelime defterine yeni bir kelime ekledin."
+            )
+            viewModel.resetAddWordState()
+            isStateLoading = false
+        }
+        is CreateWordState.Error -> {
+            CustomToast(
+                context = LocalContext.current,
+                message = "Hay aksi!! Bir şeyler ters gitti. Lütfen daha sonra tekrar dene."
+            )
+            viewModel.resetAddWordState()
+        }
+        else -> {}
+    }
+
     AddWordScreenContent(
         modifier = modifier,
-        addWordOnClick = { viewModel.addForeignWord() },
-        addWordState = addWordState,
-        resetAddWordState = { viewModel.resetAddWordState() },
+        addWordOnClick = {
+            viewModel.addForeignWord()
+            focusManager.clearFocus()
+        },
         onForeignWordChanged = { viewModel.updateForeignWord(it) },
         foreignWordVal = viewModel.foreignWord,
         onMeaningChanged = { viewModel.updateMeaning(it) },
         meaningVal = viewModel.meaning,
         foreignWordFieldError = viewModel.foreignWordFieldError,
         meaningFieldError = viewModel.meaningFieldError,
-        focusManager = focusManager
+        focusManager = focusManager,
+        isStateLoading = isStateLoading
     )
 }
 
@@ -63,47 +86,27 @@ fun AddWordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
 private fun AddWordScreenContent(
     modifier: Modifier,
     addWordOnClick: () -> Unit,
-    addWordState: CreateWordState,
-    resetAddWordState: () -> Unit,
     onForeignWordChanged: (String) -> Unit,
     foreignWordVal: String,
     onMeaningChanged: (String) -> Unit,
     meaningVal: String,
     foreignWordFieldError: Boolean,
     meaningFieldError: Boolean,
-    focusManager: FocusManager
+    focusManager: FocusManager,
+    isStateLoading: Boolean
 ) {
-    when (addWordState) {
-        is CreateWordState.Nothing -> {
-            ResponsiveContent(
-                modifier = modifier,
-                foreignWordVal = foreignWordVal,
-                onForeignWordChanged = onForeignWordChanged,
-                foreignWordFieldError = foreignWordFieldError,
-                meaningVal = meaningVal,
-                onMeaningChanged = onMeaningChanged,
-                meaningFieldError = meaningFieldError,
-                addWordOnClick = addWordOnClick,
-                focusManager = focusManager
-            )
-        }
-        is CreateWordState.Loading -> {
-            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        }
-        is CreateWordState.Success -> {
-            CustomToast(
-                context = LocalContext.current,
-                message = "Kelime defterine yeni bir kelime ekledin."
-            )
-            resetAddWordState()
-        }
-        is CreateWordState.Error -> {
-            CustomToast(context = LocalContext.current, message = addWordState.message)
-            resetAddWordState()
-        }
-    }
+    ResponsiveContent(
+        modifier = modifier,
+        foreignWordVal = foreignWordVal,
+        onForeignWordChanged = onForeignWordChanged,
+        foreignWordFieldError = foreignWordFieldError,
+        meaningVal = meaningVal,
+        onMeaningChanged = onMeaningChanged,
+        meaningFieldError = meaningFieldError,
+        addWordOnClick = addWordOnClick,
+        focusManager = focusManager,
+        isStateLoading = isStateLoading
+    )
 }
 
 @Composable
@@ -116,7 +119,8 @@ private fun ResponsiveContent(
     onMeaningChanged: (String) -> Unit,
     meaningFieldError: Boolean,
     addWordOnClick: () -> Unit,
-    focusManager: FocusManager
+    focusManager: FocusManager,
+    isStateLoading: Boolean
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         Column(
@@ -163,7 +167,8 @@ private fun ResponsiveContent(
             CustomButton(
                 modifier = modifier,
                 onClick = addWordOnClick,
-                buttonText = "Kelimeyi ekle"
+                buttonText = "Kelimeyi ekle",
+                enabled = !isStateLoading
             )
         }
     } else {
@@ -215,7 +220,8 @@ private fun ResponsiveContent(
                 CustomButton(
                     modifier = modifier,
                     onClick = addWordOnClick,
-                    buttonText = "Kelimeyi ekle"
+                    buttonText = "Kelimeyi ekle",
+                    enabled = !isStateLoading
                 )
             }
         }
