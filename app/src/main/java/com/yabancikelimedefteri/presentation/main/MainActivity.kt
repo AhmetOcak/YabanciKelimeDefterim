@@ -16,6 +16,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.core.content.edit
+import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.helpers.getCurrentOrientation
 import com.yabancikelimedefteri.core.helpers.getCurrentTheme
 import com.yabancikelimedefteri.core.helpers.saveTheme
@@ -31,6 +32,7 @@ class MainActivity : ComponentActivity() {
     lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setTheme(R.style.Theme_YabanciKelimeDefteri)
         super.onCreate(savedInstanceState)
 
         sharedPreferences = getSharedPreferences(THEME_KEY, Context.MODE_PRIVATE)

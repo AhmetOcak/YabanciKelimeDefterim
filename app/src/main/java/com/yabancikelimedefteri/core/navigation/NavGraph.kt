@@ -55,6 +55,7 @@ fun NavGraph(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         floatingActionButtonPosition = FabPosition.End,
+        backgroundColor = MaterialTheme.colors.background,
         floatingActionButton = {
             if (showFab) {
                 Fab(
