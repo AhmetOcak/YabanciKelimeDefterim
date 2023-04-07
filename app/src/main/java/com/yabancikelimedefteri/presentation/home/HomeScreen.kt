@@ -40,13 +40,23 @@ fun HomeScreen(
         onNavigateBack()
     }
 
+    if (deleteCategoryState is DeleteCategoryState.Success) {
+        CustomToast(context = LocalContext.current, message = "Kategori kaldırıldı")
+        viewModel.resetDeleteWordState()
+    } else if (deleteCategoryState is DeleteCategoryState.Error) {
+        CustomToast(
+            context = LocalContext.current,
+            message = (deleteCategoryState as DeleteCategoryState.Error).message
+        )
+        viewModel.resetDeleteWordState()
+    }
+
     HomeScreenContent(
         modifier = modifier,
         onDeleteClick = { viewModel.deleteCategories(it) },
         getCategoriesState = getCategoriesState,
-        deleteCategoryState = deleteCategoryState,
-        resetDeleteWordState = { viewModel.resetDeleteWordState() },
-        onCategoryCardClick = { onNavigateNext(it) }
+        onCategoryCardClick = { onNavigateNext(it) },
+        getCategories = { viewModel.getCategories() }
     )
 }
 
@@ -55,9 +65,8 @@ private fun HomeScreenContent(
     modifier: Modifier,
     onDeleteClick: (Int) -> Unit,
     getCategoriesState: GetCategoriesState,
-    deleteCategoryState: DeleteCategoryState,
-    resetDeleteWordState: () -> Unit,
-    onCategoryCardClick: (Int) -> Unit
+    onCategoryCardClick: (Int) -> Unit,
+    getCategories: () -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -71,12 +80,11 @@ private fun HomeScreenContent(
             }
             is GetCategoriesState.Success -> {
                 CategoryList(
-                    deleteCategoryState,
                     getCategoriesState,
                     modifier,
                     onDeleteClick,
-                    resetDeleteWordState,
-                    onCategoryCardClick
+                    onCategoryCardClick,
+                    getCategories
                 )
             }
             is GetCategoriesState.Error -> {
@@ -88,38 +96,22 @@ private fun HomeScreenContent(
 
 @Composable
 private fun CategoryList(
-    deleteCategoryState: DeleteCategoryState,
     getCategoriesState: GetCategoriesState.Success,
     modifier: Modifier,
     onDeleteClick: (Int) -> Unit,
-    resetDeleteWordState: () -> Unit,
-    onCategoryCardClick: (Int) -> Unit
+    onCategoryCardClick: (Int) -> Unit,
+    getCategories: () -> Unit
 ) {
-    when (deleteCategoryState) {
-        is DeleteCategoryState.Nothing -> {
-            if (getCategoriesState.data.isEmpty()) {
-                NoCategoryMessage(modifier = modifier)
-            } else {
-                ResponsiveCategoryList(
-                    modifier = modifier,
-                    data = getCategoriesState.data,
-                    onDeleteClick = onDeleteClick,
-                    onCategoryCardClick = onCategoryCardClick
-                )
-            }
-        }
-        is DeleteCategoryState.Loading -> {
-            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        }
-        is DeleteCategoryState.Success -> {
-            CustomToast(context = LocalContext.current, message = "Kategori kaldırıldı")
-            resetDeleteWordState()
-        }
-        is DeleteCategoryState.Error -> {
-            CustomToast(context = LocalContext.current, message = deleteCategoryState.message)
-        }
+    if (getCategoriesState.data.isEmpty()) {
+        NoCategoryMessage(modifier = modifier)
+    } else {
+        ResponsiveCategoryList(
+            modifier = modifier,
+            data = getCategoriesState.data,
+            onDeleteClick = onDeleteClick,
+            onCategoryCardClick = onCategoryCardClick,
+            getCategories = getCategories
+        )
     }
 }
 
@@ -128,7 +120,8 @@ private fun ResponsiveCategoryList(
     modifier: Modifier,
     data: List<CategoryWithId>,
     onDeleteClick: (Int) -> Unit,
-    onCategoryCardClick: (Int) -> Unit
+    onCategoryCardClick: (Int) -> Unit,
+    getCategories: () -> Unit
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         LazyColumn(
@@ -136,13 +129,14 @@ private fun ResponsiveCategoryList(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
         ) {
-            items(data) {
+            items(items = data, key = { it.categoryId }) {
                 CategoryCard(
                     modifier = modifier,
                     categoryName = it.categoryName,
                     categoryId = it.categoryId,
                     onDeleteClick = onDeleteClick,
-                    onCategoryCardClick = onCategoryCardClick
+                    onCategoryCardClick = onCategoryCardClick,
+                    getCategories = getCategories
                 )
             }
         }
@@ -154,7 +148,7 @@ private fun ResponsiveCategoryList(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(data) {
+            items(items = data, key = { it.categoryId }) {
                 CategoryCard(
                     modifier = modifier,
                     categoryName = it.categoryName,
@@ -162,7 +156,8 @@ private fun ResponsiveCategoryList(
                     onDeleteClick = onDeleteClick,
                     onCategoryCardClick = onCategoryCardClick,
                     height = LocalConfiguration.current.screenWidthDp.dp / 3,
-                    width = LocalConfiguration.current.screenWidthDp.dp / 3
+                    width = LocalConfiguration.current.screenWidthDp.dp / 3,
+                    getCategories = getCategories
                 )
             }
         }

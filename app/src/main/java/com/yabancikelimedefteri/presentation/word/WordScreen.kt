@@ -10,9 +10,7 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -37,12 +35,22 @@ fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
         onNavigateBack()
     }
 
+    if (deleteWordState is DeleteWordState.Success) {
+        CustomToast(context = LocalContext.current, message = "Kelime kaldırıldı")
+        viewModel.resetDeleteWordState()
+    } else if (deleteWordState is DeleteWordState.Error) {
+        CustomToast(
+            context = LocalContext.current,
+            message = (deleteWordState as DeleteWordState.Error).message
+        )
+        viewModel.resetDeleteWordState()
+    }
+
     WordScreenContent(
         modifier = modifier,
         getWordsState = getWordsState,
-        deleteWordState = deleteWordState,
         onDeleteClick = { viewModel.deleteWord(it) },
-        resetDeleteWordState = { viewModel.resetDeleteWordState() }
+        getWords = { viewModel.categoryId?.let { viewModel.getWords(it) } }
     )
 }
 
@@ -50,9 +58,8 @@ fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
 private fun WordScreenContent(
     modifier: Modifier,
     getWordsState: GetWordState,
-    deleteWordState: DeleteWordState,
     onDeleteClick: (Int) -> Unit,
-    resetDeleteWordState: () -> Unit
+    getWords: () -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -66,11 +73,10 @@ private fun WordScreenContent(
             }
             is GetWordState.Success -> {
                 WordList(
-                    deleteWordState,
                     getWordsState,
                     modifier,
                     onDeleteClick,
-                    resetDeleteWordState
+                    getWords
                 )
             }
             is GetWordState.Error -> {
@@ -82,36 +88,20 @@ private fun WordScreenContent(
 
 @Composable
 private fun WordList(
-    deleteWordState: DeleteWordState,
     getWordsState: GetWordState.Success,
     modifier: Modifier,
     onDeleteClick: (Int) -> Unit,
-    resetDeleteWordState: () -> Unit
+    getWords: () -> Unit
 ) {
-    when (deleteWordState) {
-        is DeleteWordState.Nothing -> {
-            if (getWordsState.data.isEmpty()) {
-                EmptyWordListMessage(modifier = modifier)
-            } else {
-                ResponsiveWordList(
-                    modifier = modifier,
-                    data = getWordsState.data,
-                    onDeleteClick = onDeleteClick
-                )
-            }
-        }
-        is DeleteWordState.Loading -> {
-            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
-            }
-        }
-        is DeleteWordState.Success -> {
-            CustomToast(context = LocalContext.current, message = "Kelime kaldırıldı")
-            resetDeleteWordState()
-        }
-        is DeleteWordState.Error -> {
-            CustomToast(context = LocalContext.current, message = deleteWordState.message)
-        }
+    if (getWordsState.data.isEmpty()) {
+        EmptyWordListMessage(modifier = modifier)
+    } else {
+        ResponsiveWordList(
+            modifier = modifier,
+            data = getWordsState.data,
+            onDeleteClick = onDeleteClick,
+            getWords = getWords
+        )
     }
 }
 
@@ -119,7 +109,8 @@ private fun WordList(
 private fun ResponsiveWordList(
     modifier: Modifier,
     data: List<WordWithId>,
-    onDeleteClick: (Int) -> Unit
+    onDeleteClick: (Int) -> Unit,
+    getWords: () -> Unit
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         LazyColumn(
@@ -127,13 +118,14 @@ private fun ResponsiveWordList(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
         ) {
-            items(data) {
+            items(items = data, key = { it.wordId }) {
                 WordCard(
                     modifier = modifier,
                     foreignWord = it.foreignWord,
                     meaning = it.meaning,
                     wordId = it.wordId,
                     onDeleteClick = onDeleteClick,
+                    getWords = getWords
                 )
             }
         }
@@ -153,7 +145,8 @@ private fun ResponsiveWordList(
                     wordId = it.wordId,
                     onDeleteClick = onDeleteClick,
                     height = LocalConfiguration.current.screenWidthDp.dp / 3,
-                    width = LocalConfiguration.current.screenWidthDp.dp / 3
+                    width = LocalConfiguration.current.screenWidthDp.dp / 3,
+                    getWords = getWords
                 )
             }
         }

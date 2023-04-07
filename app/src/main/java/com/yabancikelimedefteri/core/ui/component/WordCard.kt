@@ -1,9 +1,13 @@
 package com.yabancikelimedefteri.core.ui.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
@@ -22,33 +26,52 @@ fun WordCard(
     onDeleteClick: (Int) -> Unit,
     height: Dp = LocalConfiguration.current.screenWidthDp.dp / 2,
     width: Dp = 0.dp,
-    wordId: Int
+    wordId: Int,
+    getWords: () -> Unit
 ) {
-    Card(
-        modifier = if (width == 0.dp) {
-            modifier
-                .fillMaxWidth()
-                .height(height)
-        } else {
-            modifier
-                .width(width)
-                .height(height)
-        },
-        shape = RoundedCornerShape(10),
-        elevation = 4.dp
+    val state = remember { MutableTransitionState(false).apply { targetState = true } }
+
+    AnimatedVisibility(
+        visibleState = state,
+        enter = EnterTransition.None,
+        exit = slideOutHorizontally()
     ) {
-        DeleteWord(modifier = modifier, onClick = { onDeleteClick(wordId) })
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(vertical = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceAround
+        Card(
+            modifier = if (width == 0.dp) {
+                modifier
+                    .fillMaxWidth()
+                    .height(height)
+            } else {
+                modifier
+                    .width(width)
+                    .height(height)
+            },
+            shape = RoundedCornerShape(10),
+            elevation = 4.dp
         ) {
-            Word(modifier = modifier, word = foreignWord)
-            CompareIcon(modifier = modifier)
-            Word(modifier = modifier, word = meaning)
+            DeleteWord(
+                modifier = modifier,
+                onClick = {
+                    onDeleteClick(wordId)
+                    state.targetState = false
+                }
+            )
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(vertical = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceAround
+            ) {
+                Word(modifier = modifier, word = foreignWord)
+                CompareIcon(modifier = modifier)
+                Word(modifier = modifier, word = meaning)
+            }
         }
+    }
+
+    if (state.isIdle && !state.currentState) {
+        getWords()
     }
 }
 

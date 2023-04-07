@@ -26,19 +26,18 @@ class WordViewModel @Inject constructor(
     private val _deleteWordState = MutableStateFlow<DeleteWordState>(DeleteWordState.Nothing)
     val deleteWordState = _deleteWordState.asStateFlow()
 
-    private var categoryId: Int? = null
+    var categoryId: Int? = null
+        private set
 
     init {
         categoryId = savedStateHandle["categoryId"]
         categoryId?.let { getWords(it) }
     }
 
-    private fun getWords(categoryId: Int) = viewModelScope.launch(Dispatchers.IO) {
+    fun getWords(categoryId: Int) = viewModelScope.launch(Dispatchers.IO) {
         getWordsUseCase(listOf(categoryId)).collect() {
             when (it) {
-                is Response.Loading -> {
-                    _getWordsState.value = GetWordState.Loading
-                }
+                is Response.Loading -> { }
                 is Response.Success -> {
                     _getWordsState.value = GetWordState.Success(data = it.data)
                 }
@@ -52,12 +51,9 @@ class WordViewModel @Inject constructor(
     fun deleteWord(wordId: Int) = viewModelScope.launch(Dispatchers.IO) {
         deleteWordUseCase(wordId).collect() {
             when (it) {
-                is Response.Loading -> {
-                    _deleteWordState.value = DeleteWordState.Loading
-                }
+                is Response.Loading -> { }
                 is Response.Success -> {
                     _deleteWordState.value = DeleteWordState.Success(data = it.data)
-                    categoryId?.let { it1 -> getWords(it1) }
                 }
                 is Response.Error -> {
                     _deleteWordState.value = DeleteWordState.Error(message = it.message)
@@ -66,7 +62,6 @@ class WordViewModel @Inject constructor(
         }
     }
 
-    fun resetDeleteWordState() {
-        _deleteWordState.value = DeleteWordState.Nothing
-    }
+    fun resetDeleteWordState() { _deleteWordState.value = DeleteWordState.Nothing }
+
 }

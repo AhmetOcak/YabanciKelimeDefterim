@@ -1,9 +1,14 @@
 package com.yabancikelimedefteri.core.ui.component
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -22,32 +27,51 @@ fun CategoryCard(
     onDeleteClick: (Int) -> Unit,
     height: Dp = LocalConfiguration.current.screenWidthDp.dp / 2,
     width: Dp = 0.dp,
-    onCategoryCardClick: (Int) -> Unit
+    onCategoryCardClick: (Int) -> Unit,
+    getCategories: () -> Unit
 ) {
-    Card(
-        modifier = if (width == 0.dp) {
-            modifier
-                .fillMaxWidth()
-                .height(height)
-        } else {
-            modifier
-                .width(width)
-                .height(height)
-        },
-        shape = RoundedCornerShape(10),
-        onClick = { onCategoryCardClick(categoryId) },
-        elevation = 4.dp
+    val state = remember { MutableTransitionState(false).apply { targetState = true } }
+
+    AnimatedVisibility(
+        visibleState = state,
+        enter = EnterTransition.None,
+        exit = slideOutHorizontally()
     ) {
-        DeleteCategory(modifier = modifier, onClick = { onDeleteClick(categoryId) })
-        Column(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(vertical = 32.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        Card(
+            modifier = if (width == 0.dp) {
+                modifier
+                    .fillMaxWidth()
+                    .height(height)
+            } else {
+                modifier
+                    .width(width)
+                    .height(height)
+            },
+            shape = RoundedCornerShape(10),
+            onClick = { onCategoryCardClick(categoryId) },
+            elevation = 4.dp
         ) {
-            Word(modifier = modifier, word = categoryName)
+            DeleteCategory(
+                modifier = modifier,
+                onClick = {
+                    onDeleteClick(categoryId)
+                    state.targetState = false
+                }
+            )
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(vertical = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Word(modifier = modifier, word = categoryName)
+            }
         }
+    }
+
+    if (state.isIdle && !state.currentState) {
+        getCategories()
     }
 }
 

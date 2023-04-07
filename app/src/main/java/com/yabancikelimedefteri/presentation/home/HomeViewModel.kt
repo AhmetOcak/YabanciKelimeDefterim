@@ -29,7 +29,7 @@ class HomeViewModel @Inject constructor(
         getCategories()
     }
 
-    private fun getCategories() = viewModelScope.launch(Dispatchers.IO) {
+    fun getCategories() = viewModelScope.launch(Dispatchers.IO) {
         getCategoriesUseCase().collect() {
             when(it) {
                 is Response.Loading -> {
@@ -48,12 +48,9 @@ class HomeViewModel @Inject constructor(
     fun deleteCategories(categoryId: Int) = viewModelScope.launch(Dispatchers.IO) {
         deleteCategoryUseCase(categoryId).collect() {
             when(it) {
-                is Response.Loading -> {
-                    _deleteCategoryState.value = DeleteCategoryState.Loading
-                }
+                is Response.Loading -> { }
                 is Response.Success -> {
                     _deleteCategoryState.value = DeleteCategoryState.Success(it.data)
-                    getCategories()
                 }
                 is Response.Error -> {
                     _deleteCategoryState.value = DeleteCategoryState.Error(it.message)
