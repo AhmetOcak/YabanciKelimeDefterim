@@ -1,6 +1,7 @@
 package com.yabancikelimedefteri.presentation.add_word
 
 import android.content.res.Configuration
+import android.content.res.Resources
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -28,7 +29,7 @@ import com.yabancikelimedefteri.core.ui.component.CustomToast
 import com.yabancikelimedefteri.presentation.main.OrientationState
 
 @Composable
-fun AddWordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
+fun AddWordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, resources: Resources) {
 
     val viewModel: AddWordViewModel = hiltViewModel()
 
@@ -49,7 +50,7 @@ fun AddWordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
         is CreateWordState.Success -> {
             CustomToast(
                 context = LocalContext.current,
-                message = "Kelime defterine yeni bir kelime ekledin."
+                message = resources.getString(R.string.add_word_success)
             )
             viewModel.resetAddWordState()
             isStateLoading = false
@@ -57,7 +58,7 @@ fun AddWordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
         is CreateWordState.Error -> {
             CustomToast(
                 context = LocalContext.current,
-                message = "Hay aksi!! Bir şeyler ters gitti. Lütfen daha sonra tekrar dene."
+                message = resources.getString(R.string.error)
             )
             viewModel.resetAddWordState()
         }
@@ -77,11 +78,14 @@ fun AddWordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
         foreignWordFieldError = viewModel.foreignWordFieldError,
         meaningFieldError = viewModel.meaningFieldError,
         focusManager = focusManager,
-        isStateLoading = isStateLoading
+        isStateLoading = isStateLoading,
+        foreignWordLabel = resources.getString(R.string.foreign_word),
+        meaningLabel = resources.getString(R.string.meaning),
+        buttonText = resources.getString(R.string.add_word),
+        textFieldErrorText = resources.getString(R.string.text_field_error)
     )
 }
 
-// Todo: Loading çok hızlı geçiyor. UI takılıyor etkisi yaratıyor
 @Composable
 private fun AddWordScreenContent(
     modifier: Modifier,
@@ -93,7 +97,11 @@ private fun AddWordScreenContent(
     foreignWordFieldError: Boolean,
     meaningFieldError: Boolean,
     focusManager: FocusManager,
-    isStateLoading: Boolean
+    isStateLoading: Boolean,
+    foreignWordLabel: String,
+    meaningLabel: String,
+    buttonText: String,
+    textFieldErrorText: String
 ) {
     ResponsiveContent(
         modifier = modifier,
@@ -105,7 +113,11 @@ private fun AddWordScreenContent(
         meaningFieldError = meaningFieldError,
         addWordOnClick = addWordOnClick,
         focusManager = focusManager,
-        isStateLoading = isStateLoading
+        isStateLoading = isStateLoading,
+        foreignWordLabel = foreignWordLabel,
+        meaningLabel = meaningLabel,
+        buttonText = buttonText,
+        textFieldErrorText = textFieldErrorText
     )
 }
 
@@ -120,7 +132,11 @@ private fun ResponsiveContent(
     meaningFieldError: Boolean,
     addWordOnClick: () -> Unit,
     focusManager: FocusManager,
-    isStateLoading: Boolean
+    isStateLoading: Boolean,
+    foreignWordLabel: String,
+    meaningLabel: String,
+    buttonText: String,
+    textFieldErrorText: String
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         Column(
@@ -138,14 +154,15 @@ private fun ResponsiveContent(
                     .padding(horizontal = 48.dp),
                 value = foreignWordVal,
                 onValueChange = { onForeignWordChanged(it) },
-                labelText = "Yabancı kelime",
+                labelText = foreignWordLabel,
                 isError = foreignWordFieldError,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(
                     onNext = {
                         focusManager.moveFocus(FocusDirection.Down)
                     }
-                )
+                ),
+                errorMessage = textFieldErrorText
             )
             Space(modifier = modifier)
             CustomTextField(
@@ -154,20 +171,21 @@ private fun ResponsiveContent(
                     .padding(horizontal = 48.dp),
                 value = meaningVal,
                 onValueChange = { onMeaningChanged(it) },
-                labelText = "Kelimenin anlamı",
+                labelText = meaningLabel,
                 isError = meaningFieldError,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
                     onDone = {
                         addWordOnClick()
                     }
-                )
+                ),
+                errorMessage = textFieldErrorText
             )
             Space(modifier = modifier, spaceHeight = 32.dp)
             CustomButton(
                 modifier = modifier,
                 onClick = addWordOnClick,
-                buttonText = "Kelimeyi ekle",
+                buttonText = buttonText,
                 enabled = !isStateLoading
             )
         }
@@ -191,14 +209,15 @@ private fun ResponsiveContent(
                         .padding(horizontal = 48.dp),
                     value = foreignWordVal,
                     onValueChange = { onForeignWordChanged(it) },
-                    labelText = "Yabancı kelime",
+                    labelText = foreignWordLabel,
                     isError = foreignWordFieldError,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                     keyboardActions = KeyboardActions(
                         onNext = {
                             focusManager.moveFocus(FocusDirection.Down)
                         }
-                    )
+                    ),
+                    errorMessage = textFieldErrorText
                 )
                 Space(modifier = modifier)
                 CustomTextField(
@@ -207,20 +226,21 @@ private fun ResponsiveContent(
                         .padding(horizontal = 48.dp),
                     value = meaningVal,
                     onValueChange = { onMeaningChanged(it) },
-                    labelText = "Kelimenin anlamı",
+                    labelText = meaningLabel,
                     isError = meaningFieldError,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(
                         onDone = {
                             addWordOnClick()
                         }
-                    )
+                    ),
+                    errorMessage = textFieldErrorText
                 )
                 Space(modifier = modifier, spaceHeight = 32.dp)
                 CustomButton(
                     modifier = modifier,
                     onClick = addWordOnClick,
-                    buttonText = "Kelimeyi ekle",
+                    buttonText = buttonText,
                     enabled = !isStateLoading
                 )
             }

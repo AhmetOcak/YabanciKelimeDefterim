@@ -1,6 +1,7 @@
 package com.yabancikelimedefteri.presentation.word
 
 import android.content.res.Configuration
+import android.content.res.Resources
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,13 +19,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.ui.component.CustomToast
 import com.yabancikelimedefteri.core.ui.component.WordCard
 import com.yabancikelimedefteri.domain.model.WordWithId
 import com.yabancikelimedefteri.presentation.main.OrientationState
 
 @Composable
-fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
+fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, resources: Resources) {
 
     val viewModel: WordViewModel = hiltViewModel()
 
@@ -36,7 +38,7 @@ fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
     }
 
     if (deleteWordState is DeleteWordState.Success) {
-        CustomToast(context = LocalContext.current, message = "Kelime kaldırıldı")
+        CustomToast(context = LocalContext.current, message = resources.getString(R.string.word_removed))
         viewModel.resetDeleteWordState()
     } else if (deleteWordState is DeleteWordState.Error) {
         CustomToast(
@@ -50,7 +52,8 @@ fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
         modifier = modifier,
         getWordsState = getWordsState,
         onDeleteClick = { viewModel.deleteWord(it) },
-        getWords = { viewModel.categoryId?.let { viewModel.getWords(it) } }
+        getWords = { viewModel.categoryId?.let { viewModel.getWords(it) } },
+        emptyWordText = resources.getString(R.string.empty_word_message)
     )
 }
 
@@ -59,7 +62,8 @@ private fun WordScreenContent(
     modifier: Modifier,
     getWordsState: GetWordState,
     onDeleteClick: (Int) -> Unit,
-    getWords: () -> Unit
+    getWords: () -> Unit,
+    emptyWordText: String
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -76,7 +80,8 @@ private fun WordScreenContent(
                     getWordsState,
                     modifier,
                     onDeleteClick,
-                    getWords
+                    getWords,
+                    emptyWordText
                 )
             }
             is GetWordState.Error -> {
@@ -91,10 +96,11 @@ private fun WordList(
     getWordsState: GetWordState.Success,
     modifier: Modifier,
     onDeleteClick: (Int) -> Unit,
-    getWords: () -> Unit
+    getWords: () -> Unit,
+    emptyWordText: String
 ) {
     if (getWordsState.data.isEmpty()) {
-        EmptyWordListMessage(modifier = modifier)
+        EmptyWordListMessage(modifier = modifier, emptyWordText = emptyWordText)
     } else {
         ResponsiveWordList(
             modifier = modifier,
@@ -154,13 +160,13 @@ private fun ResponsiveWordList(
 }
 
 @Composable
-private fun EmptyWordListMessage(modifier: Modifier) {
+private fun EmptyWordListMessage(modifier: Modifier, emptyWordText: String) {
     Box(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 32.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = "Kelime defterinde hiç kelime yok 😥", textAlign = TextAlign.Center)
+        Text(text = emptyWordText, textAlign = TextAlign.Center)
     }
 }

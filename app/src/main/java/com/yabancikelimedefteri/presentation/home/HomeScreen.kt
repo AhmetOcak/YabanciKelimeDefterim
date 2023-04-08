@@ -1,6 +1,7 @@
 package com.yabancikelimedefteri.presentation.home
 
 import android.content.res.Configuration
+import android.content.res.Resources
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -20,6 +21,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.ui.component.CategoryCard
 import com.yabancikelimedefteri.core.ui.component.CustomToast
 import com.yabancikelimedefteri.domain.model.CategoryWithId
@@ -29,7 +31,8 @@ import com.yabancikelimedefteri.presentation.main.OrientationState
 fun HomeScreen(
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
-    onNavigateNext: (Int) -> Unit
+    onNavigateNext: (Int) -> Unit,
+    resources: Resources
 ) {
 
     val viewModel: HomeViewModel = hiltViewModel()
@@ -41,7 +44,7 @@ fun HomeScreen(
     }
 
     if (deleteCategoryState is DeleteCategoryState.Success) {
-        CustomToast(context = LocalContext.current, message = "Kategori kaldırıldı")
+        CustomToast(context = LocalContext.current, message = resources.getString(R.string.category_removed))
         viewModel.resetDeleteWordState()
     } else if (deleteCategoryState is DeleteCategoryState.Error) {
         CustomToast(
@@ -56,7 +59,8 @@ fun HomeScreen(
         onDeleteClick = { viewModel.deleteCategories(it) },
         getCategoriesState = getCategoriesState,
         onCategoryCardClick = { onNavigateNext(it) },
-        getCategories = { viewModel.getCategories() }
+        getCategories = { viewModel.getCategories() },
+        emptyCategoryText = resources.getString(R.string.empty_category_message)
     )
 }
 
@@ -66,7 +70,8 @@ private fun HomeScreenContent(
     onDeleteClick: (Int) -> Unit,
     getCategoriesState: GetCategoriesState,
     onCategoryCardClick: (Int) -> Unit,
-    getCategories: () -> Unit
+    getCategories: () -> Unit,
+    emptyCategoryText: String
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -84,7 +89,8 @@ private fun HomeScreenContent(
                     modifier,
                     onDeleteClick,
                     onCategoryCardClick,
-                    getCategories
+                    getCategories,
+                    emptyCategoryText
                 )
             }
             is GetCategoriesState.Error -> {
@@ -100,10 +106,11 @@ private fun CategoryList(
     modifier: Modifier,
     onDeleteClick: (Int) -> Unit,
     onCategoryCardClick: (Int) -> Unit,
-    getCategories: () -> Unit
+    getCategories: () -> Unit,
+    emptyCategoryText: String
 ) {
     if (getCategoriesState.data.isEmpty()) {
-        NoCategoryMessage(modifier = modifier)
+        NoCategoryMessage(modifier = modifier, emptyCategoryText = emptyCategoryText)
     } else {
         ResponsiveCategoryList(
             modifier = modifier,
@@ -165,13 +172,13 @@ private fun ResponsiveCategoryList(
 }
 
 @Composable
-private fun NoCategoryMessage(modifier: Modifier) {
+private fun NoCategoryMessage(modifier: Modifier, emptyCategoryText: String) {
     Box(
         modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 32.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = "Kelime defterinde hiç kategori yok 😥", textAlign = TextAlign.Center)
+        Text(text = emptyCategoryText, textAlign = TextAlign.Center)
     }
 }

@@ -3,6 +3,7 @@ package com.yabancikelimedefteri.presentation.game
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
+import android.content.res.Resources
 import androidx.activity.compose.BackHandler
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.*
@@ -32,6 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.helpers.getCurrentTheme
 import com.yabancikelimedefteri.core.ui.component.CustomButton
 import com.yabancikelimedefteri.core.ui.component.CustomTextField
@@ -41,7 +43,7 @@ import com.yabancikelimedefteri.domain.model.WordWithId
 import com.yabancikelimedefteri.presentation.main.OrientationState
 
 @Composable
-fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
+fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, resources: Resources) {
 
     val viewModel: GameViewModel = hiltViewModel()
 
@@ -90,7 +92,21 @@ fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
         removeSelectedCategory = { viewModel.removeSelectedCategory(it) },
         removeAllCategory = { viewModel.removeAllCategories() },
         isButtonEnabled = viewModel.isGameReadyToLaunch,
-        launchTheGame = { viewModel.launchTheGame() }
+        launchTheGame = { viewModel.launchTheGame() },
+        startGameButtonText = resources.getString(R.string.start_the_game),
+        allCategoryText = resources.getString(R.string.category_all),
+        gameDescriptionText = resources.getString(R.string.game_description),
+        warningMessageText = resources.getString(R.string.at_least_two_word_warning),
+        labelText = resources.getString(R.string.user_guess),
+        guessButtonText = resources.getString(R.string.submit_answer),
+        correctText = resources.getString(R.string.true_word),
+        wrongText = resources.getString(R.string.false_word),
+        descrTextPartOne = resources.getString(R.string.game_result_table_description_part_one),
+        descrTextPartTwo = resources.getString(R.string.game_result_table_description_part_two),
+        gameResultText = resources.getString(R.string.game_result_message),
+        correctAnswerText = resources.getString(R.string.correct_answer),
+        userAnswerText = resources.getString(R.string.user_answer),
+        textFieldErrorText = resources.getString(R.string.text_field_error)
     )
 }
 
@@ -118,7 +134,21 @@ private fun GameScreenContent(
     removeSelectedCategory: (Int) -> Unit,
     removeAllCategory: () -> Unit,
     isButtonEnabled: Boolean,
-    launchTheGame: () -> Unit
+    launchTheGame: () -> Unit,
+    startGameButtonText: String,
+    allCategoryText: String,
+    gameDescriptionText: String,
+    warningMessageText: String,
+    labelText: String,
+    guessButtonText: String,
+    correctText: String,
+    descrTextPartOne: String,
+    wrongText: String,
+    descrTextPartTwo: String,
+    gameResultText: String,
+    correctAnswerText: String,
+    userAnswerText: String,
+    textFieldErrorText: String
 ) {
     when (gameState) {
         is GameState.Nothing -> {
@@ -139,7 +169,10 @@ private fun GameScreenContent(
                         removeSelectedCategory = removeSelectedCategory,
                         removeAllCategory = removeAllCategory,
                         isButtonEnabled = isButtonEnabled,
-                        launchTheGame = launchTheGame
+                        launchTheGame = launchTheGame,
+                        startGameButtonText = startGameButtonText,
+                        allCategoryText = allCategoryText,
+                        gameDescriptionText = gameDescriptionText
                     )
                 }
                 is GetGameCategoriesState.Error -> {
@@ -161,7 +194,11 @@ private fun GameScreenContent(
                     value = value,
                     onValueChanged = onValueChanged,
                     isError = isError,
-                    onGuessClicked = onGuessClicked
+                    onGuessClicked = onGuessClicked,
+                    warningMessageText = warningMessageText,
+                    labelText = labelText,
+                    guessButtonText = guessButtonText,
+                    textFieldErrorText = textFieldErrorText
                 )
             } else {
                 GameResultSection(
@@ -171,7 +208,14 @@ private fun GameScreenContent(
                     correctCount = correctCount,
                     inCorrectCount = inCorrectCount,
                     sharedPreferences = sharedPreferences,
-                    isCurrentThemeDark = isCurrentThemeDark
+                    isCurrentThemeDark = isCurrentThemeDark,
+                    descrTextPartOne = descrTextPartOne,
+                    descrTextPartTwo = descrTextPartTwo,
+                    correctText = correctText,
+                    wrongText = wrongText,
+                    gameResultText = gameResultText,
+                    correctAnswerText = correctAnswerText,
+                    userAnswerText = userAnswerText
                 )
             }
         }
@@ -192,7 +236,10 @@ private fun ChooseGameCategorySection(
     removeSelectedCategory: (Int) -> Unit,
     removeAllCategory: () -> Unit,
     isButtonEnabled: Boolean,
-    launchTheGame: () -> Unit
+    launchTheGame: () -> Unit,
+    startGameButtonText: String,
+    allCategoryText: String,
+    gameDescriptionText: String
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         Column(
@@ -202,7 +249,7 @@ private fun ChooseGameCategorySection(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            CategoryDescription(modifier)
+            CategoryDescription(modifier, gameDescriptionText)
             Space(modifier = modifier.height(16.dp))
             CategoriesList(
                 modifier,
@@ -212,10 +259,11 @@ private fun ChooseGameCategorySection(
                 removeSelectedCategory,
                 setAllCateSelected,
                 addAllCategory,
-                removeAllCategory
+                removeAllCategory,
+                allCategoryText
             )
             Space(modifier = modifier.height(16.dp))
-            LaunchTheGameButton(modifier, launchTheGame, isButtonEnabled)
+            LaunchTheGameButton(modifier, launchTheGame, isButtonEnabled, startGameButtonText)
         }
     } else {
         Row(
@@ -234,7 +282,8 @@ private fun ChooseGameCategorySection(
                     removeSelectedCategory,
                     setAllCateSelected,
                     addAllCategory,
-                    removeAllCategory
+                    removeAllCategory,
+                    allCategoryText
                 )
             }
             Column(
@@ -242,9 +291,9 @@ private fun ChooseGameCategorySection(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                CategoryDescription(modifier)
+                CategoryDescription(modifier, gameDescriptionText)
                 Space(modifier = modifier.height(16.dp))
-                LaunchTheGameButton(modifier, launchTheGame, isButtonEnabled)
+                LaunchTheGameButton(modifier, launchTheGame, isButtonEnabled, startGameButtonText)
             }
         }
     }
@@ -254,12 +303,13 @@ private fun ChooseGameCategorySection(
 private fun LaunchTheGameButton(
     modifier: Modifier,
     launchTheGame: () -> Unit,
-    isButtonEnabled: Boolean
+    isButtonEnabled: Boolean,
+    startGameButtonText: String
 ) {
     CustomButton(
         modifier = modifier,
         onClick = launchTheGame,
-        buttonText = "Oyunu Başlat",
+        buttonText = startGameButtonText,
         enabled = isButtonEnabled
     )
 }
@@ -273,7 +323,8 @@ private fun CategoriesList(
     removeSelectedCategory: (Int) -> Unit,
     setAllCateSelected: (Boolean) -> Unit,
     addAllCategory: () -> Unit,
-    removeAllCategory: () -> Unit
+    removeAllCategory: () -> Unit,
+    allCategoryText: String
 ) {
     LazyVerticalGrid(
         modifier = modifier.height(LocalConfiguration.current.screenWidthDp.dp),
@@ -289,13 +340,14 @@ private fun CategoriesList(
                 isAllCatSelected = isAllCatSelected,
                 categoryId = it.categoryId,
                 addSelectedCategory = addSelectedCategory,
-                removeSelectedCategory = removeSelectedCategory
+                removeSelectedCategory = removeSelectedCategory,
+                allCategoryText = allCategoryText
             )
         }
         item {
             GameCategory(
                 modifier = modifier,
-                categoryName = "Hepsi",
+                categoryName = allCategoryText,
                 allClicked = {
                     setAllCateSelected(it)
                     if (it) {
@@ -307,17 +359,18 @@ private fun CategoriesList(
                 isAllCatSelected = isAllCatSelected,
                 categoryId = -1,
                 addSelectedCategory = addSelectedCategory,
-                removeSelectedCategory = removeSelectedCategory
+                removeSelectedCategory = removeSelectedCategory,
+                allCategoryText = allCategoryText
             )
         }
     }
 }
 
 @Composable
-private fun CategoryDescription(modifier: Modifier) {
+private fun CategoryDescription(modifier: Modifier, gameDescriptionText: String) {
     Text(
         modifier = modifier.fillMaxWidth(),
-        text = "Oyunu oynamak istediğin kategoriyi seç",
+        text = gameDescriptionText,
         textAlign = TextAlign.Center
     )
 }
@@ -330,7 +383,8 @@ private fun GameCategory(
     allClicked: (Boolean) -> Unit = {},
     isAllCatSelected: Boolean,
     addSelectedCategory: (Int) -> Unit,
-    removeSelectedCategory: (Int) -> Unit
+    removeSelectedCategory: (Int) -> Unit,
+    allCategoryText: String
 ) {
     var clicked by rememberSaveable { mutableStateOf(false) }
 
@@ -338,12 +392,12 @@ private fun GameCategory(
         modifier = modifier
             .size(96.dp)
             .clickable(
-                enabled = if (categoryName == "Hepsi") {
+                enabled = if (categoryName == allCategoryText) {
                     true
                 } else !isAllCatSelected,
                 onClick = {
                     clicked = !clicked
-                    if (categoryName == "Hepsi") {
+                    if (categoryName == allCategoryText) {
                         allClicked(clicked)
                     } else {
                         if (clicked) {
@@ -388,7 +442,14 @@ private fun GameResultSection(
     correctCount: Int,
     inCorrectCount: Int,
     sharedPreferences: SharedPreferences,
-    isCurrentThemeDark: Boolean
+    isCurrentThemeDark: Boolean,
+    correctText: String,
+    descrTextPartOne: String,
+    wrongText: String,
+    descrTextPartTwo: String,
+    gameResultText: String,
+    correctAnswerText: String,
+    userAnswerText: String
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -397,9 +458,18 @@ private fun GameResultSection(
         GameResultSubTitle(
             modifier = modifier,
             correctCount = correctCount,
-            inCorrectCount = inCorrectCount
+            inCorrectCount = inCorrectCount,
+            gameResultText = gameResultText,
+            correctText = correctText,
+            wrongText = wrongText
         )
-        InfoAboutResultTable(modifier = modifier)
+        InfoAboutResultTable(
+            modifier = modifier,
+            correctText = correctText,
+            descrTextPartOne = descrTextPartOne,
+            wrongText = wrongText,
+            descrTextPartTwo = descrTextPartTwo
+        )
         GameResultTableHeaders(
             modifier = modifier,
             tableCellTextColor = if (
@@ -407,7 +477,9 @@ private fun GameResultSection(
             ) Color.White
             else
                 Color.Black,
-            isCurrentThemeDark = isCurrentThemeDark
+            isCurrentThemeDark = isCurrentThemeDark,
+            correctAnswerText = correctAnswerText,
+            userAnswerText = userAnswerText
         )
         GameResultTable(
             modifier = modifier,
@@ -468,7 +540,9 @@ private fun GameResultTable(
 private fun GameResultTableHeaders(
     modifier: Modifier,
     tableCellTextColor: Color,
-    isCurrentThemeDark: Boolean
+    isCurrentThemeDark: Boolean,
+    correctAnswerText: String,
+    userAnswerText: String
 ) {
     Row(
         modifier = modifier
@@ -479,7 +553,7 @@ private fun GameResultTableHeaders(
     ) {
         TableCell(
             modifier = modifier,
-            text = "Doğru Cevap",
+            text = correctAnswerText,
             style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.SemiBold),
             isTextLowerCase = false,
             textColor = tableCellTextColor,
@@ -487,7 +561,7 @@ private fun GameResultTableHeaders(
         )
         TableCell(
             modifier = modifier,
-            text = "Senin Cevabın",
+            text = userAnswerText,
             style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.SemiBold),
             isTextLowerCase = false,
             textColor = tableCellTextColor,
@@ -497,17 +571,23 @@ private fun GameResultTableHeaders(
 }
 
 @Composable
-private fun InfoAboutResultTable(modifier: Modifier) {
+private fun InfoAboutResultTable(
+    modifier: Modifier,
+    correctText: String,
+    descrTextPartOne: String,
+    wrongText: String,
+    descrTextPartTwo: String
+) {
     Text(
         buildAnnotatedString {
             withStyle(style = SpanStyle(color = Color.Green)) {
-                append("Doğru ")
+                append("$correctText ")
             }
-            append("cevaplar yeşil, ")
+            append("$descrTextPartOne ")
             withStyle(style = SpanStyle(color = Color.Red)) {
-                append("yanlış ")
+                append("$wrongText ")
             }
-            append("cevaplar kırmızı renkte gösterilmiştir.")
+            append(descrTextPartTwo)
         },
         style = MaterialTheme.typography.caption,
         textAlign = TextAlign.Start,
@@ -518,7 +598,14 @@ private fun InfoAboutResultTable(modifier: Modifier) {
 }
 
 @Composable
-private fun GameResultSubTitle(modifier: Modifier, correctCount: Int, inCorrectCount: Int) {
+private fun GameResultSubTitle(
+    modifier: Modifier,
+    correctCount: Int,
+    inCorrectCount: Int,
+    gameResultText: String,
+    correctText: String,
+    wrongText: String
+) {
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -527,12 +614,12 @@ private fun GameResultSubTitle(modifier: Modifier, correctCount: Int, inCorrectC
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "Oyun Sonucun:",
+            text = "$gameResultText:",
             style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.SemiBold)
         )
         Text(
             modifier = modifier.padding(start = 4.dp),
-            text = "$correctCount doğru $inCorrectCount yanlış",
+            text = "$correctCount $correctText $inCorrectCount $wrongText",
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.body2
         )
@@ -568,7 +655,11 @@ private fun GameSection(
     value: String,
     onValueChanged: (String) -> Unit,
     isError: Boolean,
-    onGuessClicked: (String) -> Unit
+    onGuessClicked: (String) -> Unit,
+    warningMessageText: String,
+    guessButtonText: String,
+    labelText: String,
+    textFieldErrorText: String
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         Column(
@@ -579,9 +670,9 @@ private fun GameSection(
             verticalArrangement = Arrangement.Center
         ) {
             if (gameState.data.isEmpty()) {
-                EmptyWordMessage(modifier = modifier)
+                EmptyWordMessage(modifier = modifier, warningMessageText = warningMessageText)
             } else if (gameState.data.size < 2) {
-                AtLeastTwoWordMessage(modifier = modifier)
+                AtLeastTwoWordMessage(modifier = modifier, warningMessageText = warningMessageText)
             } else {
                 ForeignWord(
                     modifier = modifier,
@@ -596,13 +687,15 @@ private fun GameSection(
                     isError,
                     onGuessClicked,
                     gameState,
-                    wordIndex
+                    wordIndex,
+                    labelText,
+                    textFieldErrorText
                 )
                 Space(modifier = modifier)
                 CustomButton(
                     modifier = modifier,
                     onClick = { onGuessClicked(gameState.data[wordIndex].foreignWord) },
-                    buttonText = "Tahmin et"
+                    buttonText = guessButtonText
                 )
             }
         }
@@ -616,9 +709,9 @@ private fun GameSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (gameState.data.isEmpty()) {
-                EmptyWordMessage(modifier = modifier)
+                EmptyWordMessage(modifier = modifier, warningMessageText = warningMessageText)
             } else if (gameState.data.size < 2) {
-                AtLeastTwoWordMessage(modifier = modifier)
+                AtLeastTwoWordMessage(modifier = modifier, warningMessageText = warningMessageText)
             } else {
                 ForeignWord(
                     modifier = modifier.weight(1f),
@@ -637,13 +730,15 @@ private fun GameSection(
                         isError,
                         onGuessClicked,
                         gameState,
-                        wordIndex
+                        wordIndex,
+                        labelText,
+                        textFieldErrorText
                     )
                     Space(modifier = modifier)
                     CustomButton(
                         modifier = modifier,
                         onClick = { onGuessClicked(gameState.data[wordIndex].foreignWord) },
-                        buttonText = "Tahmin et"
+                        buttonText = guessButtonText
                     )
                 }
             }
@@ -659,7 +754,9 @@ private fun AnswerField(
     isError: Boolean,
     onGuessClicked: (String) -> Unit,
     gameState: GameState.Success,
-    wordIndex: Int
+    wordIndex: Int,
+    labelText: String,
+    textFieldErrorText: String
 ) {
     CustomTextField(
         modifier = modifier
@@ -667,31 +764,32 @@ private fun AnswerField(
             .padding(horizontal = 48.dp),
         value = value,
         onValueChange = { onValueChanged(it) },
-        labelText = "Tahminin",
+        labelText = labelText,
         isError = isError,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-        keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex].foreignWord) })
+        keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex].foreignWord) }),
+        errorMessage = textFieldErrorText
     )
 }
 
 @Composable
-private fun EmptyWordMessage(modifier: Modifier) {
+private fun EmptyWordMessage(modifier: Modifier, warningMessageText: String) {
     Text(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 32.dp),
-        text = "Kelime tahmin oyununu oynayabilmen için önce kelime defterine yeni kelimeler ekle.",
+        text = warningMessageText,
         textAlign = TextAlign.Center
     )
 }
 
 @Composable
-private fun AtLeastTwoWordMessage(modifier: Modifier) {
+private fun AtLeastTwoWordMessage(modifier: Modifier, warningMessageText: String) {
     Text(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 32.dp),
-        text = "Kelime tahmin oyununu oynayabilmen için kelime defterinde en az 2 kelime bulunmalı.",
+        text = warningMessageText,
         textAlign = TextAlign.Center
     )
 }

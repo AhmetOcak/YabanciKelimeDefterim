@@ -31,9 +31,13 @@ class MainActivity : ComponentActivity() {
 
     lateinit var sharedPreferences: SharedPreferences
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.Theme_YabanciKelimeDefteri)
         super.onCreate(savedInstanceState)
+
+        val resources = resources
+
 
         sharedPreferences = getSharedPreferences(THEME_KEY, Context.MODE_PRIVATE)
 
@@ -59,7 +63,8 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavGraph(
                         activity = this,
-                        sharedPreferences = sharedPreferences
+                        sharedPreferences = sharedPreferences,
+                        resources = resources
                     )
                 }
             }

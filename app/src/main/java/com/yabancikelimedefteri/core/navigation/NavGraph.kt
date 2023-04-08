@@ -2,6 +2,7 @@ package com.yabancikelimedefteri.core.navigation
 
 import android.app.Activity
 import android.content.SharedPreferences
+import android.content.res.Resources
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -42,11 +43,12 @@ fun NavGraph(
     modifier: Modifier = Modifier,
     startDestination: String = NavScreen.HomeScreen.route,
     activity: Activity,
-    sharedPreferences: SharedPreferences
+    sharedPreferences: SharedPreferences,
+    resources: Resources
 ) {
     val navController = rememberAnimatedNavController()
 
-    var pageTitle by rememberSaveable { mutableStateOf(PageTitles.home) }
+    var pageTitle by rememberSaveable { mutableStateOf(resources.getString(R.string.app_name)) }
 
     var showFab by rememberSaveable { mutableStateOf(true) }
 
@@ -59,7 +61,6 @@ fun NavGraph(
         floatingActionButton = {
             if (showFab) {
                 Fab(
-                    modifier = modifier,
                     onClick = {
                         if (
                             navController.currentBackStackEntry?.destination?.route != null
@@ -67,11 +68,11 @@ fun NavGraph(
                             navController.currentBackStackEntry?.destination?.route == NavScreen.HomeScreen.route
                         ) {
                             navController.navigate(NavScreen.AddCategoryScreen.route)
-                            pageTitle = PageTitles.add_category
+                            pageTitle = resources.getString(R.string.create_category)
                         } else {
                             categoryId?.let {
                                 navController.navigate("${NavNames.add_word_screen}/$it")
-                                pageTitle = PageTitles.add_word
+                                pageTitle = resources.getString(R.string.add_word)
                             }
                         }
                     }
@@ -82,7 +83,7 @@ fun NavGraph(
             TopBar(
                 onGameClick = {
                     navController.navigate(NavScreen.GameScreen.route)
-                    pageTitle = PageTitles.game
+                    pageTitle = resources.getString(R.string.word_guessing_game)
                 },
                 onDarkModeClick = {
                     // eğer tema kodu 1 ise tam karşıtı yapılır
@@ -102,13 +103,14 @@ fun NavGraph(
                 onBackClick = {
                     if (navController.currentBackStackEntry?.destination?.route != NavScreen.AddWordScreen.route) {
                         navController.navigate(NavScreen.HomeScreen.route)
-                        pageTitle = PageTitles.home
+                        pageTitle = resources.getString(R.string.app_name)
                     } else {
                         navController.navigate("${NavNames.word_screen}/$categoryId")
-                        pageTitle = PageTitles.word
+                        pageTitle = resources.getString(R.string.my_words)
                     }
                 },
-                pageTitle = pageTitle
+                pageTitle = pageTitle,
+                resources = resources
             )
         }
     ) {
@@ -136,8 +138,9 @@ fun NavGraph(
                     onNavigateNext = { id ->
                         categoryId = id
                         navController.navigate("${NavNames.word_screen}/$id")
-                        pageTitle = PageTitles.word
-                    }
+                        pageTitle = resources.getString(R.string.my_words)
+                    },
+                    resources = resources
                 )
             }
             composable(
@@ -150,8 +153,9 @@ fun NavGraph(
                 AddWordScreen(
                     onNavigateBack = {
                         navController.navigate("${NavNames.word_screen}/$categoryId")
-                        pageTitle = PageTitles.word
-                    }
+                        pageTitle = resources.getString(R.string.my_words)
+                    },
+                    resources = resources
                 )
             }
             composable(route = NavScreen.GameScreen.route) {
@@ -159,8 +163,9 @@ fun NavGraph(
                 GameScreen(
                     onNavigateBack = {
                         navController.navigate(NavScreen.HomeScreen.route)
-                        pageTitle = PageTitles.home
-                    }
+                        pageTitle = resources.getString(R.string.app_name)
+                    },
+                    resources = resources
                 )
             }
             composable(route = NavScreen.AddCategoryScreen.route) {
@@ -168,8 +173,9 @@ fun NavGraph(
                 AddCategoryScreen(
                     onNavigateBack = {
                         navController.navigate(NavScreen.HomeScreen.route)
-                        pageTitle = PageTitles.home
-                    }
+                        pageTitle = resources.getString(R.string.app_name)
+                    },
+                    resources = resources
                 )
             }
             composable(
@@ -182,8 +188,9 @@ fun NavGraph(
                 WordScreen(
                     onNavigateBack = {
                         navController.navigate(NavScreen.HomeScreen.route)
-                        pageTitle = PageTitles.home
-                    }
+                        pageTitle = resources.getString(R.string.app_name)
+                    },
+                    resources = resources
                 )
             }
         }
@@ -191,7 +198,7 @@ fun NavGraph(
 }
 
 @Composable
-private fun Fab(modifier: Modifier, onClick: () -> Unit) {
+private fun Fab(onClick: () -> Unit) {
     FloatingActionButton(onClick = onClick) {
         Icon(
             imageVector = Icons.Default.Add,
@@ -205,14 +212,15 @@ private fun TopBar(
     onGameClick: () -> Unit,
     onDarkModeClick: () -> Unit,
     onBackClick: () -> Unit,
-    pageTitle: String
+    pageTitle: String,
+    resources: Resources
 ) {
     TopAppBar(
         title = {
             Text(text = pageTitle)
         },
         actions = {
-            if (pageTitle == PageTitles.home) {
+            if (pageTitle == resources.getString(R.string.app_name)) {
                 IconButton(onClick = onDarkModeClick) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_dark_mode),
@@ -229,7 +237,7 @@ private fun TopBar(
                 }
             }
         },
-        navigationIcon = if (pageTitle != PageTitles.home) {
+        navigationIcon = if (pageTitle != resources.getString(R.string.app_name)) {
             {
                 GoBackScreen(onClick = onBackClick)
             }

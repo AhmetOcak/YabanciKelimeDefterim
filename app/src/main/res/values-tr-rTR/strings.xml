@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Yabancı Kelime Defterim</string>
+    <string name="category_name">Kategori ismi</string>
+    <string name="create_category">Kategori Oluştur</string>
+    <string name="my_words">Kelimelerim</string>
+    <string name="add_word">Kelime Ekle</string>
+    <string name="foreign_word">Yabancı kelime</string>
+    <string name="meaning">Kelimenin anlamı</string>
+    <string name="word_guessing_game">Kelime Tahmin Oyunu</string>
+    <string name="game_description">Oyunu oynamak istediğin kategoriyi seç</string>
+    <string name="category_all">Hepsi</string>
+    <string name="start_the_game">Oyunu başlat</string>
+    <string name="user_guess">Tahminin</string>
+    <string name="submit_answer">Tahmin Et</string>
+    <string name="game_result_message">Oyun Sonucun</string>
+    <string name="true_word">Doğru</string>
+    <string name="false_word">Yanlış</string>
+    <string name="game_result_table_description_part_one">cevaplar yeşil,</string>
+    <string name="game_result_table_description_part_two">cevaplar kırmızı renkte gösterilmiştir.</string>
+    <string name="correct_answer">Doğru Cevap</string>
+    <string name="wrong_answer">Yanlış Cevap</string>
+    <string name="error">Hay aksi!! Bir şeyler ters gitti. Lütfen daha sonra tekrar dene.</string>
+    <string name="add_category_success">Kelime defterinize başarılı bir şekilde bir kategori eklediniz.</string>
+    <string name="add_word_success">Kelime defterine yeni bir kelime ekledin.</string>
+    <string name="category_removed">Kategori kaldırıldı.</string>
+    <string name="word_removed">Kelime kaldırıldı.</string>
+    <string name="at_least_two_word_warning">Kelime tahmin oyununu oynayabilmen için kelime defterinde en az 2 kelime bulunmalı.</string>
+    <string name="empty_category_message">Kelime defterinde hiç kategori yok 😥</string>
+    <string name="empty_word_message">Kelime defterinde hiç kelime yok 😥</string>
+    <string name="user_answer">Senin Cevabın</string>
+    <string name="text_field_error">Bu alanı boş bırakamazsın</string>
+</resources>

@@ -24,7 +24,8 @@ fun CustomTextField(
     labelText: String,
     isError: Boolean = false,
     keyboardOptions: KeyboardOptions = KeyboardOptions(),
-    keyboardActions: KeyboardActions = KeyboardActions()
+    keyboardActions: KeyboardActions = KeyboardActions(),
+    errorMessage: String
 ) {
     OutlinedTextField(
         modifier = modifier,
@@ -39,7 +40,7 @@ fun CustomTextField(
             {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_baseline_error),
-                    contentDescription = "Bu alanı boş bırakamazsın",
+                    contentDescription = errorMessage,
                     tint = MaterialTheme.colors.error
                 )
             }
@@ -50,7 +51,7 @@ fun CustomTextField(
     if (isError) {
         Text(
             modifier = modifier.padding(top = 4.dp, start = 16.dp),
-            text = "Bu alanı boş bırakamazsın",
+            text = errorMessage,
             color = MaterialTheme.colors.error,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold

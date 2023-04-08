@@ -1,7 +1,7 @@
 package com.yabancikelimedefteri.presentation.add_category
 
 import android.content.res.Configuration
-import android.widget.Toast
+import android.content.res.Resources
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
@@ -9,7 +9,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +26,11 @@ import com.yabancikelimedefteri.core.ui.component.CustomToast
 import com.yabancikelimedefteri.presentation.main.OrientationState
 
 @Composable
-fun AddCategoryScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
+fun AddCategoryScreen(
+    modifier: Modifier = Modifier,
+    onNavigateBack: () -> Unit,
+    resources: Resources
+) {
 
     val viewModel: AddCategoryViewModel = hiltViewModel()
 
@@ -48,7 +51,7 @@ fun AddCategoryScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit)
         is CreateCategoryState.Success -> {
             CustomToast(
                 context = LocalContext.current,
-                message = "Kelime defterinize başarılı bir şekilde bir kategori eklediniz."
+                message = resources.getString(R.string.add_category_success)
             )
             viewModel.resetCategoryState()
             isStateLoading = false
@@ -56,7 +59,7 @@ fun AddCategoryScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit)
         is CreateCategoryState.Error -> {
             CustomToast(
                 context = LocalContext.current,
-                message = "Hay aksi!! Bir şeyler ters gitti. Lütfen daha sonra tekrar dene."
+                message = resources.getString(R.string.error)
             )
             viewModel.resetCategoryState()
         }
@@ -72,7 +75,10 @@ fun AddCategoryScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit)
             viewModel.createCategory()
             focusManager.clearFocus()
         },
-        isStateLoading = isStateLoading
+        isStateLoading = isStateLoading,
+        textFieldLabel = resources.getString(R.string.category_name),
+        buttonText = resources.getString(R.string.create_category),
+        textFieldErrorText = resources.getString(R.string.text_field_error)
     )
 }
 
@@ -83,7 +89,10 @@ private fun AddCategoryScreenContent(
     onCategoryChanged: (String) -> Unit,
     categoryFieldError: Boolean,
     createCategoryOnClick: () -> Unit,
-    isStateLoading: Boolean
+    isStateLoading: Boolean,
+    textFieldLabel: String,
+    buttonText: String,
+    textFieldErrorText: String
 ) {
     ResponsiveContent(
         modifier = modifier,
@@ -91,7 +100,10 @@ private fun AddCategoryScreenContent(
         onCategoryChanged = onCategoryChanged,
         categoryFieldError = categoryFieldError,
         createCategoryOnClick = createCategoryOnClick,
-        isStateLoading = isStateLoading
+        isStateLoading = isStateLoading,
+        textFieldLabel = textFieldLabel,
+        buttonText = buttonText,
+        textFieldErrorText = textFieldErrorText
     )
 }
 
@@ -102,7 +114,10 @@ private fun ResponsiveContent(
     onCategoryChanged: (String) -> Unit,
     categoryFieldError: Boolean,
     createCategoryOnClick: () -> Unit,
-    isStateLoading: Boolean
+    isStateLoading: Boolean,
+    textFieldLabel: String,
+    buttonText: String,
+    textFieldErrorText: String
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         Column(
@@ -120,20 +135,21 @@ private fun ResponsiveContent(
                     .padding(horizontal = 48.dp),
                 value = categoryNameVal,
                 onValueChange = { onCategoryChanged(it) },
-                labelText = "Kategori ismi",
+                labelText = textFieldLabel,
                 isError = categoryFieldError,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
                     onDone = {
                         createCategoryOnClick()
                     }
-                )
+                ),
+                errorMessage = textFieldErrorText
             )
             Spacer(modifier = modifier.height(32.dp))
             CustomButton(
                 modifier = modifier,
                 onClick = createCategoryOnClick,
-                buttonText = "Kategoriyi oluştur",
+                buttonText = buttonText,
                 enabled = !isStateLoading
             )
         }
@@ -157,20 +173,21 @@ private fun ResponsiveContent(
                         .padding(horizontal = 48.dp),
                     value = categoryNameVal,
                     onValueChange = { onCategoryChanged(it) },
-                    labelText = "Kategori ismi",
+                    labelText = textFieldLabel,
                     isError = categoryFieldError,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     keyboardActions = KeyboardActions(
                         onDone = {
                             createCategoryOnClick()
                         }
-                    )
+                    ),
+                    errorMessage = textFieldErrorText
                 )
                 Spacer(modifier = modifier.height(32.dp))
                 CustomButton(
                     modifier = modifier,
                     onClick = createCategoryOnClick,
-                    buttonText = "Kategoriyi oluştur",
+                    buttonText = buttonText,
                     enabled = !isStateLoading
                 )
             }
