@@ -1,0 +1,1 @@
+# Yabancı Kelime Defteri
