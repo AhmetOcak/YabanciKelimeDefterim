@@ -2,6 +2,8 @@
 
 <img src="https://user-images.githubusercontent.com/73544434/233358103-4b2aff63-5b3d-44f4-8c16-225e16bb55a3.png"/>
 
+[<img src="https://user-images.githubusercontent.com/73544434/233419257-664128a8-1db0-400a-8206-8c88a4ebab1f.png" width="600" height="195" >](https://play.google.com/store/apps/details?id=com.yabancikelimedefteri)
+
 Anlamını bilmediğin kelimeleri kategorize ederek sakla. Kategoriler oluştur ve oluşturduğun bu kategorilere anlamını bilmediğin kelimeleri anlamlarıyla beraber ekle. Kelime tahmin oyununu oynarak eklediğin kelimelerle sınan, kendini test et. Dilediğin zaman kelimeleri ve kategorileri silebilirsin. Bir kategori silerken dikkatli ol. Bir kategoriyi sildiğin zaman o kategorideki kelimeleride silersin. Uygulamayı dilersen açık dilersen karanlık temada kullan.
 
 ## Tech Stack 📚
