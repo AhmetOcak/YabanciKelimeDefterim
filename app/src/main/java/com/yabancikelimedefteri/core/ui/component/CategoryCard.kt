@@ -7,6 +7,8 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -28,7 +30,8 @@ fun CategoryCard(
     height: Dp = LocalConfiguration.current.screenWidthDp.dp / 2,
     width: Dp = 0.dp,
     onCategoryCardClick: (Int) -> Unit,
-    getCategories: () -> Unit
+    getCategories: () -> Unit,
+    onEditClick: (Int) -> Unit
 ) {
     val state = remember { MutableTransitionState(false).apply { targetState = true } }
 
@@ -51,11 +54,14 @@ fun CategoryCard(
             onClick = { onCategoryCardClick(categoryId) },
             elevation = 4.dp
         ) {
-            DeleteCategory(
+            CardFeatures(
                 modifier = modifier,
-                onClick = {
+                onDeleteClick = {
                     onDeleteClick(categoryId)
                     state.targetState = false
+                },
+                onEditClick = {
+                    onEditClick(categoryId)
                 }
             )
             Column(
@@ -76,18 +82,35 @@ fun CategoryCard(
 }
 
 @Composable
-private fun DeleteCategory(modifier: Modifier, onClick: () -> Unit) {
-    Box(
+private fun CardFeatures(modifier: Modifier, onDeleteClick: () -> Unit, onEditClick: () -> Unit) {
+    Row(
         modifier = modifier.fillMaxWidth(),
-        contentAlignment = Alignment.TopEnd
+        horizontalArrangement = Arrangement.End
     ) {
-        IconButton(onClick = onClick) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_baseline_delete_forever),
-                contentDescription = "Kelimeyi sil",
-                tint = MaterialTheme.colors.secondary
-            )
-        }
+        EditCategory(modifier = modifier, onClick = onEditClick)
+        DeleteCategory(modifier = modifier, onClick = onDeleteClick)
+    }
+}
+
+@Composable
+private fun DeleteCategory(modifier: Modifier, onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_baseline_delete_forever),
+            contentDescription = "Kategoriyi sil",
+            tint = MaterialTheme.colors.secondary
+        )
+    }
+}
+
+@Composable
+private fun EditCategory(modifier: Modifier, onClick: () -> Unit) {
+    IconButton(onClick = onClick) {
+        Icon(
+            imageVector = Icons.Filled.Edit,
+            contentDescription = "Kategoriyi düzenle",
+            tint = MaterialTheme.colors.secondary
+        )
     }
 }
 

@@ -10,10 +10,17 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -22,11 +29,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.core.helpers.HomeScreenFab
 import com.yabancikelimedefteri.core.ui.component.CategoryCard
+import com.yabancikelimedefteri.core.ui.component.CustomButton
+import com.yabancikelimedefteri.core.ui.component.CustomTextField
 import com.yabancikelimedefteri.core.ui.component.CustomToast
 import com.yabancikelimedefteri.domain.model.CategoryWithId
 import com.yabancikelimedefteri.presentation.main.OrientationState
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -39,12 +51,34 @@ fun HomeScreen(
     val getCategoriesState by viewModel.getCategoriesState.collectAsState()
     val deleteCategoryState by viewModel.deleteCategoryState.collectAsState()
 
-    BackHandler {
+    val sheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        confirmStateChange = { it != ModalBottomSheetValue.HalfExpanded }
+    )
+
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(key1 = sheetState.isVisible) {
+        coroutineScope.launch {
+            HomeScreenFab.showFab.value = !sheetState.isVisible
+        }
+    }
+
+    BackHandler(!sheetState.isVisible) {
         onNavigateBack()
     }
 
+    BackHandler(sheetState.isVisible) {
+        coroutineScope.launch {
+            sheetState.hide()
+        }
+    }
+
     if (deleteCategoryState is DeleteCategoryState.Success) {
-        CustomToast(context = LocalContext.current, message = resources.getString(R.string.category_removed))
+        CustomToast(
+            context = LocalContext.current,
+            message = resources.getString(R.string.category_removed)
+        )
         viewModel.resetDeleteWordState()
     } else if (deleteCategoryState is DeleteCategoryState.Error) {
         CustomToast(
@@ -60,10 +94,18 @@ fun HomeScreen(
         getCategoriesState = getCategoriesState,
         onCategoryCardClick = { onNavigateNext(it) },
         getCategories = { viewModel.getCategories() },
-        emptyCategoryText = resources.getString(R.string.empty_category_message)
+        emptyCategoryText = resources.getString(R.string.empty_category_message),
+        sheetState = sheetState,
+        onEditClick = {
+            coroutineScope.launch {
+                HomeScreenFab.showFab.value = false
+                sheetState.show()
+            }
+        }
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun HomeScreenContent(
     modifier: Modifier,
@@ -71,7 +113,9 @@ private fun HomeScreenContent(
     getCategoriesState: GetCategoriesState,
     onCategoryCardClick: (Int) -> Unit,
     getCategories: () -> Unit,
-    emptyCategoryText: String
+    emptyCategoryText: String,
+    sheetState: ModalBottomSheetState,
+    onEditClick: (Int) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -83,6 +127,7 @@ private fun HomeScreenContent(
                     CircularProgressIndicator()
                 }
             }
+
             is GetCategoriesState.Success -> {
                 CategoryList(
                     getCategoriesState,
@@ -90,9 +135,12 @@ private fun HomeScreenContent(
                     onDeleteClick,
                     onCategoryCardClick,
                     getCategories,
-                    emptyCategoryText
+                    emptyCategoryText,
+                    sheetState,
+                    onEditClick
                 )
             }
+
             is GetCategoriesState.Error -> {
                 CustomToast(context = LocalContext.current, message = getCategoriesState.message)
             }
@@ -100,6 +148,7 @@ private fun HomeScreenContent(
     }
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun CategoryList(
     getCategoriesState: GetCategoriesState.Success,
@@ -107,18 +156,29 @@ private fun CategoryList(
     onDeleteClick: (Int) -> Unit,
     onCategoryCardClick: (Int) -> Unit,
     getCategories: () -> Unit,
-    emptyCategoryText: String
+    emptyCategoryText: String,
+    sheetState: ModalBottomSheetState,
+    onEditClick: (Int) -> Unit
 ) {
-    if (getCategoriesState.data.isEmpty()) {
-        NoCategoryMessage(modifier = modifier, emptyCategoryText = emptyCategoryText)
-    } else {
-        ResponsiveCategoryList(
-            modifier = modifier,
-            data = getCategoriesState.data,
-            onDeleteClick = onDeleteClick,
-            onCategoryCardClick = onCategoryCardClick,
-            getCategories = getCategories
-        )
+    ModalBottomSheetLayout(
+        modifier = modifier.fillMaxSize(),
+        sheetContent = {
+            SheetContent(modifier = modifier)
+        },
+        sheetState = sheetState
+    ) {
+        if (getCategoriesState.data.isEmpty()) {
+            NoCategoryMessage(modifier = modifier, emptyCategoryText = emptyCategoryText)
+        } else {
+            ResponsiveCategoryList(
+                modifier = modifier,
+                data = getCategoriesState.data,
+                onDeleteClick = onDeleteClick,
+                onCategoryCardClick = onCategoryCardClick,
+                getCategories = getCategories,
+                onEditClick = onEditClick
+            )
+        }
     }
 }
 
@@ -128,7 +188,8 @@ private fun ResponsiveCategoryList(
     data: List<CategoryWithId>,
     onDeleteClick: (Int) -> Unit,
     onCategoryCardClick: (Int) -> Unit,
-    getCategories: () -> Unit
+    getCategories: () -> Unit,
+    onEditClick: (Int) -> Unit
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         LazyColumn(
@@ -143,7 +204,8 @@ private fun ResponsiveCategoryList(
                     categoryId = it.categoryId,
                     onDeleteClick = onDeleteClick,
                     onCategoryCardClick = onCategoryCardClick,
-                    getCategories = getCategories
+                    getCategories = getCategories,
+                    onEditClick = onEditClick
                 )
             }
         }
@@ -164,10 +226,35 @@ private fun ResponsiveCategoryList(
                     onCategoryCardClick = onCategoryCardClick,
                     height = LocalConfiguration.current.screenWidthDp.dp / 3,
                     width = LocalConfiguration.current.screenWidthDp.dp / 3,
-                    getCategories = getCategories
+                    getCategories = getCategories,
+                    onEditClick = onEditClick
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun SheetContent(modifier: Modifier) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.End
+    ) {
+        CustomTextField(
+            modifier = modifier.fillMaxWidth(),
+            value = "",
+            onValueChange = {},
+            labelText = "Yeni kategori ismi",
+            errorMessage = ""
+        )
+        CustomButton(
+            modifier = modifier.padding(top = 16.dp),
+            onClick = { /*TODO*/ },
+            buttonText = "Kaydet"
+        )
     }
 }
 

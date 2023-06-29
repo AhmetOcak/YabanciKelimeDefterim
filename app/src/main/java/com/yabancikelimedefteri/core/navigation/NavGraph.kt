@@ -28,6 +28,7 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.core.helpers.HomeScreenFab
 import com.yabancikelimedefteri.core.helpers.getCurrentTheme
 import com.yabancikelimedefteri.core.helpers.saveTheme
 import com.yabancikelimedefteri.core.ui.theme.ThemeState
@@ -132,7 +133,7 @@ fun NavGraph(
             }
         ) {
             composable(route = NavScreen.HomeScreen.route) {
-                showFab = true
+                showFab = HomeScreenFab.showFab.value
                 HomeScreen(
                     onNavigateBack = { activity.finish() },
                     onNavigateNext = { id ->
