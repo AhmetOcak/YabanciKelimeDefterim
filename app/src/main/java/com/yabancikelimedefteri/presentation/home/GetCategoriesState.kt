@@ -1,6 +1,5 @@
 package com.yabancikelimedefteri.presentation.home
 
-import com.yabancikelimedefteri.domain.model.Category
 import com.yabancikelimedefteri.domain.model.CategoryWithId
 
 sealed interface GetCategoriesState {

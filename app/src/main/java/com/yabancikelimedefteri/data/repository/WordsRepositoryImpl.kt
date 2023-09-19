@@ -12,7 +12,9 @@ import com.yabancikelimedefteri.domain.model.WordWithId
 import com.yabancikelimedefteri.domain.repository.WordsRepository
 import javax.inject.Inject
 
-class WordsRepositoryImpl @Inject constructor(private val localDataSource: WordsLocalDataSource): WordsRepository {
+class WordsRepositoryImpl @Inject constructor(
+    private val localDataSource: WordsLocalDataSource
+) : WordsRepository {
 
     override suspend fun createCategory(category: Category) =
         localDataSource.createCategory(category.toCategoryEntity())
@@ -22,6 +24,9 @@ class WordsRepositoryImpl @Inject constructor(private val localDataSource: Words
 
     override suspend fun deleteCategory(categoryId: Int) =
         localDataSource.deleteCategory(categoryId)
+
+    override suspend fun updateCategoryName(categoryId: Int, newCategoryName: String) =
+        localDataSource.updateCategoryName(categoryId, newCategoryName)
 
     override suspend fun createWord(word: Word) =
         localDataSource.createWord(word.toWordEntity())

@@ -11,6 +11,8 @@ interface WordsLocalDataSource {
 
     suspend fun deleteCategory(categoryId: Int)
 
+    suspend fun updateCategoryName(categoryId: Int, newCategoryName: String)
+
     suspend fun createWord(wordEntity: WordEntity)
 
     suspend fun getAllWords(): List<WordEntity>

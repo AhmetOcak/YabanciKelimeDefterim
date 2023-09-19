@@ -19,6 +19,9 @@ class WordsLocalDataSourceImpl @Inject constructor(
     override suspend fun deleteCategory(categoryId: Int) =
         categoryDao.deleteCategory(categoryId)
 
+    override suspend fun updateCategoryName(categoryId: Int, newCategoryName: String) =
+        categoryDao.updateCategoryName(categoryId, newCategoryName)
+
     override suspend fun createWord(wordEntity: WordEntity) =
         wordDao.createWord(wordEntity)
 

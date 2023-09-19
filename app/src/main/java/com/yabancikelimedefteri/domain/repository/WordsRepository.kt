@@ -13,6 +13,8 @@ interface WordsRepository {
 
     suspend fun deleteCategory(categoryId: Int)
 
+    suspend fun updateCategoryName(categoryId: Int, newCategoryName: String)
+
     suspend fun createWord(word: Word)
 
     suspend fun getAllWords(): List<WordWithId>

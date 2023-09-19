@@ -29,4 +29,7 @@
     <string name="empty_word_message">There are no words in the vocabulary book 😥</string>
     <string name="user_answer">Your Answer</string>
     <string name="text_field_error">Please fill in this field</string>
+    <string name="update_cat_successfull">Category updated successfully</string>
+    <string name="new_cat_name">New category name</string>
+    <string name="save">Save</string>
 </resources>

@@ -50,6 +50,7 @@ fun HomeScreen(
     val viewModel: HomeViewModel = hiltViewModel()
     val getCategoriesState by viewModel.getCategoriesState.collectAsState()
     val deleteCategoryState by viewModel.deleteCategoryState.collectAsState()
+    val updateCategoryState by viewModel.updateCategoryState.collectAsState()
 
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
@@ -88,6 +89,20 @@ fun HomeScreen(
         viewModel.resetDeleteWordState()
     }
 
+    if (updateCategoryState is UpdateCategoryState.Success) {
+        CustomToast(
+            context = LocalContext.current,
+            message = resources.getString(R.string.update_cat_successfull)
+        )
+        viewModel.resetUpdateCatState()
+    } else if (updateCategoryState is UpdateCategoryState.Error) {
+        CustomToast(
+            context = LocalContext.current,
+            message = (deleteCategoryState as DeleteCategoryState.Error).message
+        )
+        viewModel.resetUpdateCatState()
+    }
+
     HomeScreenContent(
         modifier = modifier,
         onDeleteClick = { viewModel.deleteCategories(it) },
@@ -97,11 +112,29 @@ fun HomeScreen(
         emptyCategoryText = resources.getString(R.string.empty_category_message),
         sheetState = sheetState,
         onEditClick = {
+            viewModel.updateSelectedCaId(it)
             coroutineScope.launch {
                 HomeScreenFab.showFab.value = false
                 sheetState.show()
             }
-        }
+        },
+        categoryNameVal = viewModel.newCategoryName,
+        onCategoryNameChanged = { viewModel.updateNewCategoryName(it) },
+        updateCategoryName = {
+            viewModel.updateCategoryName(
+                viewModel.selectedCatId,
+                viewModel.newCategoryName
+            )
+            coroutineScope.launch {
+                viewModel.resetNewCatName()
+                sheetState.hide()
+                viewModel.getCategories()
+            }
+        },
+        updateCategoryNameFieldError = viewModel.newCategoryNameFieldError,
+        textFieldErrorMessage = resources.getString(R.string.text_field_error),
+        updateCatNameLabel = resources.getString(R.string.new_cat_name),
+        buttonText = resources.getString(R.string.save)
     )
 }
 
@@ -115,7 +148,14 @@ private fun HomeScreenContent(
     getCategories: () -> Unit,
     emptyCategoryText: String,
     sheetState: ModalBottomSheetState,
-    onEditClick: (Int) -> Unit
+    onEditClick: (Int) -> Unit,
+    categoryNameVal: String,
+    onCategoryNameChanged: (String) -> Unit,
+    updateCategoryName: () -> Unit,
+    updateCategoryNameFieldError: Boolean,
+    textFieldErrorMessage: String,
+    updateCatNameLabel: String,
+    buttonText: String
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -137,7 +177,14 @@ private fun HomeScreenContent(
                     getCategories,
                     emptyCategoryText,
                     sheetState,
-                    onEditClick
+                    onEditClick,
+                    categoryNameVal,
+                    onCategoryNameChanged,
+                    updateCategoryName,
+                    updateCategoryNameFieldError,
+                    textFieldErrorMessage,
+                    updateCatNameLabel,
+                    buttonText
                 )
             }
 
@@ -158,12 +205,28 @@ private fun CategoryList(
     getCategories: () -> Unit,
     emptyCategoryText: String,
     sheetState: ModalBottomSheetState,
-    onEditClick: (Int) -> Unit
+    onEditClick: (Int) -> Unit,
+    categoryNameVal: String,
+    onCategoryNameChanged: (String) -> Unit,
+    updateCategoryName: () -> Unit,
+    updateCategoryNameFieldError: Boolean,
+    textFieldErrorMessage: String,
+    updateCatNameLabel: String,
+    buttonText: String
 ) {
     ModalBottomSheetLayout(
         modifier = modifier.fillMaxSize(),
         sheetContent = {
-            SheetContent(modifier = modifier)
+            SheetContent(
+                modifier = modifier,
+                categoryNameVal = categoryNameVal,
+                onCategoryNameChanged = onCategoryNameChanged,
+                updateCategoryName = updateCategoryName,
+                updateCategoryNameFieldError = updateCategoryNameFieldError,
+                textFieldErrorMessage = textFieldErrorMessage,
+                updateCatNameLabel = updateCatNameLabel,
+                buttonText = buttonText
+            )
         },
         sheetState = sheetState
     ) {
@@ -235,7 +298,16 @@ private fun ResponsiveCategoryList(
 }
 
 @Composable
-private fun SheetContent(modifier: Modifier) {
+private fun SheetContent(
+    modifier: Modifier,
+    categoryNameVal: String,
+    onCategoryNameChanged: (String) -> Unit,
+    updateCategoryName: () -> Unit,
+    updateCategoryNameFieldError: Boolean,
+    textFieldErrorMessage: String,
+    updateCatNameLabel: String,
+    buttonText: String
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -245,15 +317,16 @@ private fun SheetContent(modifier: Modifier) {
     ) {
         CustomTextField(
             modifier = modifier.fillMaxWidth(),
-            value = "",
-            onValueChange = {},
-            labelText = "Yeni kategori ismi",
-            errorMessage = ""
+            value = categoryNameVal,
+            onValueChange = { onCategoryNameChanged(it) },
+            labelText = updateCatNameLabel,
+            isError = updateCategoryNameFieldError,
+            errorMessage = textFieldErrorMessage
         )
         CustomButton(
             modifier = modifier.padding(top = 16.dp),
-            onClick = { /*TODO*/ },
-            buttonText = "Kaydet"
+            onClick = updateCategoryName ,
+            buttonText = buttonText
         )
     }
 }

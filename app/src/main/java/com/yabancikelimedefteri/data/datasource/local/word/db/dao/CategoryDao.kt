@@ -16,4 +16,7 @@ interface CategoryDao {
 
     @Query("DELETE FROM category_table WHERE id = :categoryId")
     suspend fun deleteCategory(categoryId: Int)
+
+    @Query("UPDATE category_table SET category_name = :newCategoryName WHERE id = :categoryId")
+    suspend fun updateCategoryName(categoryId: Int, newCategoryName: String)
 }

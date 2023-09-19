@@ -30,4 +30,7 @@
     <string name="empty_word_message">Kelime defterinde hiç kelime yok 😥</string>
     <string name="user_answer">Senin Cevabın</string>
     <string name="text_field_error">Bu alanı boş bırakamazsın</string>
+    <string name="update_cat_successfull">Kategori başarıyla güncellendi</string>
+    <string name="new_cat_name">Yeni kategori ismi</string>
+    <string name="save">Kaydet</string>
 </resources>
