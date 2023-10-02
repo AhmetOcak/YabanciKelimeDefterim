@@ -21,10 +21,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -38,7 +42,7 @@ import com.yabancikelimedefteri.domain.model.CategoryWithId
 import com.yabancikelimedefteri.presentation.main.OrientationState
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
@@ -59,9 +63,21 @@ fun HomeScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+
     LaunchedEffect(key1 = sheetState.isVisible) {
         coroutineScope.launch {
             HomeScreenFab.showFab.value = !sheetState.isVisible
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        snapshotFlow { sheetState.currentValue }.collect {
+            if (it == ModalBottomSheetValue.Hidden) {
+                focusManager.clearFocus()
+                keyboardController?.hide()
+            }
         }
     }
 
@@ -325,7 +341,7 @@ private fun SheetContent(
         )
         CustomButton(
             modifier = modifier.padding(top = 16.dp),
-            onClick = updateCategoryName ,
+            onClick = updateCategoryName,
             buttonText = buttonText
         )
     }
