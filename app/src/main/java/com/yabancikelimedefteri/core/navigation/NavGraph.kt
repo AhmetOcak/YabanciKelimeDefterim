@@ -34,6 +34,7 @@ import com.yabancikelimedefteri.core.helpers.saveTheme
 import com.yabancikelimedefteri.core.ui.theme.ThemeState
 import com.yabancikelimedefteri.presentation.add_category.AddCategoryScreen
 import com.yabancikelimedefteri.presentation.add_word.AddWordScreen
+import com.yabancikelimedefteri.presentation.dictionary.DictionaryScreen
 import com.yabancikelimedefteri.presentation.game.GameScreen
 import com.yabancikelimedefteri.presentation.home.HomeScreen
 import com.yabancikelimedefteri.presentation.word.WordScreen
@@ -192,6 +193,15 @@ fun NavGraph(
                         pageTitle = resources.getString(R.string.app_name)
                     },
                     resources = resources
+                )
+            }
+            composable(route = NavScreen.DictionaryScreen.route) {
+                showFab = false
+                DictionaryScreen(
+                    onNavigateBack = {
+                        navController.navigate(NavScreen.HomeScreen.route)
+                        pageTitle = resources.getString(R.string.app_name)
+                    }
                 )
             }
         }

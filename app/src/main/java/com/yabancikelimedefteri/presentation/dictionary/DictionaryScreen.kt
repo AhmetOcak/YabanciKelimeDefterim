@@ -1,6 +1,7 @@
 package com.yabancikelimedefteri.presentation.dictionary
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,7 +33,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,10 +41,14 @@ import com.yabancikelimedefteri.core.ui.component.CustomTextField
 import com.yabancikelimedefteri.domain.model.WordWithId
 
 @Composable
-fun DictionaryScreen(modifier: Modifier = Modifier) {
+fun DictionaryScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
 
     val viewModel: DictionaryViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsState()
+
+    BackHandler {
+        onNavigateBack()
+    }
 
     DictionaryScreenContent(
         modifier = modifier,
@@ -206,11 +210,4 @@ private fun WordMeaning(modifier: Modifier, meaningOfWord: String, onDismiss: ()
             )
         }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PreviewDictionaryScreen() {
-
-    DictionaryScreen()
 }

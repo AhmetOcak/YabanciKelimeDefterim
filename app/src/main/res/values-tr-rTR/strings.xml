@@ -35,4 +35,5 @@
     <string name="save">Kaydet</string>
     <string name="search">Ara</string>
     <string name="search_empty">Görünüşe göre aradığınız kelime sözlüğünüzde yok 😥</string>
+    <string name="my_dictionary">Sözlüğüm</string>
 </resources>

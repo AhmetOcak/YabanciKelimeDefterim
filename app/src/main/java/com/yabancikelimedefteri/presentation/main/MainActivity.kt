@@ -38,7 +38,6 @@ class MainActivity : ComponentActivity() {
 
         val resources = resources
 
-
         sharedPreferences = getSharedPreferences(THEME_KEY, Context.MODE_PRIVATE)
 
         val currentTheme = sharedPreferences.getCurrentTheme()

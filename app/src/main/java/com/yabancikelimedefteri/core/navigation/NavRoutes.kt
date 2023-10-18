@@ -6,6 +6,7 @@ object NavRoutes {
     const val game_screen = "game_screen"
     const val add_category_screen = "add_category_screen"
     const val word_screen = "${NavNames.word_screen}/{categoryId}"
+    const val dictionary_screen = "dictionary_screen"
 }
 
 object NavNames {
