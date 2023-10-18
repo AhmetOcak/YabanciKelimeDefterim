@@ -29,8 +29,7 @@ private const val THEME_KEY = "current_theme"
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    lateinit var sharedPreferences: SharedPreferences
-
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.Theme_YabanciKelimeDefteri)
