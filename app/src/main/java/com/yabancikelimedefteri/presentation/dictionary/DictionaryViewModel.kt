@@ -66,14 +66,14 @@ class DictionaryViewModel @Inject constructor(
 
     private fun searchWord() {
         if (_uiState.value.searchText.isNotBlank()) {
-           _uiState.update {
-               it.copy(
-                   searchResults = wordsList.filter { word ->
-                       word.foreignWord.contains(_uiState.value.searchText)
-                   },
-                   isSearching = true
-               )
-           }
+            _uiState.update {
+                it.copy(
+                    searchResults = wordsList.filter { word ->
+                        word.foreignWord.contains(_uiState.value.searchText)
+                    },
+                    isSearching = true
+                )
+            }
         } else {
             _uiState.update {
                 it.copy(
@@ -83,6 +83,15 @@ class DictionaryViewModel @Inject constructor(
             }
         }
     }
+
+    fun getWordMeaning(wordWithId: WordWithId) {
+        val meaning = _uiState.value.searchResults.first {
+            wordWithId.wordId == it.wordId
+        }
+        _uiState.update {
+            it.copy(wordMeaning = meaning.meaning)
+        }
+    }
 }
 
 data class DictionaryUiState(
@@ -90,5 +99,6 @@ data class DictionaryUiState(
     val searchFieldError: Boolean = false,
     val searchResults: List<WordWithId> = listOf(),
     val isSearching: Boolean = false,
-    val isError: Boolean = false
+    val isError: Boolean = false,
+    val wordMeaning: String? = null
 )
