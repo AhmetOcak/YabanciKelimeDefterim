@@ -35,4 +35,6 @@
     <string name="search">Search</string>
     <string name="search_empty">Looks like the word you are looking for is not in your dictionary 😥</string>
     <string name="my_dictionary">My Dictionary</string>
+
+    <string name="content_open_dict">Open dictionary</string>
 </resources>

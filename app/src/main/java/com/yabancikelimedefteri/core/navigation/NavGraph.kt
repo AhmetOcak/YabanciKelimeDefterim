@@ -112,7 +112,10 @@ fun NavGraph(
                     }
                 },
                 pageTitle = pageTitle,
-                resources = resources
+                resources = resources,
+                onDictClick = {
+                    navController.navigate(NavScreen.DictionaryScreen.route)
+                }
             )
         }
     ) {
@@ -222,6 +225,7 @@ private fun Fab(onClick: () -> Unit) {
 private fun TopBar(
     onGameClick: () -> Unit,
     onDarkModeClick: () -> Unit,
+    onDictClick: () -> Unit,
     onBackClick: () -> Unit,
     pageTitle: String,
     resources: Resources
@@ -232,6 +236,13 @@ private fun TopBar(
         },
         actions = {
             if (pageTitle == resources.getString(R.string.app_name)) {
+                IconButton(onClick = onDictClick) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_dictionary),
+                        contentDescription = resources.getString(R.string.content_open_dict),
+                        tint = Color.White
+                    )
+                }
                 IconButton(onClick = onDarkModeClick) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_dark_mode),

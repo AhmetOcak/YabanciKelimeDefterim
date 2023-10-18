@@ -36,4 +36,6 @@
     <string name="search">Ara</string>
     <string name="search_empty">Görünüşe göre aradığınız kelime sözlüğünüzde yok 😥</string>
     <string name="my_dictionary">Sözlüğüm</string>
+
+    <string name="content_open_dict">Sözlüğü aç</string>
 </resources>
