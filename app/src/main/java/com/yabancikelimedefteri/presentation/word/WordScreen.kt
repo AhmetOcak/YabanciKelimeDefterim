@@ -1,7 +1,6 @@
 package com.yabancikelimedefteri.presentation.word
 
 import android.content.res.Configuration
-import android.content.res.Resources
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,7 +26,7 @@ import com.yabancikelimedefteri.domain.model.WordWithId
 import com.yabancikelimedefteri.presentation.main.OrientationState
 
 @Composable
-fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, resources: Resources) {
+fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
 
     val viewModel: WordViewModel = hiltViewModel()
 
@@ -38,7 +38,7 @@ fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, resour
     }
 
     if (deleteWordState is DeleteWordState.Success) {
-        CustomToast(context = LocalContext.current, message = resources.getString(R.string.word_removed))
+        CustomToast(context = LocalContext.current, message = stringResource(R.string.word_removed))
         viewModel.resetDeleteWordState()
     } else if (deleteWordState is DeleteWordState.Error) {
         CustomToast(
@@ -53,7 +53,7 @@ fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, resour
         getWordsState = getWordsState,
         onDeleteClick = { viewModel.deleteWord(it) },
         getWords = { viewModel.categoryId?.let { viewModel.getWords(it) } },
-        emptyWordText = resources.getString(R.string.empty_word_message)
+        emptyWordText = stringResource(R.string.empty_word_message)
     )
 }
 

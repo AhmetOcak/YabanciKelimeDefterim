@@ -3,7 +3,6 @@ package com.yabancikelimedefteri.presentation.game
 import android.content.Context
 import android.content.SharedPreferences
 import android.content.res.Configuration
-import android.content.res.Resources
 import androidx.activity.compose.BackHandler
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.*
@@ -24,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -43,7 +43,7 @@ import com.yabancikelimedefteri.domain.model.WordWithId
 import com.yabancikelimedefteri.presentation.main.OrientationState
 
 @Composable
-fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, resources: Resources) {
+fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
 
     val viewModel: GameViewModel = hiltViewModel()
 
@@ -93,20 +93,20 @@ fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, resour
         removeAllCategory = { viewModel.removeAllCategories() },
         isButtonEnabled = viewModel.isGameReadyToLaunch,
         launchTheGame = { viewModel.launchTheGame() },
-        startGameButtonText = resources.getString(R.string.start_the_game),
-        allCategoryText = resources.getString(R.string.category_all),
-        gameDescriptionText = resources.getString(R.string.game_description),
-        warningMessageText = resources.getString(R.string.at_least_two_word_warning),
-        labelText = resources.getString(R.string.user_guess),
-        guessButtonText = resources.getString(R.string.submit_answer),
-        correctText = resources.getString(R.string.true_word),
-        wrongText = resources.getString(R.string.false_word),
-        descrTextPartOne = resources.getString(R.string.game_result_table_description_part_one),
-        descrTextPartTwo = resources.getString(R.string.game_result_table_description_part_two),
-        gameResultText = resources.getString(R.string.game_result_message),
-        correctAnswerText = resources.getString(R.string.correct_answer),
-        userAnswerText = resources.getString(R.string.user_answer),
-        textFieldErrorText = resources.getString(R.string.text_field_error)
+        startGameButtonText = stringResource(R.string.start_the_game),
+        allCategoryText = stringResource(R.string.category_all),
+        gameDescriptionText = stringResource(R.string.game_description),
+        warningMessageText = stringResource(R.string.at_least_two_word_warning),
+        labelText = stringResource(R.string.user_guess),
+        guessButtonText = stringResource(R.string.submit_answer),
+        correctText = stringResource(R.string.true_word),
+        wrongText = stringResource(R.string.false_word),
+        descrTextPartOne = stringResource(R.string.game_result_table_description_part_one),
+        descrTextPartTwo = stringResource(R.string.game_result_table_description_part_two),
+        gameResultText = stringResource(R.string.game_result_message),
+        correctAnswerText = stringResource(R.string.correct_answer),
+        userAnswerText = stringResource(R.string.user_answer),
+        textFieldErrorText = stringResource(R.string.text_field_error)
     )
 }
 
