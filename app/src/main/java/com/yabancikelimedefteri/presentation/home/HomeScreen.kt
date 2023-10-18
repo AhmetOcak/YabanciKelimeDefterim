@@ -1,7 +1,6 @@
 package com.yabancikelimedefteri.presentation.home
 
 import android.content.res.Configuration
-import android.content.res.Resources
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,6 +28,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -47,8 +47,7 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
-    onNavigateNext: (Int) -> Unit,
-    resources: Resources
+    onNavigateNext: (Int) -> Unit
 ) {
 
     val viewModel: HomeViewModel = hiltViewModel()
@@ -94,7 +93,7 @@ fun HomeScreen(
     if (deleteCategoryState is DeleteCategoryState.Success) {
         CustomToast(
             context = LocalContext.current,
-            message = resources.getString(R.string.category_removed)
+            message = stringResource(R.string.category_removed)
         )
         viewModel.resetDeleteWordState()
     } else if (deleteCategoryState is DeleteCategoryState.Error) {
@@ -108,7 +107,7 @@ fun HomeScreen(
     if (updateCategoryState is UpdateCategoryState.Success) {
         CustomToast(
             context = LocalContext.current,
-            message = resources.getString(R.string.update_cat_successfull)
+            message = stringResource(R.string.update_cat_successfull)
         )
         viewModel.resetUpdateCatState()
     } else if (updateCategoryState is UpdateCategoryState.Error) {
@@ -125,7 +124,7 @@ fun HomeScreen(
         getCategoriesState = getCategoriesState,
         onCategoryCardClick = { onNavigateNext(it) },
         getCategories = { viewModel.getCategories() },
-        emptyCategoryText = resources.getString(R.string.empty_category_message),
+        emptyCategoryText = stringResource(R.string.empty_category_message),
         sheetState = sheetState,
         onEditClick = {
             viewModel.updateSelectedCaId(it)
@@ -148,9 +147,9 @@ fun HomeScreen(
             }
         },
         updateCategoryNameFieldError = viewModel.newCategoryNameFieldError,
-        textFieldErrorMessage = resources.getString(R.string.text_field_error),
-        updateCatNameLabel = resources.getString(R.string.new_cat_name),
-        buttonText = resources.getString(R.string.save)
+        textFieldErrorMessage = stringResource(R.string.text_field_error),
+        updateCatNameLabel = stringResource(R.string.new_cat_name),
+        buttonText = stringResource(R.string.save)
     )
 }
 
