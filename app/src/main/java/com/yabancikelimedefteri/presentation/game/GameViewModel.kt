@@ -39,7 +39,6 @@ class GameViewModel @Inject constructor(
         private set
 
     private var categories: List<CategoryWithId> = listOf()
-        private set
 
     var correctAnswerCount by mutableStateOf(0)
         private set
