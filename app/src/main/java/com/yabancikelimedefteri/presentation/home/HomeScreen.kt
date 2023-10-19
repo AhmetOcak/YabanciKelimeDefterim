@@ -1,6 +1,7 @@
 package com.yabancikelimedefteri.presentation.home
 
 import android.content.res.Configuration
+import android.content.res.Resources
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -51,8 +52,6 @@ fun HomeScreen(
     onNavigateNext: (Int) -> Unit,
     resources: Resources,
     listType: ListType
-    onNavigateNext: (Int) -> Unit
-
 ) {
 
     val viewModel: HomeViewModel = hiltViewModel()
@@ -156,9 +155,6 @@ fun HomeScreen(
         updateCatNameLabel = resources.getString(R.string.new_cat_name),
         buttonText = resources.getString(R.string.save),
         listType = listType
-        textFieldErrorMessage = stringResource(R.string.text_field_error),
-        updateCatNameLabel = stringResource(R.string.new_cat_name),
-        buttonText = stringResource(R.string.save)
     )
 }
 

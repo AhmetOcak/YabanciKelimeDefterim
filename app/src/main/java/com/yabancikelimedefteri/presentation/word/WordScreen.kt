@@ -1,6 +1,7 @@
 package com.yabancikelimedefteri.presentation.word
 
 import android.content.res.Configuration
+import android.content.res.Resources
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,8 +34,6 @@ fun WordScreen(
     resources: Resources,
     listType: ListType
 ) {
-fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
-
     val viewModel: WordViewModel = hiltViewModel()
 
     val getWordsState by viewModel.getWordState.collectAsState()
@@ -66,7 +65,6 @@ fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
         getWords = { viewModel.categoryId?.let { viewModel.getWords(it) } },
         emptyWordText = resources.getString(R.string.empty_word_message),
         listType = listType
-        emptyWordText = stringResource(R.string.empty_word_message)
     )
 }
 

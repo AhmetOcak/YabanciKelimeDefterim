@@ -221,7 +221,6 @@ fun NavGraph(
                     },
                     resources = resources,
                     listType = catListType
-                    }
                 )
             }
             composable(
