@@ -126,7 +126,11 @@ fun WordCard(
             shape = RoundedCornerShape(10),
             elevation = 4.dp
         ) {
-            Column(modifier = modifier.fillMaxSize().padding(8.dp)) {
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(8.dp)
+            ) {
                 DeleteWord(
                     modifier = modifier.fillMaxWidth(),
                     onClick = {
@@ -169,7 +173,10 @@ private fun DeleteWord(modifier: Modifier, onClick: () -> Unit, isWordCardThin: 
         modifier = modifier,
         contentAlignment = Alignment.TopEnd
     ) {
-        IconButton(modifier = Modifier.size(if (isWordCardThin) 24.dp else 48.dp), onClick = onClick) {
+        IconButton(
+            modifier = Modifier.size(if (isWordCardThin) 24.dp else 48.dp),
+            onClick = onClick
+        ) {
             if (isWordCardThin) {
                 Icon(
                     imageVector = Icons.Filled.Clear,
