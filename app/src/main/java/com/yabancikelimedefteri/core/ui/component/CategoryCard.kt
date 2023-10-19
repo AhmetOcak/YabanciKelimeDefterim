@@ -8,12 +8,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
@@ -27,7 +27,7 @@ fun CategoryCard(
     categoryName: String,
     categoryId: Int,
     onDeleteClick: (Int) -> Unit,
-    height: Dp = LocalConfiguration.current.screenWidthDp.dp / 2,
+    height: Dp,
     width: Dp = 0.dp,
     onCategoryCardClick: (Int) -> Unit,
     getCategories: () -> Unit,
@@ -81,34 +81,129 @@ fun CategoryCard(
     }
 }
 
+/**
+ * Thin version of the Category Card.
+ * Use this component when user choose thin ui mode.
+ */
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-private fun CardFeatures(modifier: Modifier, onDeleteClick: () -> Unit, onEditClick: () -> Unit) {
+fun CategoryCard(
+    modifier: Modifier,
+    categoryName: String,
+    categoryId: Int,
+    onDeleteClick: (Int) -> Unit,
+    width: Dp = 0.dp,
+    onCategoryCardClick: (Int) -> Unit,
+    getCategories: () -> Unit,
+    onEditClick: (Int) -> Unit
+) {
+    val state = remember { MutableTransitionState(false).apply { targetState = true } }
+
+    AnimatedVisibility(
+        visibleState = state,
+        enter = EnterTransition.None,
+        exit = slideOutHorizontally()
+    ) {
+        Card(
+            modifier = if (width == 0.dp) {
+                modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+            } else {
+                modifier
+                    .width(width)
+                    .wrapContentHeight()
+            },
+            shape = RoundedCornerShape(10),
+            onClick = { onCategoryCardClick(categoryId) },
+            elevation = 4.dp
+        ) {
+            Column(
+                modifier = modifier
+                    .fillMaxSize()
+                    .padding(8.dp)
+            ) {
+                CardFeatures(
+                    modifier = modifier,
+                    onDeleteClick = {
+                        onDeleteClick(categoryId)
+                        state.targetState = false
+                    },
+                    onEditClick = {
+                        onEditClick(categoryId)
+                    },
+                    isCatCardThin = true
+                )
+                Column(
+                    modifier = modifier.fillMaxSize(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Word(modifier = modifier, word = categoryName)
+                }
+            }
+        }
+    }
+
+    if (state.isIdle && !state.currentState) {
+        getCategories()
+    }
+}
+
+
+@Composable
+private fun CardFeatures(
+    modifier: Modifier,
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit,
+    isCatCardThin: Boolean = false
+) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.End
     ) {
-        EditCategory(modifier = modifier, onClick = onEditClick)
-        DeleteCategory(modifier = modifier, onClick = onDeleteClick)
+        EditCategory(onClick = onEditClick, isCatCardThin = isCatCardThin)
+        if (isCatCardThin) {
+            Box(modifier = modifier.size(width = 8.dp, height = 0.dp))
+        }
+        DeleteCategory(onClick = onDeleteClick, isCatCardThin = isCatCardThin)
     }
 }
 
 @Composable
-private fun DeleteCategory(modifier: Modifier, onClick: () -> Unit) {
-    IconButton(onClick = onClick) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_baseline_delete_forever),
-            contentDescription = "Kategoriyi sil",
-            tint = MaterialTheme.colors.secondary
-        )
+private fun DeleteCategory(
+    onClick: () -> Unit,
+    isCatCardThin: Boolean
+) {
+    IconButton(
+        modifier = Modifier.size(if (isCatCardThin) 24.dp else 48.dp),
+        onClick = onClick
+    ) {
+        if (isCatCardThin) {
+            Icon(
+                imageVector = Icons.Filled.Clear,
+                contentDescription = null,
+                tint = MaterialTheme.colors.secondary
+            )
+        } else {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_baseline_delete_forever),
+                contentDescription = null,
+                tint = MaterialTheme.colors.secondary
+            )
+        }
     }
 }
 
 @Composable
-private fun EditCategory(modifier: Modifier, onClick: () -> Unit) {
-    IconButton(onClick = onClick) {
+private fun EditCategory(onClick: () -> Unit, isCatCardThin: Boolean) {
+    IconButton(
+        modifier = Modifier.size(if (isCatCardThin) 24.dp else 48.dp),
+        onClick = onClick
+    ) {
         Icon(
             imageVector = Icons.Filled.Edit,
-            contentDescription = "Kategoriyi düzenle",
+            contentDescription = null,
             tint = MaterialTheme.colors.secondary
         )
     }
