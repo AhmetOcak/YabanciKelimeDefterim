@@ -9,7 +9,6 @@ import com.yabancikelimedefteri.core.helpers.Response
 import com.yabancikelimedefteri.domain.model.CategoryWithId
 import com.yabancikelimedefteri.domain.model.WordWithId
 import com.yabancikelimedefteri.domain.usecase.category.GetCategoriesUseCase
-import com.yabancikelimedefteri.domain.usecase.word.GetAllWordsUseCase
 import com.yabancikelimedefteri.domain.usecase.word.GetWordsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +19,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
-    private val getAllWordsUseCase: GetAllWordsUseCase,
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val getWordsUseCase: GetWordsUseCase
 ) : ViewModel() {
@@ -40,7 +38,7 @@ class GameViewModel @Inject constructor(
     var words: List<WordWithId>? = null
         private set
 
-    var categories: List<CategoryWithId> = listOf()
+    private var categories: List<CategoryWithId> = listOf()
         private set
 
     var correctAnswerCount by mutableStateOf(0)
@@ -127,25 +125,6 @@ class GameViewModel @Inject constructor(
         return if (words.isNullOrEmpty()) {
             true
         } else wordIndex <= (words?.size ?: 0) - 1
-    }
-
-    private fun getAllWords() = viewModelScope.launch(Dispatchers.IO) {
-        getAllWordsUseCase().collect() {
-            when(it) {
-                is Response.Loading -> {
-                    _gameState.value = GameState.Loading
-                }
-                is Response.Success -> {
-                    words = it.data
-                    words?.let { words ->
-                        _gameState.value = GameState.Success(data = words.shuffled())
-                    }
-                }
-                is Response.Error -> {
-                    _gameState.value = GameState.Error(message = it.message)
-                }
-            }
-        }
     }
 
     fun launchTheGame() = viewModelScope.launch(Dispatchers.IO) {
