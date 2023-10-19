@@ -169,7 +169,7 @@ private fun DeleteWord(modifier: Modifier, onClick: () -> Unit, isWordCardThin: 
         modifier = modifier,
         contentAlignment = Alignment.TopEnd
     ) {
-        IconButton(modifier = Modifier.size(24.dp), onClick = onClick) {
+        IconButton(modifier = Modifier.size(if (isWordCardThin) 24.dp else 48.dp), onClick = onClick) {
             if (isWordCardThin) {
                 Icon(
                     imageVector = Icons.Filled.Clear,
