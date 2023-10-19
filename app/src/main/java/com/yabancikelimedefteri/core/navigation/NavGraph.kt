@@ -292,7 +292,7 @@ private fun Fab(onClick: () -> Unit) {
     FloatingActionButton(onClick = onClick) {
         Icon(
             imageVector = Icons.Default.Add,
-            contentDescription = "kelime ekle"
+            contentDescription = null
         )
     }
 }
@@ -338,7 +338,7 @@ private fun TopBar(
                                 }
                             }
                         ),
-                        contentDescription = "Dizilim şeklini değiştir",
+                        contentDescription = null,
                         tint = Color.White
                     )
                 }
@@ -371,7 +371,7 @@ private fun HomeScreenTopAppBar(
     IconButton(onClick = onDarkModeClick) {
         Icon(
             painter = painterResource(id = R.drawable.ic_baseline_dark_mode),
-            contentDescription = "Karanlık mod açıksa kapat, kapalıysa aç",
+            contentDescription = null,
             tint = Color.White
         )
     }
@@ -431,7 +431,7 @@ private fun GoBackScreen(onClick: () -> Unit) {
     IconButton(onClick = onClick) {
         Icon(
             imageVector = Icons.Default.ArrowBack,
-            contentDescription = "Bir önceki sayfaya git"
+            contentDescription = null
         )
     }
 }

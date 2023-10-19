@@ -206,7 +206,7 @@ private fun ContentImage(modifier: Modifier, isOrientationPortrait: Boolean = tr
             modifier.padding(horizontal = 80.dp)
         },
         painter = painterResource(id = R.drawable.ic_undraw_bookshelves_re_lxoy),
-        contentDescription = "kelime ekleme görseli",
+        contentDescription = null,
         contentScale = ContentScale.Fit
     )
 }

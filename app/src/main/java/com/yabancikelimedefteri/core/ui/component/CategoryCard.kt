@@ -182,13 +182,13 @@ private fun DeleteCategory(
         if (isCatCardThin) {
             Icon(
                 imageVector = Icons.Filled.Clear,
-                contentDescription = "kategoriyi sil",
+                contentDescription = null,
                 tint = MaterialTheme.colors.secondary
             )
         } else {
             Icon(
                 painter = painterResource(id = R.drawable.ic_baseline_delete_forever),
-                contentDescription = "kategoriyi sil",
+                contentDescription = null,
                 tint = MaterialTheme.colors.secondary
             )
         }
@@ -203,7 +203,7 @@ private fun EditCategory(onClick: () -> Unit, isCatCardThin: Boolean) {
     ) {
         Icon(
             imageVector = Icons.Filled.Edit,
-            contentDescription = "Kategoriyi düzenle",
+            contentDescription = null,
             tint = MaterialTheme.colors.secondary
         )
     }

@@ -180,13 +180,13 @@ private fun DeleteWord(modifier: Modifier, onClick: () -> Unit, isWordCardThin: 
             if (isWordCardThin) {
                 Icon(
                     imageVector = Icons.Filled.Clear,
-                    contentDescription = "Kelimeyi sil",
+                    contentDescription = null,
                     tint = MaterialTheme.colors.secondary
                 )
             } else {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_baseline_delete_forever),
-                    contentDescription = "Kelimeyi sil",
+                    contentDescription = null,
                     tint = MaterialTheme.colors.secondary
                 )
             }
