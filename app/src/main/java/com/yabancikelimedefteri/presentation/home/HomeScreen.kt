@@ -282,6 +282,7 @@ private fun ResponsiveCategoryList(
                     categoryName = it.categoryName,
                     categoryId = it.categoryId,
                     onDeleteClick = onDeleteClick,
+                    height = LocalConfiguration.current.screenWidthDp.dp / 2,
                     onCategoryCardClick = onCategoryCardClick,
                     getCategories = getCategories,
                     onEditClick = onEditClick
