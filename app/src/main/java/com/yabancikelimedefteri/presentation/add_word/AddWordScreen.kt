@@ -1,15 +1,26 @@
 package com.yabancikelimedefteri.presentation.add_word
 
 import android.content.res.Configuration
-import android.content.res.Resources
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -18,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -29,7 +41,7 @@ import com.yabancikelimedefteri.core.ui.component.CustomToast
 import com.yabancikelimedefteri.presentation.main.OrientationState
 
 @Composable
-fun AddWordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, resources: Resources) {
+fun AddWordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
 
     val viewModel: AddWordViewModel = hiltViewModel()
 
@@ -50,7 +62,7 @@ fun AddWordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, res
         is CreateWordState.Success -> {
             CustomToast(
                 context = LocalContext.current,
-                message = resources.getString(R.string.add_word_success)
+                message = stringResource(R.string.add_word_success)
             )
             viewModel.resetAddWordState()
             isStateLoading = false
@@ -58,7 +70,7 @@ fun AddWordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, res
         is CreateWordState.Error -> {
             CustomToast(
                 context = LocalContext.current,
-                message = resources.getString(R.string.error)
+                message = stringResource(R.string.error)
             )
             viewModel.resetAddWordState()
         }
@@ -79,10 +91,10 @@ fun AddWordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, res
         meaningFieldError = viewModel.meaningFieldError,
         focusManager = focusManager,
         isStateLoading = isStateLoading,
-        foreignWordLabel = resources.getString(R.string.foreign_word),
-        meaningLabel = resources.getString(R.string.meaning),
-        buttonText = resources.getString(R.string.add_word),
-        textFieldErrorText = resources.getString(R.string.text_field_error)
+        foreignWordLabel = stringResource(R.string.foreign_word),
+        meaningLabel = stringResource(R.string.meaning),
+        buttonText = stringResource(R.string.add_word),
+        textFieldErrorText = stringResource(R.string.text_field_error)
     )
 }
 

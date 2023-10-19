@@ -221,6 +221,7 @@ fun NavGraph(
                     },
                     resources = resources,
                     listType = catListType
+                    }
                 )
             }
             composable(
@@ -234,8 +235,7 @@ fun NavGraph(
                     onNavigateBack = {
                         navController.navigate("${NavNames.word_screen}/$categoryId")
                         pageTitle = resources.getString(R.string.my_words)
-                    },
-                    resources = resources
+                    }
                 )
             }
             composable(route = NavScreen.GameScreen.route) {
@@ -244,8 +244,7 @@ fun NavGraph(
                     onNavigateBack = {
                         navController.navigate(NavScreen.HomeScreen.route)
                         pageTitle = resources.getString(R.string.app_name)
-                    },
-                    resources = resources
+                    }
                 )
             }
             composable(route = NavScreen.AddCategoryScreen.route) {
@@ -254,8 +253,7 @@ fun NavGraph(
                     onNavigateBack = {
                         navController.navigate(NavScreen.HomeScreen.route)
                         pageTitle = resources.getString(R.string.app_name)
-                    },
-                    resources = resources
+                    }
                 )
             }
             composable(

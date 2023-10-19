@@ -1,21 +1,33 @@
 package com.yabancikelimedefteri.presentation.add_category
 
 import android.content.res.Configuration
-import android.content.res.Resources
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -28,8 +40,7 @@ import com.yabancikelimedefteri.presentation.main.OrientationState
 @Composable
 fun AddCategoryScreen(
     modifier: Modifier = Modifier,
-    onNavigateBack: () -> Unit,
-    resources: Resources
+    onNavigateBack: () -> Unit
 ) {
 
     val viewModel: AddCategoryViewModel = hiltViewModel()
@@ -51,7 +62,7 @@ fun AddCategoryScreen(
         is CreateCategoryState.Success -> {
             CustomToast(
                 context = LocalContext.current,
-                message = resources.getString(R.string.add_category_success)
+                message = stringResource(R.string.add_category_success)
             )
             viewModel.resetCategoryState()
             isStateLoading = false
@@ -59,7 +70,7 @@ fun AddCategoryScreen(
         is CreateCategoryState.Error -> {
             CustomToast(
                 context = LocalContext.current,
-                message = resources.getString(R.string.error)
+                message = stringResource(R.string.error)
             )
             viewModel.resetCategoryState()
         }
@@ -76,9 +87,9 @@ fun AddCategoryScreen(
             focusManager.clearFocus()
         },
         isStateLoading = isStateLoading,
-        textFieldLabel = resources.getString(R.string.category_name),
-        buttonText = resources.getString(R.string.create_category),
-        textFieldErrorText = resources.getString(R.string.text_field_error)
+        textFieldLabel = stringResource(R.string.category_name),
+        buttonText = stringResource(R.string.create_category),
+        textFieldErrorText = stringResource(R.string.text_field_error)
     )
 }
 
