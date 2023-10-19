@@ -129,6 +129,7 @@ private fun ResponsiveWordList(
                     modifier = modifier,
                     foreignWord = it.foreignWord,
                     meaning = it.meaning,
+                    height = LocalConfiguration.current.screenWidthDp.dp / 2,
                     wordId = it.wordId,
                     onDeleteClick = onDeleteClick,
                     getWords = getWords
