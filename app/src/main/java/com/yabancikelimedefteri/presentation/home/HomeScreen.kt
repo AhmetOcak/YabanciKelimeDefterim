@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.helpers.HomeScreenFab
+import com.yabancikelimedefteri.core.navigation.ListType
 import com.yabancikelimedefteri.core.ui.component.CategoryCard
 import com.yabancikelimedefteri.core.ui.component.CustomButton
 import com.yabancikelimedefteri.core.ui.component.CustomTextField
@@ -48,7 +49,8 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     onNavigateBack: () -> Unit,
     onNavigateNext: (Int) -> Unit,
-    resources: Resources
+    resources: Resources,
+    listType: ListType
 ) {
 
     val viewModel: HomeViewModel = hiltViewModel()
@@ -150,7 +152,8 @@ fun HomeScreen(
         updateCategoryNameFieldError = viewModel.newCategoryNameFieldError,
         textFieldErrorMessage = resources.getString(R.string.text_field_error),
         updateCatNameLabel = resources.getString(R.string.new_cat_name),
-        buttonText = resources.getString(R.string.save)
+        buttonText = resources.getString(R.string.save),
+        listType = listType
     )
 }
 
@@ -171,7 +174,8 @@ private fun HomeScreenContent(
     updateCategoryNameFieldError: Boolean,
     textFieldErrorMessage: String,
     updateCatNameLabel: String,
-    buttonText: String
+    buttonText: String,
+    listType: ListType
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -200,7 +204,8 @@ private fun HomeScreenContent(
                     updateCategoryNameFieldError,
                     textFieldErrorMessage,
                     updateCatNameLabel,
-                    buttonText
+                    buttonText,
+                    listType
                 )
             }
 
@@ -228,7 +233,8 @@ private fun CategoryList(
     updateCategoryNameFieldError: Boolean,
     textFieldErrorMessage: String,
     updateCatNameLabel: String,
-    buttonText: String
+    buttonText: String,
+    listType: ListType
 ) {
     ModalBottomSheetLayout(
         modifier = modifier.fillMaxSize(),
@@ -255,7 +261,8 @@ private fun CategoryList(
                 onDeleteClick = onDeleteClick,
                 onCategoryCardClick = onCategoryCardClick,
                 getCategories = getCategories,
-                onEditClick = onEditClick
+                onEditClick = onEditClick,
+                listType = listType
             )
         }
     }
@@ -268,7 +275,8 @@ private fun ResponsiveCategoryList(
     onDeleteClick: (Int) -> Unit,
     onCategoryCardClick: (Int) -> Unit,
     getCategories: () -> Unit,
-    onEditClick: (Int) -> Unit
+    onEditClick: (Int) -> Unit,
+    listType: ListType
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         LazyColumn(
@@ -277,16 +285,31 @@ private fun ResponsiveCategoryList(
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
         ) {
             items(items = data, key = { it.categoryId }) {
-                CategoryCard(
-                    modifier = modifier,
-                    categoryName = it.categoryName,
-                    categoryId = it.categoryId,
-                    onDeleteClick = onDeleteClick,
-                    height = LocalConfiguration.current.screenWidthDp.dp / 2,
-                    onCategoryCardClick = onCategoryCardClick,
-                    getCategories = getCategories,
-                    onEditClick = onEditClick
-                )
+                when(listType) {
+                    ListType.RECTANGLE -> {
+                        CategoryCard(
+                            modifier = modifier,
+                            categoryName = it.categoryName,
+                            categoryId = it.categoryId,
+                            onDeleteClick = onDeleteClick,
+                            height = LocalConfiguration.current.screenWidthDp.dp / 2,
+                            onCategoryCardClick = onCategoryCardClick,
+                            getCategories = getCategories,
+                            onEditClick = onEditClick
+                        )
+                    }
+                    ListType.THIN -> {
+                        CategoryCard(
+                            modifier = modifier,
+                            categoryName = it.categoryName,
+                            categoryId = it.categoryId,
+                            onDeleteClick = onDeleteClick,
+                            onCategoryCardClick = onCategoryCardClick,
+                            getCategories = getCategories,
+                            onEditClick = onEditClick
+                        )
+                    }
+                }
             }
         }
     } else {
@@ -298,17 +321,33 @@ private fun ResponsiveCategoryList(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(items = data, key = { it.categoryId }) {
-                CategoryCard(
-                    modifier = modifier,
-                    categoryName = it.categoryName,
-                    categoryId = it.categoryId,
-                    onDeleteClick = onDeleteClick,
-                    onCategoryCardClick = onCategoryCardClick,
-                    height = LocalConfiguration.current.screenWidthDp.dp / 3,
-                    width = LocalConfiguration.current.screenWidthDp.dp / 3,
-                    getCategories = getCategories,
-                    onEditClick = onEditClick
-                )
+                when(listType) {
+                    ListType.RECTANGLE -> {
+                        CategoryCard(
+                            modifier = modifier,
+                            categoryName = it.categoryName,
+                            categoryId = it.categoryId,
+                            onDeleteClick = onDeleteClick,
+                            onCategoryCardClick = onCategoryCardClick,
+                            height = LocalConfiguration.current.screenWidthDp.dp / 3,
+                            width = LocalConfiguration.current.screenWidthDp.dp / 3,
+                            getCategories = getCategories,
+                            onEditClick = onEditClick
+                        )
+                    }
+                    ListType.THIN -> {
+                        CategoryCard(
+                            modifier = modifier,
+                            categoryName = it.categoryName,
+                            categoryId = it.categoryId,
+                            onDeleteClick = onDeleteClick,
+                            onCategoryCardClick = onCategoryCardClick,
+                            getCategories = getCategories,
+                            onEditClick = onEditClick,
+                            width = LocalConfiguration.current.screenWidthDp.dp / 3,
+                        )
+                    }
+                }
             }
         }
     }

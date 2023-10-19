@@ -1,7 +1,8 @@
 package com.yabancikelimedefteri.core.helpers
 
 import android.content.SharedPreferences
-import com.yabancikelimedefteri.core.navigation.LIST_TYPE_KEY
+import com.yabancikelimedefteri.core.navigation.CAT_LIST_TYPE_KEY
+import com.yabancikelimedefteri.core.navigation.WORD_LIST_TYPE_KEY
 import com.yabancikelimedefteri.core.navigation.ListType
 
 fun SharedPreferences.Editor.saveTheme(themeCode: Int) {
@@ -13,17 +14,33 @@ fun SharedPreferences.getCurrentTheme(): Int {
     return getInt("current_theme", -1)
 }
 
-fun SharedPreferences.getCurrentListType(): Boolean {
-    return getBoolean(LIST_TYPE_KEY, true)
+fun SharedPreferences.getCurrentWordListType(): Boolean {
+    return getBoolean(WORD_LIST_TYPE_KEY, false)
 }
 
-fun SharedPreferences.Editor.saveNewListType(listType: ListType) {
+fun SharedPreferences.getCurrentCatListType(): Boolean {
+    return getBoolean(CAT_LIST_TYPE_KEY, false)
+}
+
+fun SharedPreferences.Editor.saveNewWordListType(listType: ListType) {
     when(listType) {
         ListType.RECTANGLE -> {
-            putBoolean(LIST_TYPE_KEY, true)
+            putBoolean(WORD_LIST_TYPE_KEY, true)
         }
         ListType.THIN -> {
-            putBoolean(LIST_TYPE_KEY, false)
+            putBoolean(WORD_LIST_TYPE_KEY, false)
+        }
+    }
+    apply()
+}
+
+fun SharedPreferences.Editor.saveNewCatListType(listType: ListType) {
+    when(listType) {
+        ListType.RECTANGLE -> {
+            putBoolean(CAT_LIST_TYPE_KEY, true)
+        }
+        ListType.THIN -> {
+            putBoolean(CAT_LIST_TYPE_KEY, false)
         }
     }
     apply()
