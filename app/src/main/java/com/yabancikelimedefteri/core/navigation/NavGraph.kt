@@ -29,7 +29,9 @@ import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.helpers.HomeScreenFab
+import com.yabancikelimedefteri.core.helpers.getCurrentListType
 import com.yabancikelimedefteri.core.helpers.getCurrentTheme
+import com.yabancikelimedefteri.core.helpers.saveNewListType
 import com.yabancikelimedefteri.core.helpers.saveTheme
 import com.yabancikelimedefteri.core.ui.theme.ThemeState
 import com.yabancikelimedefteri.presentation.add_category.AddCategoryScreen
@@ -38,6 +40,15 @@ import com.yabancikelimedefteri.presentation.dictionary.DictionaryScreen
 import com.yabancikelimedefteri.presentation.game.GameScreen
 import com.yabancikelimedefteri.presentation.home.HomeScreen
 import com.yabancikelimedefteri.presentation.word.WordScreen
+
+// if true -> ListType.Rectangle
+// else -> ListType.Thin
+const val LIST_TYPE_KEY = "list_type"
+
+enum class ListType {
+    THIN,
+    RECTANGLE
+}
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -53,6 +64,16 @@ fun NavGraph(
     var pageTitle by rememberSaveable { mutableStateOf(resources.getString(R.string.app_name)) }
 
     var showFab by rememberSaveable { mutableStateOf(true) }
+
+    var listType by rememberSaveable {
+        mutableStateOf(
+            if (sharedPreferences.getCurrentListType()) {
+                ListType.RECTANGLE
+            } else {
+                ListType.THIN
+            }
+        )
+    }
 
     var categoryId: Int? = null
 
@@ -115,7 +136,21 @@ fun NavGraph(
                 resources = resources,
                 onDictClick = {
                     navController.navigate(NavScreen.DictionaryScreen.route)
-                }
+                },
+                onListTypeClick = {
+                    when (listType) {
+                        ListType.RECTANGLE -> {
+                            listType = ListType.THIN
+                            sharedPreferences.edit().saveNewListType(ListType.THIN)
+                        }
+
+                        ListType.THIN -> {
+                            listType = ListType.RECTANGLE
+                            sharedPreferences.edit().saveNewListType(ListType.RECTANGLE)
+                        }
+                    }
+                },
+                listType = listType
             )
         }
     ) {
@@ -195,7 +230,8 @@ fun NavGraph(
                         navController.navigate(NavScreen.HomeScreen.route)
                         pageTitle = resources.getString(R.string.app_name)
                     },
-                    resources = resources
+                    resources = resources,
+                    listType = listType
                 )
             }
             composable(route = NavScreen.DictionaryScreen.route) {
@@ -227,6 +263,8 @@ private fun TopBar(
     onDarkModeClick: () -> Unit,
     onDictClick: () -> Unit,
     onBackClick: () -> Unit,
+    onListTypeClick: () -> Unit,
+    listType: ListType,
     pageTitle: String,
     resources: Resources
 ) {
@@ -254,6 +292,24 @@ private fun TopBar(
                     Icon(
                         painter = painterResource(id = R.drawable.ic_baseline_games),
                         contentDescription = "Kelime tahmin oyunu sayfasını aç",
+                        tint = Color.White
+                    )
+                }
+            } else if (pageTitle == resources.getString(R.string.my_words)) {
+                IconButton(onClick = onListTypeClick) {
+                    Icon(
+                        painter = painterResource(
+                            id = when (listType) {
+                                ListType.RECTANGLE -> {
+                                    R.drawable.ic_rectangle
+                                }
+
+                                ListType.THIN -> {
+                                    R.drawable.ic_line
+                                }
+                            }
+                        ),
+                        contentDescription = "Dizilim şeklini değiştir",
                         tint = Color.White
                     )
                 }

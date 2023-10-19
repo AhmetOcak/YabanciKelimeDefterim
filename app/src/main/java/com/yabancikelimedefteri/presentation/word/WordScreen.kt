@@ -20,13 +20,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.core.navigation.ListType
 import com.yabancikelimedefteri.core.ui.component.CustomToast
 import com.yabancikelimedefteri.core.ui.component.WordCard
 import com.yabancikelimedefteri.domain.model.WordWithId
 import com.yabancikelimedefteri.presentation.main.OrientationState
 
 @Composable
-fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, resources: Resources) {
+fun WordScreen(
+    modifier: Modifier = Modifier,
+    onNavigateBack: () -> Unit,
+    resources: Resources,
+    listType: ListType
+) {
 
     val viewModel: WordViewModel = hiltViewModel()
 
@@ -38,7 +44,10 @@ fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, resour
     }
 
     if (deleteWordState is DeleteWordState.Success) {
-        CustomToast(context = LocalContext.current, message = resources.getString(R.string.word_removed))
+        CustomToast(
+            context = LocalContext.current,
+            message = resources.getString(R.string.word_removed)
+        )
         viewModel.resetDeleteWordState()
     } else if (deleteWordState is DeleteWordState.Error) {
         CustomToast(
@@ -53,7 +62,8 @@ fun WordScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit, resour
         getWordsState = getWordsState,
         onDeleteClick = { viewModel.deleteWord(it) },
         getWords = { viewModel.categoryId?.let { viewModel.getWords(it) } },
-        emptyWordText = resources.getString(R.string.empty_word_message)
+        emptyWordText = resources.getString(R.string.empty_word_message),
+        listType = listType
     )
 }
 
@@ -63,7 +73,8 @@ private fun WordScreenContent(
     getWordsState: GetWordState,
     onDeleteClick: (Int) -> Unit,
     getWords: () -> Unit,
-    emptyWordText: String
+    emptyWordText: String,
+    listType: ListType
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -75,15 +86,18 @@ private fun WordScreenContent(
                     CircularProgressIndicator()
                 }
             }
+
             is GetWordState.Success -> {
                 WordList(
                     getWordsState,
                     modifier,
                     onDeleteClick,
                     getWords,
-                    emptyWordText
+                    emptyWordText,
+                    listType
                 )
             }
+
             is GetWordState.Error -> {
                 CustomToast(context = LocalContext.current, message = getWordsState.message)
             }
@@ -97,7 +111,8 @@ private fun WordList(
     modifier: Modifier,
     onDeleteClick: (Int) -> Unit,
     getWords: () -> Unit,
-    emptyWordText: String
+    emptyWordText: String,
+    listType: ListType
 ) {
     if (getWordsState.data.isEmpty()) {
         EmptyWordListMessage(modifier = modifier, emptyWordText = emptyWordText)
@@ -106,7 +121,8 @@ private fun WordList(
             modifier = modifier,
             data = getWordsState.data,
             onDeleteClick = onDeleteClick,
-            getWords = getWords
+            getWords = getWords,
+            listType = listType
         )
     }
 }
@@ -116,7 +132,8 @@ private fun ResponsiveWordList(
     modifier: Modifier,
     data: List<WordWithId>,
     onDeleteClick: (Int) -> Unit,
-    getWords: () -> Unit
+    getWords: () -> Unit,
+    listType: ListType
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         LazyColumn(
@@ -125,36 +142,65 @@ private fun ResponsiveWordList(
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
         ) {
             items(items = data, key = { it.wordId }) {
-                WordCard(
-                    modifier = modifier,
-                    foreignWord = it.foreignWord,
-                    meaning = it.meaning,
-                    height = LocalConfiguration.current.screenWidthDp.dp / 2,
-                    wordId = it.wordId,
-                    onDeleteClick = onDeleteClick,
-                    getWords = getWords
-                )
+                when(listType) {
+                    ListType.RECTANGLE -> {
+                        WordCard(
+                            modifier = modifier,
+                            foreignWord = it.foreignWord,
+                            meaning = it.meaning,
+                            height = LocalConfiguration.current.screenWidthDp.dp / 2,
+                            wordId = it.wordId,
+                            onDeleteClick = onDeleteClick,
+                            getWords = getWords
+                        )
+                    }
+                    ListType.THIN -> {
+                        WordCard(
+                            modifier = modifier,
+                            foreignWord = it.foreignWord,
+                            meaning = it.meaning,
+                            wordId = it.wordId,
+                            onDeleteClick = onDeleteClick,
+                            getWords = getWords
+                        )
+                    }
+                }
             }
         }
     } else {
         LazyVerticalGrid(
             modifier = modifier.fillMaxSize(),
-            columns = GridCells.Fixed(3),
+            columns = GridCells.Fixed(if (listType == ListType.RECTANGLE) 3 else 2),
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(data) {
-                WordCard(
-                    modifier = modifier,
-                    foreignWord = it.foreignWord,
-                    meaning = it.meaning,
-                    wordId = it.wordId,
-                    onDeleteClick = onDeleteClick,
-                    height = LocalConfiguration.current.screenWidthDp.dp / 3,
-                    width = LocalConfiguration.current.screenWidthDp.dp / 3,
-                    getWords = getWords
-                )
+                when(listType) {
+                    ListType.RECTANGLE -> {
+                        WordCard(
+                            modifier = modifier,
+                            foreignWord = it.foreignWord,
+                            meaning = it.meaning,
+                            wordId = it.wordId,
+                            onDeleteClick = onDeleteClick,
+                            height = LocalConfiguration.current.screenWidthDp.dp / 3,
+                            width = LocalConfiguration.current.screenWidthDp.dp / 3,
+                            getWords = getWords
+                        )
+                    }
+                    ListType.THIN -> {
+                        WordCard(
+                            modifier = modifier,
+                            foreignWord = it.foreignWord,
+                            meaning = it.meaning,
+                            wordId = it.wordId,
+                            onDeleteClick = onDeleteClick,
+                            getWords = getWords,
+                            width = LocalConfiguration.current.screenWidthDp.dp / 3,
+                        )
+                    }
+                }
             }
         }
     }
