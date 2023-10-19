@@ -4,20 +4,6 @@ import android.content.SharedPreferences
 import com.yabancikelimedefteri.core.navigation.LIST_TYPE_KEY
 import com.yabancikelimedefteri.core.navigation.ListType
 
-fun SharedPreferences.Editor.saveWord(foreignWord: String, meaning: String) {
-    putString(foreignWord, meaning)
-    apply()
-}
-
-fun SharedPreferences.getWords(): MutableMap<String, *>? {
-    return all
-}
-
-fun SharedPreferences.Editor.removeWord(foreignWord: String) {
-    remove(foreignWord)
-    apply()
-}
-
 fun SharedPreferences.Editor.saveTheme(themeCode: Int) {
     putInt("current_theme", themeCode)
     apply()
