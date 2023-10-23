@@ -14,6 +14,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+enum class SearchType {
+    FOREIGN_WORD,
+    MEANING_OF_WORD
+}
+
 @HiltViewModel
 class DictionaryViewModel @Inject constructor(
     private val getAllWordsUseCase: GetAllWordsUseCase
@@ -66,10 +71,20 @@ class DictionaryViewModel @Inject constructor(
 
     private fun searchWord() {
         if (_uiState.value.searchText.isNotBlank()) {
-            _uiState.update {
-                it.copy(
+            _uiState.update { state ->
+                state.copy(
                     searchResults = wordsList.filter { word ->
-                        word.foreignWord.contains(_uiState.value.searchText)
+                        word.foreignWord.contains(_uiState.value.searchText.lowercase())
+                            .also { result ->
+                                if (result) {
+                                    _uiState.update { state.copy(searchType = SearchType.FOREIGN_WORD) }
+                                }
+                            } || word.meaning.contains(_uiState.value.searchText.lowercase())
+                            .also { result ->
+                                if (result) {
+                                    _uiState.update { state.copy(searchType = SearchType.MEANING_OF_WORD) }
+                                }
+                            }
                     },
                     isSearching = true
                 )
@@ -89,7 +104,17 @@ class DictionaryViewModel @Inject constructor(
             wordWithId.wordId == it.wordId
         }
         _uiState.update {
-            it.copy(wordMeaning = meaning.meaning)
+            it.copy(
+                wordMeaning = when (_uiState.value.searchType) {
+                    SearchType.FOREIGN_WORD -> {
+                        meaning.meaning
+                    }
+
+                    SearchType.MEANING_OF_WORD -> {
+                        meaning.foreignWord
+                    }
+                }
+            )
         }
     }
 }
@@ -100,5 +125,6 @@ data class DictionaryUiState(
     val searchResults: List<WordWithId> = listOf(),
     val isSearching: Boolean = false,
     val isError: Boolean = false,
+    val searchType: SearchType = SearchType.FOREIGN_WORD,
     val wordMeaning: String? = null
 )
