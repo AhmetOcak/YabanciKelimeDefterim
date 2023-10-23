@@ -61,7 +61,8 @@ fun DictionaryScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) 
         onSearchClicked = { viewModel.onSearchClicked() },
         isSearchFieldError = uiState.searchFieldError,
         meaningOfWord = uiState.wordMeaning ?: "",
-        onWordClicked = { viewModel.getWordMeaning(it) }
+        onWordClicked = { viewModel.getWordMeaning(it) },
+        searchType = uiState.searchType
     )
 }
 
@@ -76,7 +77,8 @@ private fun DictionaryScreenContent(
     onSearchClicked: () -> Unit,
     isSearchFieldError: Boolean,
     meaningOfWord: String,
-    onWordClicked: (WordWithId) -> Unit
+    onWordClicked: (WordWithId) -> Unit,
+    searchType: SearchType
 ) {
     var showWordDialog by remember { mutableStateOf(false) }
 
@@ -97,7 +99,8 @@ private fun DictionaryScreenContent(
             onWordClicked = {
                 onWordClicked(it)
                 showWordDialog = true
-            }
+            },
+            searchType = searchType
         )
         if (showSearchResultEmpty) {
             SearchResultEmpty(modifier)
@@ -116,14 +119,15 @@ private fun DictionaryScreenContent(
 private fun SearchList(
     modifier: Modifier,
     searchResults: List<WordWithId>,
-    onWordClicked: (WordWithId) -> Unit
+    onWordClicked: (WordWithId) -> Unit,
+    searchType: SearchType
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
         contentPadding = PaddingValues(vertical = 16.dp)
     ) {
         items(searchResults, key = { it.wordId }) {
-            WordItem(modifier, it, onWordClicked)
+            WordItem(modifier, it, onWordClicked, searchType)
         }
     }
 }
@@ -168,7 +172,12 @@ private fun SearchResultEmpty(modifier: Modifier) {
 }
 
 @Composable
-private fun WordItem(modifier: Modifier, word: WordWithId, onWordClicked: (WordWithId) -> Unit) {
+private fun WordItem(
+    modifier: Modifier,
+    word: WordWithId,
+    onWordClicked: (WordWithId) -> Unit,
+    searchType: SearchType
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -182,7 +191,15 @@ private fun WordItem(modifier: Modifier, word: WordWithId, onWordClicked: (WordW
             modifier = modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            text = word.foreignWord,
+            text = when (searchType) {
+                SearchType.FOREIGN_WORD -> {
+                    word.foreignWord
+                }
+
+                SearchType.MEANING_OF_WORD -> {
+                    word.meaning
+                }
+            },
             style = MaterialTheme.typography.body1
         )
         Divider(modifier = modifier.fillMaxWidth())
