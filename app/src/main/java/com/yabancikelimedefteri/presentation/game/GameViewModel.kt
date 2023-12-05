@@ -26,7 +26,8 @@ class GameViewModel @Inject constructor(
     private val _gameState = MutableStateFlow<GameState>(GameState.Nothing)
     val gameState = _gameState.asStateFlow()
 
-    private val _categoriesState = MutableStateFlow<GetGameCategoriesState>(GetGameCategoriesState.Loading)
+    private val _categoriesState =
+        MutableStateFlow<GetGameCategoriesState>(GetGameCategoriesState.Loading)
     val categoriesState = _categoriesState.asStateFlow()
 
     var guessWord by mutableStateOf("")
@@ -65,9 +66,13 @@ class GameViewModel @Inject constructor(
         getCategories()
     }
 
-    fun updateGuessWord(newValue: String) { guessWord = newValue }
+    fun updateGuessWord(newValue: String) {
+        guessWord = newValue
+    }
 
-    fun setAllCategorySelect(newValue: Boolean) { isAllCategorySelected = newValue }
+    fun setAllCategorySelect(newValue: Boolean) {
+        isAllCategorySelected = newValue
+    }
 
     fun addAllCategories() {
         categories.forEach {
@@ -108,7 +113,9 @@ class GameViewModel @Inject constructor(
         }
     }
 
-    fun resetGuessWord() { guessWord = "" }
+    fun resetGuessWord() {
+        guessWord = ""
+    }
 
     fun isGuessWordReadyForSubmit(): Boolean {
         return if (guessWord.isBlank()) {
@@ -132,12 +139,14 @@ class GameViewModel @Inject constructor(
                 is Response.Loading -> {
                     _gameState.value = GameState.Loading
                 }
+
                 is Response.Success -> {
                     words = it.data
                     words?.let { words ->
                         _gameState.value = GameState.Success(data = words.shuffled())
                     }
                 }
+
                 is Response.Error -> {
                     _gameState.value = GameState.Error(message = it.message)
                 }
@@ -147,14 +156,16 @@ class GameViewModel @Inject constructor(
 
     private fun getCategories() = viewModelScope.launch(Dispatchers.IO) {
         getCategoriesUseCase().collect() {
-            when(it) {
+            when (it) {
                 is Response.Loading -> {
                     _categoriesState.value = GetGameCategoriesState.Loading
                 }
+
                 is Response.Success -> {
                     categories = it.data
                     _categoriesState.value = GetGameCategoriesState.Success(data = it.data)
                 }
+
                 is Response.Error -> {
                     _categoriesState.value = GetGameCategoriesState.Error(message = it.message)
                 }
@@ -164,12 +175,12 @@ class GameViewModel @Inject constructor(
 
     fun calculateResult() {
         answers.keys.forEach {
-            if (answers[it]?.uppercase() == words?.find { word -> word.foreignWord == it }?.meaning?.uppercase()) {
+            if (words?.find { word -> word.foreignWord == it }?.meaning?.uppercase()?.contains(
+                    "${answers[it]?.uppercase()}") == true) {
                 correctAnswerCount++
             } else {
                 inCorrectAnswerCount++
             }
         }
     }
-
 }

@@ -523,11 +523,9 @@ private fun GameResultTable(
                     modifier = modifier,
                     text = answers[it] ?: "",
                     textColor = if (
-                        (words.find { word ->
-                            word.foreignWord == it
-                        }?.meaning?.uppercase() ?: "")
-                        ==
-                        (answers[it]?.uppercase() ?: "")
+                        words.find { word -> word.foreignWord == it }?.meaning?.uppercase()?.contains(
+                            "${answers[it]?.uppercase()}"
+                        ) == true
                     ) Color.Green else Color.Red,
                     isCurrentThemeDark = isCurrentThemeDark
                 )
