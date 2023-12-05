@@ -104,8 +104,8 @@ fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
         descrTextPartOne = stringResource(R.string.game_result_table_description_part_one),
         descrTextPartTwo = stringResource(R.string.game_result_table_description_part_two),
         gameResultText = stringResource(R.string.game_result_message),
+        questionText = stringResource(R.string.question),
         correctAnswerText = stringResource(R.string.correct_answer),
-        userAnswerText = stringResource(R.string.user_answer),
         textFieldErrorText = stringResource(R.string.text_field_error)
     )
 }
@@ -146,8 +146,8 @@ private fun GameScreenContent(
     wrongText: String,
     descrTextPartTwo: String,
     gameResultText: String,
+    questionText: String,
     correctAnswerText: String,
-    userAnswerText: String,
     textFieldErrorText: String
 ) {
     when (gameState) {
@@ -214,8 +214,8 @@ private fun GameScreenContent(
                     correctText = correctText,
                     wrongText = wrongText,
                     gameResultText = gameResultText,
-                    correctAnswerText = correctAnswerText,
-                    userAnswerText = userAnswerText
+                    questionText = questionText,
+                    correctAnswerText = correctAnswerText
                 )
             }
         }
@@ -448,8 +448,8 @@ private fun GameResultSection(
     wrongText: String,
     descrTextPartTwo: String,
     gameResultText: String,
-    correctAnswerText: String,
-    userAnswerText: String
+    questionText: String,
+    correctAnswerText: String
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -478,8 +478,8 @@ private fun GameResultSection(
             else
                 Color.Black,
             isCurrentThemeDark = isCurrentThemeDark,
-            correctAnswerText = correctAnswerText,
-            userAnswerText = userAnswerText
+            questionText = questionText,
+            correctAnswerText = correctAnswerText
         )
         GameResultTable(
             modifier = modifier,
@@ -507,27 +507,27 @@ private fun GameResultTable(
         modifier = modifier.fillMaxWidth(),
         contentPadding = PaddingValues(bottom = 16.dp, start = 16.dp, end = 16.dp)
     ) {
-        items(answers.keys.toList()) {
+        items(answers.keys.toList()) { question ->
             Row(
-                modifier = modifier.fillMaxWidth(),
+                modifier = modifier
+                    .fillMaxWidth()
+                    .border(1.dp, if (isCurrentThemeDark) Color.Gray else Color.Black),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TableCell(
                     modifier = modifier,
-                    text = it,
-                    textColor = tableCellTextColor,
-                    isCurrentThemeDark = isCurrentThemeDark
+                    text = question,
+                    textColor = tableCellTextColor
                 )
                 TableCell(
                     modifier = modifier,
-                    text = answers[it] ?: "",
+                    text = words.find { word -> word.foreignWord == question }?.meaning ?: "",
                     textColor = if (
-                        words.find { word -> word.foreignWord == it }?.meaning?.uppercase()?.contains(
-                            "${answers[it]?.uppercase()}"
+                        words.find { word -> word.foreignWord == question }?.meaning?.uppercase()?.contains(
+                            "${answers[question]?.uppercase()}"
                         ) == true
-                    ) Color.Green else Color.Red,
-                    isCurrentThemeDark = isCurrentThemeDark
+                    ) Color.Green else Color.Red
                 )
             }
         }
@@ -539,31 +539,30 @@ private fun GameResultTableHeaders(
     modifier: Modifier,
     tableCellTextColor: Color,
     isCurrentThemeDark: Boolean,
-    correctAnswerText: String,
-    userAnswerText: String
+    questionText: String,
+    correctAnswerText: String
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(top = 4.dp, start = 16.dp, end = 16.dp),
+            .padding(top = 4.dp, start = 16.dp, end = 16.dp)
+            .border(1.dp, if (isCurrentThemeDark) Color.Gray else Color.Black),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         TableCell(
             modifier = modifier,
-            text = correctAnswerText,
+            text = questionText,
             style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.SemiBold),
             isTextLowerCase = false,
-            textColor = tableCellTextColor,
-            isCurrentThemeDark = isCurrentThemeDark
+            textColor = tableCellTextColor
         )
         TableCell(
             modifier = modifier,
-            text = userAnswerText,
+            text = correctAnswerText,
             style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.SemiBold),
             isTextLowerCase = false,
-            textColor = tableCellTextColor,
-            isCurrentThemeDark = isCurrentThemeDark
+            textColor = tableCellTextColor
         )
     }
 }
@@ -630,14 +629,12 @@ private fun RowScope.TableCell(
     text: String,
     textColor: Color,
     style: TextStyle = MaterialTheme.typography.body2,
-    isTextLowerCase: Boolean = true,
-    isCurrentThemeDark: Boolean
+    isTextLowerCase: Boolean = true
 ) {
     Text(
         modifier = modifier
             .fillMaxWidth()
             .weight(1f)
-            .border(1.dp, if (isCurrentThemeDark) Color.Gray else Color.Black)
             .padding(8.dp),
         text = if (isTextLowerCase) text.lowercase() else text,
         color = textColor,
