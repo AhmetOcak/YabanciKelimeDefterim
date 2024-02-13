@@ -4,7 +4,11 @@
 
 [<img src="https://user-images.githubusercontent.com/73544434/233419257-664128a8-1db0-400a-8206-8c88a4ebab1f.png" width="600" height="195" >](https://play.google.com/store/apps/details?id=com.yabancikelimedefteri)
 
+<!--
 Anlamını bilmediğin kelimeleri kategorize ederek sakla. Kategoriler oluştur ve oluşturduğun bu kategorilere anlamını bilmediğin kelimeleri anlamlarıyla beraber ekle. Kelime tahmin oyununu oynarak eklediğin kelimelerle sınan, kendini test et. Dilediğin zaman kelimeleri ve kategorileri silebilirsin. Bir kategori silerken dikkatli ol. Bir kategoriyi sildiğin zaman o kategorideki kelimeleride silersin. Uygulamayı dilersen açık dilersen karanlık temada kullan.
+-->
+
+Categorize and store words you don't know the meaning of. Create categories and add the words you don't know the meaning of to these categories with their meanings. Test yourself with the words you add by playing the word guessing game. You can delete words and categories at any time. Be careful when deleting a category. When you delete a category, you delete the words in that category. You can use the app in light or dark theme.
 
 ## Tech Stack 📚
 
