@@ -1,42 +1,42 @@
 package com.yabancikelimedefteri.core.navigation
 
-import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.SharedPreferences
 import android.content.res.Resources
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.edit
 import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.google.accompanist.navigation.animation.AnimatedNavHost
-import com.google.accompanist.navigation.animation.composable
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.helpers.HomeScreenFab
 import com.yabancikelimedefteri.core.helpers.getCurrentCatListType
@@ -64,17 +64,15 @@ enum class ListType {
     RECTANGLE
 }
 
-@SuppressLint("CommitPrefEdits")
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun NavGraph(
     modifier: Modifier = Modifier,
     startDestination: String = NavScreen.HomeScreen.route,
-    activity: Activity,
     sharedPreferences: SharedPreferences,
     resources: Resources
 ) {
-    val navController = rememberAnimatedNavController()
+    val navController = rememberNavController()
 
     var pageTitle by rememberSaveable { mutableStateOf(resources.getString(R.string.app_name)) }
 
@@ -105,7 +103,7 @@ fun NavGraph(
     Scaffold(
         modifier = modifier.fillMaxSize(),
         floatingActionButtonPosition = FabPosition.End,
-        backgroundColor = MaterialTheme.colors.background,
+        containerColor = MaterialTheme.colorScheme.background,
         floatingActionButton = {
             if (showFab) {
                 Fab(
@@ -193,27 +191,14 @@ fun NavGraph(
             )
         }
     ) {
-        AnimatedNavHost(
+        NavHost(
             modifier = modifier.padding(it),
             navController = navController,
-            startDestination = startDestination,
-            enterTransition = {
-                slideIntoContainer(
-                    AnimatedContentScope.SlideDirection.Right,
-                    animationSpec = tween(500)
-                )
-            },
-            exitTransition = {
-                slideOutOfContainer(
-                    AnimatedContentScope.SlideDirection.Left,
-                    animationSpec = tween(500)
-                )
-            }
+            startDestination = startDestination
         ) {
             composable(route = NavScreen.HomeScreen.route) {
                 showFab = HomeScreenFab.showFab.value
                 HomeScreen(
-                    onNavigateBack = { activity.finish() },
                     onNavigateNext = { id ->
                         categoryId = id
                         navController.navigate("${NavNames.word_screen}/$id")
@@ -294,6 +279,7 @@ private fun Fab(onClick: () -> Unit) {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TopBar(
     onGameClick: () -> Unit,
@@ -341,11 +327,11 @@ private fun TopBar(
                 }
             }
         },
-        navigationIcon = if (pageTitle != resources.getString(R.string.app_name)) {
-            {
+        navigationIcon = {
+            if (pageTitle != resources.getString(R.string.app_name)) {
                 GoBackScreen(onClick = onBackClick)
             }
-        } else null
+        }
     )
 }
 
@@ -373,31 +359,35 @@ private fun HomeScreenTopAppBar(
         )
     }
     OverflowMenu {
-        DropdownMenuItem(onClick = onGameClick) {
-            Row(
-                modifier = Modifier.fillMaxSize(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Icon(
-                    modifier = Modifier.fillMaxHeight(),
-                    painter = painterResource(id = R.drawable.ic_baseline_games),
-                    contentDescription = null
-                )
+        DropdownMenuItem(
+            text = {
                 Text(
                     modifier = Modifier.fillMaxSize(),
                     text = resources.getString(R.string.word_game),
                     style = TextStyle(fontSize = 16.sp),
                     textAlign = TextAlign.Center
                 )
+            },
+            onClick = onGameClick,
+            trailingIcon = {
+                Icon(
+                    modifier = Modifier.fillMaxHeight(),
+                    painter = painterResource(id = R.drawable.ic_baseline_games),
+                    contentDescription = null
+                )
             }
-        }
-        DropdownMenuItem(onClick = onChangeCatListType) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
+        )
+        DropdownMenuItem(
+            text = {
+                Text(
+                    modifier = Modifier.fillMaxSize(),
+                    text = resources.getString(R.string.appearance),
+                    style = TextStyle(fontSize = 16.sp),
+                    textAlign = TextAlign.Center
+                )
+            },
+            onClick = onChangeCatListType,
+            trailingIcon = {
                 Icon(
                     modifier = Modifier.fillMaxHeight(),
                     painter = painterResource(
@@ -412,14 +402,8 @@ private fun HomeScreenTopAppBar(
                     ),
                     contentDescription = null
                 )
-                Text(
-                    modifier = Modifier.fillMaxSize(),
-                    text = resources.getString(R.string.appearance),
-                    style = TextStyle(fontSize = 16.sp),
-                    textAlign = TextAlign.Center
-                )
             }
-        }
+        )
     }
 }
 
@@ -427,7 +411,7 @@ private fun HomeScreenTopAppBar(
 private fun GoBackScreen(onClick: () -> Unit) {
     IconButton(onClick = onClick) {
         Icon(
-            imageVector = Icons.Default.ArrowBack,
+            imageVector = Icons.AutoMirrored.Default.ArrowBack,
             contentDescription = null
         )
     }

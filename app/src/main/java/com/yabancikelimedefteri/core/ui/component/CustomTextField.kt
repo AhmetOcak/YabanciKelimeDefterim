@@ -4,10 +4,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -18,7 +18,7 @@ import com.yabancikelimedefteri.R
 
 @Composable
 fun CustomTextField(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     value: String,
     onValueChange: (String) -> Unit,
     labelText: String,
@@ -41,7 +41,7 @@ fun CustomTextField(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_baseline_error),
                     contentDescription = errorMessage,
-                    tint = MaterialTheme.colors.error
+                    tint = MaterialTheme.colorScheme.error
                 )
             }
         } else null,
@@ -50,9 +50,9 @@ fun CustomTextField(
     )
     if (isError) {
         Text(
-            modifier = modifier.padding(top = 4.dp, start = 16.dp),
+            modifier = Modifier.padding(top = 4.dp, start = 16.dp),
             text = errorMessage,
-            color = MaterialTheme.colors.error,
+            color = MaterialTheme.colorScheme.error,
             fontSize = 12.sp,
             fontWeight = FontWeight.Bold
         )

@@ -31,7 +31,6 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.yabancikelimedefteri.R
@@ -158,10 +157,10 @@ private fun ResponsiveContent(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            ContentImage(modifier = modifier)
-            Space(modifier = modifier, spaceHeight = 64.dp)
+            ContentImage()
+            Spacer(modifier = Modifier.height(64.dp))
             CustomTextField(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 48.dp),
                 value = foreignWordVal,
@@ -176,9 +175,9 @@ private fun ResponsiveContent(
                 ),
                 errorMessage = textFieldErrorText
             )
-            Space(modifier = modifier)
+            Spacer(modifier = Modifier.height(16.dp))
             CustomTextField(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 48.dp),
                 value = meaningVal,
@@ -193,9 +192,8 @@ private fun ResponsiveContent(
                 ),
                 errorMessage = textFieldErrorText
             )
-            Space(modifier = modifier, spaceHeight = 32.dp)
+            Spacer(modifier = Modifier.height(32.dp))
             CustomButton(
-                modifier = modifier,
                 onClick = addWordOnClick,
                 buttonText = buttonText,
                 enabled = !isStateLoading
@@ -209,14 +207,14 @@ private fun ResponsiveContent(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ContentImage(modifier = modifier.weight(1f))
+            ContentImage(modifier = Modifier.weight(1f))
             Column(
-                modifier = modifier.weight(1f),
+                modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
                 CustomTextField(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 48.dp),
                     value = foreignWordVal,
@@ -231,9 +229,9 @@ private fun ResponsiveContent(
                     ),
                     errorMessage = textFieldErrorText
                 )
-                Space(modifier = modifier)
+                Spacer(modifier = Modifier.height(16.dp))
                 CustomTextField(
-                    modifier = modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 48.dp),
                     value = meaningVal,
@@ -248,9 +246,8 @@ private fun ResponsiveContent(
                     ),
                     errorMessage = textFieldErrorText
                 )
-                Space(modifier = modifier, spaceHeight = 32.dp)
+                Spacer(modifier = Modifier.height(32.dp))
                 CustomButton(
-                    modifier = modifier,
                     onClick = addWordOnClick,
                     buttonText = buttonText,
                     enabled = !isStateLoading
@@ -261,7 +258,7 @@ private fun ResponsiveContent(
 }
 
 @Composable
-private fun ContentImage(modifier: Modifier, isOrientationPortrait: Boolean = true) {
+private fun ContentImage(modifier: Modifier = Modifier, isOrientationPortrait: Boolean = true) {
     Image(
         modifier = if (isOrientationPortrait) {
             modifier
@@ -274,9 +271,4 @@ private fun ContentImage(modifier: Modifier, isOrientationPortrait: Boolean = tr
         contentDescription = null,
         contentScale = ContentScale.Fit
     )
-}
-
-@Composable
-private fun Space(modifier: Modifier, spaceHeight: Dp = 16.dp) {
-    Spacer(modifier = modifier.height(spaceHeight))
 }

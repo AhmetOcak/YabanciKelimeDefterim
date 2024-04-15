@@ -17,10 +17,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -87,14 +87,12 @@ private fun DictionaryScreenContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         SearchField(
-            modifier = modifier,
             searchFieldVal = searchFieldVal,
             onSearchTextChange = onSearchTextChange,
             onSearchClicked = onSearchClicked,
             isSearchFieldError = isSearchFieldError
         )
         SearchList(
-            modifier = modifier,
             searchResults = searchResults,
             onWordClicked = {
                 onWordClicked(it)
@@ -103,11 +101,10 @@ private fun DictionaryScreenContent(
             searchType = searchType
         )
         if (showSearchResultEmpty) {
-            SearchResultEmpty(modifier)
+            SearchResultEmpty()
         }
         if (showWordDialog) {
             WordMeaning(
-                modifier = modifier,
                 meaningOfWord = meaningOfWord,
                 onDismiss = { showWordDialog = false }
             )
@@ -117,31 +114,29 @@ private fun DictionaryScreenContent(
 
 @Composable
 private fun SearchList(
-    modifier: Modifier,
     searchResults: List<WordWithId>,
     onWordClicked: (WordWithId) -> Unit,
     searchType: SearchType
 ) {
     LazyColumn(
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(vertical = 16.dp)
     ) {
-        items(searchResults, key = { it.wordId }) {
-            WordItem(modifier, it, onWordClicked, searchType)
+        items(searchResults, key = { it.wordId }) { word ->
+            WordItem(word = word, onWordClicked = onWordClicked, searchType = searchType)
         }
     }
 }
 
 @Composable
 private fun SearchField(
-    modifier: Modifier,
     searchFieldVal: String,
     onSearchTextChange: (String) -> Unit,
     onSearchClicked: () -> Unit,
     isSearchFieldError: Boolean
 ) {
     CustomTextField(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
         value = searchFieldVal,
@@ -158,14 +153,14 @@ private fun SearchField(
 }
 
 @Composable
-private fun SearchResultEmpty(modifier: Modifier) {
-    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+private fun SearchResultEmpty() {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Text(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             text = stringResource(id = R.string.search_empty),
-            style = MaterialTheme.typography.body2,
+            style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center
         )
     }
@@ -173,13 +168,12 @@ private fun SearchResultEmpty(modifier: Modifier) {
 
 @Composable
 private fun WordItem(
-    modifier: Modifier,
     word: WordWithId,
     onWordClicked: (WordWithId) -> Unit,
     searchType: SearchType
 ) {
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .clickable {
                 onWordClicked(word)
@@ -188,7 +182,7 @@ private fun WordItem(
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
             text = when (searchType) {
@@ -200,29 +194,29 @@ private fun WordItem(
                     word.meaning
                 }
             },
-            style = MaterialTheme.typography.body1
+            style = MaterialTheme.typography.bodySmall
         )
-        Divider(modifier = modifier.fillMaxWidth())
+        HorizontalDivider(modifier = Modifier.fillMaxWidth())
     }
 }
 
 @Composable
-private fun WordMeaning(modifier: Modifier, meaningOfWord: String, onDismiss: () -> Unit) {
+private fun WordMeaning(meaningOfWord: String, onDismiss: () -> Unit) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .height(200.dp)
                 .padding(16.dp),
             shape = RoundedCornerShape(16.dp)
         ) {
             Text(
-                modifier = modifier
+                modifier = Modifier
                     .fillMaxSize()
                     .wrapContentSize(Alignment.Center)
                     .padding(horizontal = 8.dp),
                 text = meaningOfWord,
-                style = MaterialTheme.typography.body2,
+                style = MaterialTheme.typography.bodyMedium,
                 textAlign = TextAlign.Center
             )
         }

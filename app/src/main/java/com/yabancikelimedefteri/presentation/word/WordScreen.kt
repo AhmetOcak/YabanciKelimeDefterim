@@ -9,8 +9,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -61,9 +61,12 @@ fun WordScreen(
     WordScreenContent(
         modifier = modifier,
         getWordsState = getWordsState,
-        onDeleteClick = { viewModel.deleteWord(it) },
-        getWords = { viewModel.categoryId?.let { viewModel.getWords(it) } },
-        emptyWordText = resources.getString(R.string.empty_word_message),
+        onDeleteClick = remember {
+            { viewModel.deleteWord(it) }
+        },
+        getWords = remember {
+            { viewModel.categoryId?.let { viewModel.getWords(it) } }
+        },
         listType = listType
     )
 }
@@ -74,7 +77,6 @@ private fun WordScreenContent(
     getWordsState: GetWordState,
     onDeleteClick: (Int) -> Unit,
     getWords: () -> Unit,
-    emptyWordText: String,
     listType: ListType
 ) {
     Column(
@@ -90,12 +92,10 @@ private fun WordScreenContent(
 
             is GetWordState.Success -> {
                 WordList(
-                    getWordsState,
-                    modifier,
-                    onDeleteClick,
-                    getWords,
-                    emptyWordText,
-                    listType
+                    getWordsState = getWordsState,
+                    onDeleteClick = onDeleteClick,
+                    getWords = getWords,
+                    listType = listType
                 )
             }
 
@@ -109,17 +109,14 @@ private fun WordScreenContent(
 @Composable
 private fun WordList(
     getWordsState: GetWordState.Success,
-    modifier: Modifier,
     onDeleteClick: (Int) -> Unit,
     getWords: () -> Unit,
-    emptyWordText: String,
     listType: ListType
 ) {
     if (getWordsState.data.isEmpty()) {
-        EmptyWordListMessage(modifier = modifier, emptyWordText = emptyWordText)
+        EmptyWordListMessage()
     } else {
         ResponsiveWordList(
-            modifier = modifier,
             data = getWordsState.data,
             onDeleteClick = onDeleteClick,
             getWords = getWords,
@@ -130,7 +127,6 @@ private fun WordList(
 
 @Composable
 private fun ResponsiveWordList(
-    modifier: Modifier,
     data: List<WordWithId>,
     onDeleteClick: (Int) -> Unit,
     getWords: () -> Unit,
@@ -138,26 +134,30 @@ private fun ResponsiveWordList(
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         LazyColumn(
-            modifier = modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
         ) {
             items(items = data, key = { it.wordId }) {
-                when(listType) {
+                when (listType) {
                     ListType.RECTANGLE -> {
                         WordCard(
-                            modifier = modifier,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(LocalConfiguration.current.screenWidthDp.dp / 2),
                             foreignWord = it.foreignWord,
                             meaning = it.meaning,
-                            height = LocalConfiguration.current.screenWidthDp.dp / 2,
                             wordId = it.wordId,
                             onDeleteClick = onDeleteClick,
                             getWords = getWords
                         )
                     }
+
                     ListType.THIN -> {
                         WordCard(
-                            modifier = modifier,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
                             foreignWord = it.foreignWord,
                             meaning = it.meaning,
                             wordId = it.wordId,
@@ -170,35 +170,35 @@ private fun ResponsiveWordList(
         }
     } else {
         LazyVerticalGrid(
-            modifier = modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             columns = GridCells.Fixed(if (listType == ListType.RECTANGLE) 3 else 2),
             contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(data) {
-                when(listType) {
+                when (listType) {
                     ListType.RECTANGLE -> {
                         WordCard(
-                            modifier = modifier,
+                            modifier = Modifier.size(LocalConfiguration.current.screenWidthDp.dp / 3),
                             foreignWord = it.foreignWord,
                             meaning = it.meaning,
                             wordId = it.wordId,
                             onDeleteClick = onDeleteClick,
-                            height = LocalConfiguration.current.screenWidthDp.dp / 3,
-                            width = LocalConfiguration.current.screenWidthDp.dp / 3,
                             getWords = getWords
                         )
                     }
+
                     ListType.THIN -> {
                         WordCard(
-                            modifier = modifier,
+                            modifier = Modifier
+                                .width(LocalConfiguration.current.screenWidthDp.dp / 3)
+                                .wrapContentHeight(),
                             foreignWord = it.foreignWord,
                             meaning = it.meaning,
                             wordId = it.wordId,
                             onDeleteClick = onDeleteClick,
-                            getWords = getWords,
-                            width = LocalConfiguration.current.screenWidthDp.dp / 3,
+                            getWords = getWords
                         )
                     }
                 }
@@ -208,13 +208,13 @@ private fun ResponsiveWordList(
 }
 
 @Composable
-private fun EmptyWordListMessage(modifier: Modifier, emptyWordText: String) {
+private fun EmptyWordListMessage() {
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 32.dp),
         contentAlignment = Alignment.Center
     ) {
-        Text(text = emptyWordText, textAlign = TextAlign.Center)
+        Text(text = stringResource(R.string.empty_word_message), textAlign = TextAlign.Center)
     }
 }

@@ -15,7 +15,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -58,17 +63,21 @@ fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
         modifier = modifier,
         gameState = gameState,
         wordIndex = viewModel.wordIndex,
-        onGuessClicked = {
-            if (viewModel.isGuessWordReadyForSubmit()) {
-                viewModel.addAnswer(it)
-                viewModel.resetGuessWord()
-                viewModel.incWordIndex()
-            }
-            if (!viewModel.isGameStillGoing()) {
-                viewModel.calculateResult()
+        onGuessClicked = remember {
+            {
+                if (viewModel.isGuessWordReadyForSubmit()) {
+                    viewModel.addAnswer(it)
+                    viewModel.resetGuessWord()
+                    viewModel.incWordIndex()
+                }
+                if (!viewModel.isGameStillGoing()) {
+                    viewModel.calculateResult()
+                }
             }
         },
-        onValueChanged = { viewModel.updateGuessWord(it) },
+        onValueChanged = remember {
+            { viewModel.updateGuessWord(it) }
+        },
         value = viewModel.guessWord,
         isError = viewModel.guessWordFieldError,
         isGameOver = !viewModel.isGameStillGoing(),
@@ -84,29 +93,21 @@ fun GameScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
             "current_theme",
             Context.MODE_PRIVATE
         ).getCurrentTheme() == AppCompatDelegate.MODE_NIGHT_YES,
-        setAllCateSelected = { viewModel.setAllCategorySelect(it) },
+        setAllCateSelected = remember {
+            { viewModel.setAllCategorySelect(it) }
+        },
         isAllCatSelected = viewModel.isAllCategorySelected,
         categoriesState = categoriesState,
-        addAllCategory = { viewModel.addAllCategories() },
-        addSelectedCategory = { viewModel.addSelectedCategory(it) },
-        removeSelectedCategory = { viewModel.removeSelectedCategory(it) },
-        removeAllCategory = { viewModel.removeAllCategories() },
+        addAllCategory = viewModel::addAllCategories,
+        addSelectedCategory = remember {
+            { viewModel.addSelectedCategory(it) }
+        },
+        removeSelectedCategory = remember {
+            { viewModel.removeSelectedCategory(it) }
+        },
+        removeAllCategory = viewModel::removeAllCategories,
         isButtonEnabled = viewModel.isGameReadyToLaunch,
-        launchTheGame = { viewModel.launchTheGame() },
-        startGameButtonText = stringResource(R.string.start_the_game),
-        allCategoryText = stringResource(R.string.category_all),
-        gameDescriptionText = stringResource(R.string.game_description),
-        warningMessageText = stringResource(R.string.at_least_two_word_warning),
-        labelText = stringResource(R.string.user_guess),
-        guessButtonText = stringResource(R.string.submit_answer),
-        correctText = stringResource(R.string.true_word),
-        wrongText = stringResource(R.string.false_word),
-        descrTextPartOne = stringResource(R.string.game_result_table_description_part_one),
-        descrTextPartTwo = stringResource(R.string.game_result_table_description_part_two),
-        gameResultText = stringResource(R.string.game_result_message),
-        correctAnswerText = stringResource(R.string.correct_answer),
-        userAnswerText = stringResource(R.string.user_answer),
-        textFieldErrorText = stringResource(R.string.text_field_error)
+        launchTheGame = viewModel::launchTheGame
     )
 }
 
@@ -135,20 +136,6 @@ private fun GameScreenContent(
     removeAllCategory: () -> Unit,
     isButtonEnabled: Boolean,
     launchTheGame: () -> Unit,
-    startGameButtonText: String,
-    allCategoryText: String,
-    gameDescriptionText: String,
-    warningMessageText: String,
-    labelText: String,
-    guessButtonText: String,
-    correctText: String,
-    descrTextPartOne: String,
-    wrongText: String,
-    descrTextPartTwo: String,
-    gameResultText: String,
-    correctAnswerText: String,
-    userAnswerText: String,
-    textFieldErrorText: String
 ) {
     when (gameState) {
         is GameState.Nothing -> {
@@ -158,6 +145,7 @@ private fun GameScreenContent(
                         CircularProgressIndicator()
                     }
                 }
+
                 is GetGameCategoriesState.Success -> {
                     ChooseGameCategorySection(
                         modifier = modifier,
@@ -170,55 +158,43 @@ private fun GameScreenContent(
                         removeAllCategory = removeAllCategory,
                         isButtonEnabled = isButtonEnabled,
                         launchTheGame = launchTheGame,
-                        startGameButtonText = startGameButtonText,
-                        allCategoryText = allCategoryText,
-                        gameDescriptionText = gameDescriptionText
                     )
                 }
+
                 is GetGameCategoriesState.Error -> {
                     CustomToast(context = LocalContext.current, message = categoriesState.message)
                 }
             }
         }
+
         is GameState.Loading -> {
             Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
+
         is GameState.Success -> {
             if (!isGameOver) {
                 GameSection(
-                    modifier = modifier,
                     gameState = gameState,
                     wordIndex = wordIndex,
                     value = value,
                     onValueChanged = onValueChanged,
                     isError = isError,
                     onGuessClicked = onGuessClicked,
-                    warningMessageText = warningMessageText,
-                    labelText = labelText,
-                    guessButtonText = guessButtonText,
-                    textFieldErrorText = textFieldErrorText
                 )
             } else {
                 GameResultSection(
-                    modifier = modifier,
                     answers = answers,
                     words = words,
                     correctCount = correctCount,
                     inCorrectCount = inCorrectCount,
                     sharedPreferences = sharedPreferences,
                     isCurrentThemeDark = isCurrentThemeDark,
-                    descrTextPartOne = descrTextPartOne,
-                    descrTextPartTwo = descrTextPartTwo,
-                    correctText = correctText,
-                    wrongText = wrongText,
-                    gameResultText = gameResultText,
-                    correctAnswerText = correctAnswerText,
-                    userAnswerText = userAnswerText
                 )
             }
         }
+
         is GameState.Error -> {
             CustomToast(context = LocalContext.current, message = gameState.message)
         }
@@ -236,10 +212,7 @@ private fun ChooseGameCategorySection(
     removeSelectedCategory: (Int) -> Unit,
     removeAllCategory: () -> Unit,
     isButtonEnabled: Boolean,
-    launchTheGame: () -> Unit,
-    startGameButtonText: String,
-    allCategoryText: String,
-    gameDescriptionText: String
+    launchTheGame: () -> Unit
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         Column(
@@ -249,10 +222,9 @@ private fun ChooseGameCategorySection(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            CategoryDescription(modifier, gameDescriptionText)
-            Space(modifier = modifier.height(16.dp))
+            CategoryDescription()
+            Space(modifier = Modifier.height(16.dp))
             CategoriesList(
-                modifier,
                 categories,
                 isAllCatSelected,
                 addSelectedCategory,
@@ -260,10 +232,9 @@ private fun ChooseGameCategorySection(
                 setAllCateSelected,
                 addAllCategory,
                 removeAllCategory,
-                allCategoryText
             )
-            Space(modifier = modifier.height(16.dp))
-            LaunchTheGameButton(modifier, launchTheGame, isButtonEnabled, startGameButtonText)
+            Space(modifier = Modifier.height(16.dp))
+            LaunchTheGameButton(launchTheGame = launchTheGame, isButtonEnabled = isButtonEnabled)
         }
     } else {
         Row(
@@ -273,9 +244,8 @@ private fun ChooseGameCategorySection(
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(modifier = modifier.weight(1f)) {
+            Row(modifier = Modifier.weight(1f)) {
                 CategoriesList(
-                    modifier,
                     categories,
                     isAllCatSelected,
                     addSelectedCategory,
@@ -283,17 +253,19 @@ private fun ChooseGameCategorySection(
                     setAllCateSelected,
                     addAllCategory,
                     removeAllCategory,
-                    allCategoryText
                 )
             }
             Column(
-                modifier = modifier.weight(1f),
+                modifier = Modifier.weight(1f),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                CategoryDescription(modifier, gameDescriptionText)
-                Space(modifier = modifier.height(16.dp))
-                LaunchTheGameButton(modifier, launchTheGame, isButtonEnabled, startGameButtonText)
+                CategoryDescription()
+                Space(modifier = Modifier.height(16.dp))
+                LaunchTheGameButton(
+                    launchTheGame = launchTheGame,
+                    isButtonEnabled = isButtonEnabled
+                )
             }
         }
     }
@@ -301,22 +273,18 @@ private fun ChooseGameCategorySection(
 
 @Composable
 private fun LaunchTheGameButton(
-    modifier: Modifier,
     launchTheGame: () -> Unit,
-    isButtonEnabled: Boolean,
-    startGameButtonText: String
+    isButtonEnabled: Boolean
 ) {
     CustomButton(
-        modifier = modifier,
         onClick = launchTheGame,
-        buttonText = startGameButtonText,
+        buttonText = stringResource(R.string.start_the_game),
         enabled = isButtonEnabled
     )
 }
 
 @Composable
 private fun CategoriesList(
-    modifier: Modifier,
     categories: List<CategoryWithId>,
     isAllCatSelected: Boolean,
     addSelectedCategory: (Int) -> Unit,
@@ -324,10 +292,9 @@ private fun CategoriesList(
     setAllCateSelected: (Boolean) -> Unit,
     addAllCategory: () -> Unit,
     removeAllCategory: () -> Unit,
-    allCategoryText: String
 ) {
     LazyVerticalGrid(
-        modifier = modifier.height(LocalConfiguration.current.screenWidthDp.dp),
+        modifier = Modifier.height(LocalConfiguration.current.screenWidthDp.dp),
         columns = GridCells.Fixed(2),
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -335,19 +302,16 @@ private fun CategoriesList(
     ) {
         items(categories) {
             GameCategory(
-                modifier = modifier,
                 categoryName = it.categoryName,
                 isAllCatSelected = isAllCatSelected,
                 categoryId = it.categoryId,
                 addSelectedCategory = addSelectedCategory,
                 removeSelectedCategory = removeSelectedCategory,
-                allCategoryText = allCategoryText
             )
         }
         item {
             GameCategory(
-                modifier = modifier,
-                categoryName = allCategoryText,
+                categoryName = stringResource(R.string.category_all),
                 allClicked = {
                     setAllCateSelected(it)
                     if (it) {
@@ -359,37 +323,36 @@ private fun CategoriesList(
                 isAllCatSelected = isAllCatSelected,
                 categoryId = -1,
                 addSelectedCategory = addSelectedCategory,
-                removeSelectedCategory = removeSelectedCategory,
-                allCategoryText = allCategoryText
+                removeSelectedCategory = removeSelectedCategory
             )
         }
     }
 }
 
 @Composable
-private fun CategoryDescription(modifier: Modifier, gameDescriptionText: String) {
+private fun CategoryDescription() {
     Text(
-        modifier = modifier.fillMaxWidth(),
-        text = gameDescriptionText,
+        modifier = Modifier.fillMaxWidth(),
+        text = stringResource(R.string.game_description),
         textAlign = TextAlign.Center
     )
 }
 
 @Composable
 private fun GameCategory(
-    modifier: Modifier,
     categoryName: String,
     categoryId: Int,
     allClicked: (Boolean) -> Unit = {},
     isAllCatSelected: Boolean,
     addSelectedCategory: (Int) -> Unit,
-    removeSelectedCategory: (Int) -> Unit,
-    allCategoryText: String
+    removeSelectedCategory: (Int) -> Unit
 ) {
     var clicked by rememberSaveable { mutableStateOf(false) }
 
+    val allCategoryText = stringResource(R.string.category_all)
+
     Card(
-        modifier = modifier
+        modifier = Modifier
             .size(96.dp)
             .clickable(
                 enabled = if (categoryName == allCategoryText) {
@@ -410,24 +373,25 @@ private fun GameCategory(
             ),
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colors.primary
+            color = MaterialTheme.colorScheme.primary
         ),
         shape = RoundedCornerShape(10),
-        elevation = 0.dp,
-        backgroundColor = if (isAllCatSelected)
-            MaterialTheme.colors.secondary.copy(alpha = 0.5f)
-        else if (clicked) {
-            MaterialTheme.colors.secondary.copy(alpha = 0.5f)
-        } else
-            MaterialTheme.colors.surface
+        colors = CardDefaults.cardColors(
+            containerColor = if (isAllCatSelected)
+                MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+            else if (clicked) {
+                MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f)
+            } else
+                MaterialTheme.colorScheme.surface
+        )
     ) {
         Box(
-            modifier = modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = categoryName,
-                style = MaterialTheme.typography.caption.copy(fontWeight = FontWeight.Bold),
+                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                 textAlign = TextAlign.Center
             )
         }
@@ -436,53 +400,31 @@ private fun GameCategory(
 
 @Composable
 private fun GameResultSection(
-    modifier: Modifier,
     answers: MutableMap<String, String>,
     words: List<WordWithId>,
     correctCount: Int,
     inCorrectCount: Int,
     sharedPreferences: SharedPreferences,
     isCurrentThemeDark: Boolean,
-    correctText: String,
-    descrTextPartOne: String,
-    wrongText: String,
-    descrTextPartTwo: String,
-    gameResultText: String,
-    correctAnswerText: String,
-    userAnswerText: String
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         GameResultSubTitle(
-            modifier = modifier,
             correctCount = correctCount,
             inCorrectCount = inCorrectCount,
-            gameResultText = gameResultText,
-            correctText = correctText,
-            wrongText = wrongText
         )
-        InfoAboutResultTable(
-            modifier = modifier,
-            correctText = correctText,
-            descrTextPartOne = descrTextPartOne,
-            wrongText = wrongText,
-            descrTextPartTwo = descrTextPartTwo
-        )
+        InfoAboutResultTable()
         GameResultTableHeaders(
-            modifier = modifier,
             tableCellTextColor = if (
                 sharedPreferences.getCurrentTheme() == AppCompatDelegate.MODE_NIGHT_YES
             ) Color.White
             else
                 Color.Black,
             isCurrentThemeDark = isCurrentThemeDark,
-            correctAnswerText = correctAnswerText,
-            userAnswerText = userAnswerText
         )
         GameResultTable(
-            modifier = modifier,
             answers = answers,
             words = words,
             tableCellTextColor = if (
@@ -497,30 +439,27 @@ private fun GameResultSection(
 
 @Composable
 private fun GameResultTable(
-    modifier: Modifier,
     answers: MutableMap<String, String>,
     words: List<WordWithId>,
     tableCellTextColor: Color,
     isCurrentThemeDark: Boolean
 ) {
     LazyColumn(
-        modifier = modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(bottom = 16.dp, start = 16.dp, end = 16.dp)
     ) {
         items(answers.keys.toList()) {
             Row(
-                modifier = modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TableCell(
-                    modifier = modifier,
                     text = it,
                     textColor = tableCellTextColor,
                     isCurrentThemeDark = isCurrentThemeDark
                 )
                 TableCell(
-                    modifier = modifier,
                     text = answers[it] ?: "",
                     textColor = if (
                         (words.find { word ->
@@ -538,31 +477,26 @@ private fun GameResultTable(
 
 @Composable
 private fun GameResultTableHeaders(
-    modifier: Modifier,
     tableCellTextColor: Color,
     isCurrentThemeDark: Boolean,
-    correctAnswerText: String,
-    userAnswerText: String
 ) {
     Row(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(top = 4.dp, start = 16.dp, end = 16.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         TableCell(
-            modifier = modifier,
-            text = correctAnswerText,
-            style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.SemiBold),
+            text = stringResource(R.string.correct_answer),
+            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold),
             isTextLowerCase = false,
             textColor = tableCellTextColor,
             isCurrentThemeDark = isCurrentThemeDark
         )
         TableCell(
-            modifier = modifier,
-            text = userAnswerText,
-            style = MaterialTheme.typography.h6.copy(fontWeight = FontWeight.SemiBold),
+            text = stringResource(R.string.user_answer),
+            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold),
             isTextLowerCase = false,
             textColor = tableCellTextColor,
             isCurrentThemeDark = isCurrentThemeDark
@@ -571,27 +505,21 @@ private fun GameResultTableHeaders(
 }
 
 @Composable
-private fun InfoAboutResultTable(
-    modifier: Modifier,
-    correctText: String,
-    descrTextPartOne: String,
-    wrongText: String,
-    descrTextPartTwo: String
-) {
+private fun InfoAboutResultTable() {
     Text(
         buildAnnotatedString {
             withStyle(style = SpanStyle(color = Color.Green)) {
-                append("$correctText ")
+                append("${stringResource(R.string.true_word)} ")
             }
-            append("$descrTextPartOne ")
+            append("${stringResource(R.string.game_result_table_description_part_one)} ")
             withStyle(style = SpanStyle(color = Color.Red)) {
-                append("$wrongText ")
+                append("${stringResource(R.string.false_word)} ")
             }
-            append(descrTextPartTwo)
+            append(stringResource(R.string.game_result_table_description_part_two))
         },
-        style = MaterialTheme.typography.caption,
+        style = MaterialTheme.typography.bodyMedium,
         textAlign = TextAlign.Start,
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(top = 32.dp, start = 16.dp, end = 16.dp)
     )
@@ -599,44 +527,43 @@ private fun InfoAboutResultTable(
 
 @Composable
 private fun GameResultSubTitle(
-    modifier: Modifier,
     correctCount: Int,
     inCorrectCount: Int,
-    gameResultText: String,
-    correctText: String,
-    wrongText: String
 ) {
     Row(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(top = 32.dp, start = 16.dp, end = 16.dp),
         horizontalArrangement = Arrangement.Start,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "$gameResultText:",
-            style = MaterialTheme.typography.body2.copy(fontWeight = FontWeight.SemiBold)
+            text = "${stringResource(R.string.game_result_message)}:",
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.SemiBold)
         )
         Text(
-            modifier = modifier.padding(start = 4.dp),
-            text = "$correctCount $correctText $inCorrectCount $wrongText",
+            modifier = Modifier.padding(start = 4.dp),
+            text = "$correctCount ${stringResource(R.string.true_word)} $inCorrectCount ${
+                stringResource(
+                    R.string.false_word
+                )
+            }",
             textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.bodyMedium
         )
     }
 }
 
 @Composable
 private fun RowScope.TableCell(
-    modifier: Modifier,
     text: String,
     textColor: Color,
-    style: TextStyle = MaterialTheme.typography.body2,
+    style: TextStyle = MaterialTheme.typography.bodyMedium,
     isTextLowerCase: Boolean = true,
     isCurrentThemeDark: Boolean
 ) {
     Text(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .weight(1f)
             .border(1.dp, if (isCurrentThemeDark) Color.Gray else Color.Black)
@@ -649,59 +576,49 @@ private fun RowScope.TableCell(
 
 @Composable
 private fun GameSection(
-    modifier: Modifier,
     gameState: GameState.Success,
     wordIndex: Int,
     value: String,
     onValueChanged: (String) -> Unit,
     isError: Boolean,
     onGuessClicked: (String) -> Unit,
-    warningMessageText: String,
-    guessButtonText: String,
-    labelText: String,
-    textFieldErrorText: String
 ) {
     if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
         Column(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             if (gameState.data.isEmpty()) {
-                EmptyWordMessage(modifier = modifier, warningMessageText = warningMessageText)
+                EmptyWordMessage()
             } else if (gameState.data.size < 2) {
-                AtLeastTwoWordMessage(modifier = modifier, warningMessageText = warningMessageText)
+                AtLeastTwoWordMessage()
             } else {
                 ForeignWord(
-                    modifier = modifier,
                     word = gameState.data[wordIndex].foreignWord,
                     isOrientPortrait = true
                 )
-                Space(modifier = modifier)
+                Space()
                 AnswerField(
-                    modifier,
-                    value,
+                    value = value,
                     onValueChanged,
                     isError,
                     onGuessClicked,
                     gameState,
                     wordIndex,
-                    labelText,
-                    textFieldErrorText
                 )
-                Space(modifier = modifier)
+                Space()
                 CustomButton(
-                    modifier = modifier,
                     onClick = { onGuessClicked(gameState.data[wordIndex].foreignWord) },
-                    buttonText = guessButtonText
+                    buttonText = stringResource(R.string.submit_answer)
                 )
             }
         }
     } else {
         Row(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState()),
@@ -709,36 +626,32 @@ private fun GameSection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (gameState.data.isEmpty()) {
-                EmptyWordMessage(modifier = modifier, warningMessageText = warningMessageText)
+                EmptyWordMessage()
             } else if (gameState.data.size < 2) {
-                AtLeastTwoWordMessage(modifier = modifier, warningMessageText = warningMessageText)
+                AtLeastTwoWordMessage()
             } else {
                 ForeignWord(
-                    modifier = modifier.weight(1f),
+                    modifier = Modifier.weight(1f),
                     word = gameState.data[wordIndex].foreignWord,
                     isOrientPortrait = false
                 )
                 Column(
-                    modifier = modifier.weight(1f),
+                    modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
                     AnswerField(
-                        modifier,
-                        value,
-                        onValueChanged,
-                        isError,
-                        onGuessClicked,
-                        gameState,
-                        wordIndex,
-                        labelText,
-                        textFieldErrorText
+                        value = value,
+                        onValueChanged = onValueChanged,
+                        isError = isError,
+                        onGuessClicked = onGuessClicked,
+                        gameState = gameState,
+                        wordIndex = wordIndex,
                     )
-                    Space(modifier = modifier)
+                    Space()
                     CustomButton(
-                        modifier = modifier,
                         onClick = { onGuessClicked(gameState.data[wordIndex].foreignWord) },
-                        buttonText = guessButtonText
+                        buttonText = stringResource(R.string.submit_answer)
                     )
                 }
             }
@@ -748,55 +661,52 @@ private fun GameSection(
 
 @Composable
 private fun AnswerField(
-    modifier: Modifier,
     value: String,
     onValueChanged: (String) -> Unit,
     isError: Boolean,
     onGuessClicked: (String) -> Unit,
     gameState: GameState.Success,
     wordIndex: Int,
-    labelText: String,
-    textFieldErrorText: String
 ) {
     CustomTextField(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 48.dp),
         value = value,
         onValueChange = { onValueChanged(it) },
-        labelText = labelText,
+        labelText = stringResource(R.string.user_guess),
         isError = isError,
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = { onGuessClicked(gameState.data[wordIndex].foreignWord) }),
-        errorMessage = textFieldErrorText
+        errorMessage = stringResource(R.string.text_field_error)
     )
 }
 
 @Composable
-private fun EmptyWordMessage(modifier: Modifier, warningMessageText: String) {
+private fun EmptyWordMessage() {
     Text(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 32.dp),
-        text = warningMessageText,
+        text = stringResource(R.string.at_least_two_word_warning),
         textAlign = TextAlign.Center
     )
 }
 
 @Composable
-private fun AtLeastTwoWordMessage(modifier: Modifier, warningMessageText: String) {
+private fun AtLeastTwoWordMessage() {
     Text(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 32.dp),
-        text = warningMessageText,
+        text = stringResource(R.string.at_least_two_word_warning),
         textAlign = TextAlign.Center
     )
 }
 
 @Composable
-private fun ForeignWord(modifier: Modifier, word: String, isOrientPortrait: Boolean) {
-    Card(
+private fun ForeignWord(modifier: Modifier = Modifier, word: String, isOrientPortrait: Boolean) {
+    ElevatedCard(
         modifier = if (isOrientPortrait) {
             modifier
                 .fillMaxWidth()
@@ -807,8 +717,7 @@ private fun ForeignWord(modifier: Modifier, word: String, isOrientPortrait: Bool
                 .height(LocalConfiguration.current.screenWidthDp.dp / 3)
                 .padding(32.dp)
         },
-        shape = RoundedCornerShape(10),
-        elevation = 8.dp
+        shape = RoundedCornerShape(10)
     ) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text(modifier = Modifier.fillMaxWidth(), text = word, textAlign = TextAlign.Center)
@@ -817,6 +726,6 @@ private fun ForeignWord(modifier: Modifier, word: String, isOrientPortrait: Bool
 }
 
 @Composable
-private fun Space(modifier: Modifier) {
+private fun Space(modifier: Modifier = Modifier) {
     Spacer(modifier = modifier.height(32.dp))
 }
