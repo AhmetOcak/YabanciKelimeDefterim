@@ -4,22 +4,25 @@ import com.yabancikelimedefteri.domain.model.Category
 import com.yabancikelimedefteri.domain.model.CategoryWithId
 import com.yabancikelimedefteri.domain.model.Word
 import com.yabancikelimedefteri.domain.model.WordWithId
+import kotlinx.coroutines.flow.Flow
 
 interface WordsRepository {
 
-    suspend fun createCategory(category: Category)
+    suspend fun addCategory(category: Category)
 
-    suspend fun getCategories(): List<CategoryWithId>
+    fun observeCategories(): Flow<List<CategoryWithId>>
 
     suspend fun deleteCategory(categoryId: Int)
 
-    suspend fun updateCategoryName(categoryId: Int, newCategoryName: String)
+    suspend fun updateCategory(categoryId: Int, newCategoryName: String)
 
-    suspend fun createWord(word: Word)
+    suspend fun addWord(word: Word)
 
-    suspend fun getAllWords(): List<WordWithId>
+    fun observeAllWords(): Flow<List<WordWithId>>
 
-    suspend fun getWords(categoryIds: List<Int>): List<WordWithId>
+    fun observeSpecificWords(categoryId: Int): Flow<List<WordWithId>>
 
     suspend fun deleteWord(wordId: Int)
+
+    suspend fun getSpecificWords(categoryId: Int): List<WordWithId>
 }

@@ -2,7 +2,7 @@ package com.yabancikelimedefteri.core.di
 
 import android.content.Context
 import androidx.room.Room
-import com.yabancikelimedefteri.data.datasource.local.db.room.ForeignWordsDatabase
+import com.yabancikelimedefteri.data.datasource.local.db.ForeignWordsDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

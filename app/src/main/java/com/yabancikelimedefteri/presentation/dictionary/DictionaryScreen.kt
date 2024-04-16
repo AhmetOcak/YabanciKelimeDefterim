@@ -1,10 +1,8 @@
 package com.yabancikelimedefteri.presentation.dictionary
 
 import android.annotation.SuppressLint
-import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.clickable
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,17 +16,21 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -36,34 +38,58 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.R
-import com.yabancikelimedefteri.core.ui.component.CustomTextField
+import com.yabancikelimedefteri.core.navigation.HomeSections
+import com.yabancikelimedefteri.core.ui.component.EmptyListMessage
+import com.yabancikelimedefteri.core.ui.component.MyVocabularyNavigationBar
 import com.yabancikelimedefteri.domain.model.WordWithId
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DictionaryScreen(modifier: Modifier = Modifier, onNavigateBack: () -> Unit) {
+fun DictionaryScreen(
+    onNavigateToRoute: (String) -> Unit,
+    viewModel: DictionaryViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val viewModel: DictionaryViewModel = hiltViewModel()
-    val uiState by viewModel.uiState.collectAsState()
-
-    BackHandler {
-        onNavigateBack()
+    if (uiState.errorMessages.isNotEmpty()) {
+        Toast.makeText(
+            LocalContext.current,
+            uiState.errorMessages.first().asString(),
+            Toast.LENGTH_LONG
+        ).show()
+        viewModel.consumedErrorMessage()
     }
 
-    DictionaryScreenContent(
-        modifier = modifier,
-        searchFieldVal = uiState.searchText,
-        onSearchTextChange = {
-            viewModel.updateSearchField(it)
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(title = {
+                Text(text = stringResource(id = R.string.my_dictionary))
+            })
         },
-        searchResults = uiState.searchResults,
-        showSearchResultEmpty = uiState.isSearching && uiState.searchResults.isEmpty(),
-        onSearchClicked = { viewModel.onSearchClicked() },
-        isSearchFieldError = uiState.searchFieldError,
-        meaningOfWord = uiState.wordMeaning ?: "",
-        onWordClicked = { viewModel.getWordMeaning(it) },
-        searchType = uiState.searchType
-    )
+        bottomBar = {
+            MyVocabularyNavigationBar(
+                tabs = HomeSections.values(),
+                currentRoute = HomeSections.DICTIONARY.route,
+                navigateToRoute = onNavigateToRoute
+            )
+        }
+    ) { paddingValues ->
+        DictionaryScreenContent(
+            modifier = Modifier.padding(paddingValues),
+            searchFieldVal = uiState.searchText,
+            onSearchTextChange = viewModel::updateSearchField,
+            searchResults = uiState.searchResults,
+            showSearchResultEmpty = uiState.isSearching && uiState.searchResults.isEmpty(),
+            onSearchClicked = viewModel::onSearchClicked,
+            isSearchFieldError = uiState.searchFieldError,
+            meaningOfWord = uiState.wordMeaning ?: "",
+            onWordClicked = viewModel::getWordMeaning,
+            searchType = uiState.searchType
+        )
+    }
 }
 
 @SuppressLint("UnrememberedMutableState")
@@ -83,25 +109,47 @@ private fun DictionaryScreenContent(
     var showWordDialog by remember { mutableStateOf(false) }
 
     Column(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        SearchField(
-            searchFieldVal = searchFieldVal,
-            onSearchTextChange = onSearchTextChange,
-            onSearchClicked = onSearchClicked,
-            isSearchFieldError = isSearchFieldError
-        )
-        SearchList(
-            searchResults = searchResults,
-            onWordClicked = {
-                onWordClicked(it)
-                showWordDialog = true
+        OutlinedTextField(
+            modifier = Modifier.fillMaxWidth(),
+            value = searchFieldVal,
+            onValueChange = onSearchTextChange,
+            label = {
+                Text(
+                    text = stringResource(
+                        id = if (isSearchFieldError) R.string.text_field_error else R.string.search
+                    )
+                )
             },
-            searchType = searchType
+            keyboardActions = KeyboardActions(onSearch = { onSearchClicked() }),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Search,
+                keyboardType = KeyboardType.Text
+            ),
+            isError = isSearchFieldError
         )
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(searchResults, key = { it.wordId }) { word ->
+                WordItem(
+                    word = word,
+                    onWordClicked = {
+                        onWordClicked(it)
+                        showWordDialog = true
+                    },
+                    searchType = searchType
+                )
+            }
+        }
         if (showSearchResultEmpty) {
-            SearchResultEmpty()
+            EmptyListMessage(message = stringResource(id = R.string.search_empty))
         }
         if (showWordDialog) {
             WordMeaning(
@@ -113,78 +161,20 @@ private fun DictionaryScreenContent(
 }
 
 @Composable
-private fun SearchList(
-    searchResults: List<WordWithId>,
-    onWordClicked: (WordWithId) -> Unit,
-    searchType: SearchType
-) {
-    LazyColumn(
-        modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(vertical = 16.dp)
-    ) {
-        items(searchResults, key = { it.wordId }) { word ->
-            WordItem(word = word, onWordClicked = onWordClicked, searchType = searchType)
-        }
-    }
-}
-
-@Composable
-private fun SearchField(
-    searchFieldVal: String,
-    onSearchTextChange: (String) -> Unit,
-    onSearchClicked: () -> Unit,
-    isSearchFieldError: Boolean
-) {
-    CustomTextField(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        value = searchFieldVal,
-        onValueChange = onSearchTextChange,
-        labelText = stringResource(id = R.string.search),
-        errorMessage = stringResource(id = R.string.text_field_error),
-        keyboardActions = KeyboardActions(onSearch = { onSearchClicked() }),
-        keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Search,
-            keyboardType = KeyboardType.Text
-        ),
-        isError = isSearchFieldError
-    )
-}
-
-@Composable
-private fun SearchResultEmpty() {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            text = stringResource(id = R.string.search_empty),
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
-@Composable
 private fun WordItem(
     word: WordWithId,
     onWordClicked: (WordWithId) -> Unit,
     searchType: SearchType
 ) {
-    Column(
+    ElevatedCard(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable {
-                onWordClicked(word)
-            }
-            .padding(top = 16.dp),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
+            .wrapContentSize(),
+        onClick = { onWordClicked(word) }) {
         Text(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(16.dp),
             text = when (searchType) {
                 SearchType.FOREIGN_WORD -> {
                     word.foreignWord
@@ -194,9 +184,9 @@ private fun WordItem(
                     word.meaning
                 }
             },
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center
         )
-        HorizontalDivider(modifier = Modifier.fillMaxWidth())
     }
 }
 

@@ -1,67 +1,150 @@
 package com.yabancikelimedefteri.presentation.word
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yabancikelimedefteri.core.helpers.Response
+import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.core.helpers.UiText
+import com.yabancikelimedefteri.core.navigation.MainDestinations
+import com.yabancikelimedefteri.domain.model.Word
+import com.yabancikelimedefteri.domain.model.WordWithId
+import com.yabancikelimedefteri.domain.usecase.word.AddWordUseCase
 import com.yabancikelimedefteri.domain.usecase.word.DeleteWordUseCase
-import com.yabancikelimedefteri.domain.usecase.word.GetWordsUseCase
+import com.yabancikelimedefteri.domain.usecase.word.ObserveSpecificWordsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class WordViewModel @Inject constructor(
-    private val getWordsUseCase: GetWordsUseCase,
+    private val observeSpecificWordsUseCase: ObserveSpecificWordsUseCase,
     private val deleteWordUseCase: DeleteWordUseCase,
+    private val addWordUseCase: AddWordUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _getWordsState = MutableStateFlow<GetWordState>(GetWordState.Loading)
-    val getWordState = _getWordsState.asStateFlow()
+    private val _uiState = MutableStateFlow(WordsUiState())
+    val uiState: StateFlow<WordsUiState> = _uiState.asStateFlow()
 
-    private val _deleteWordState = MutableStateFlow<DeleteWordState>(DeleteWordState.Nothing)
-    val deleteWordState = _deleteWordState.asStateFlow()
-
-    var categoryId: Int? = null
+    var categoryId: String? = null
         private set
 
     init {
-        categoryId = savedStateHandle["categoryId"]
-        categoryId?.let { getWords(it) }
+        categoryId = savedStateHandle[MainDestinations.WORD_ID_KEY]
+        categoryId?.let { getWords(it.toInt()) }
     }
 
-    fun getWords(categoryId: Int) = viewModelScope.launch(Dispatchers.IO) {
-        getWordsUseCase(listOf(categoryId)).collect() {
-            when (it) {
-                is Response.Loading -> { }
-                is Response.Success -> {
-                    _getWordsState.value = GetWordState.Success(data = it.data)
+    var foreignWord by mutableStateOf("")
+        private set
+    var meaningWord by mutableStateOf("")
+        private set
+
+    var foreignWordFieldError by mutableStateOf(false)
+        private set
+    var meaningWordFieldError by mutableStateOf(false)
+        private set
+
+    fun updateForeignWord(newValue: String) {
+        foreignWord = newValue
+    }
+
+    fun updateMeaningWord(newValue: String) {
+        meaningWord = newValue
+    }
+
+    private fun getWords(categoryId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                observeSpecificWordsUseCase(categoryId).collect { wordList ->
+                    _uiState.update {
+                        it.copy(words = wordList, isLoading = false)
+                    }
                 }
-                is Response.Error -> {
-                    _getWordsState.value = GetWordState.Error(message = it.message)
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        errorMessages = listOf(UiText.StringResource(R.string.error)),
+                        isLoading = false
+                    )
                 }
             }
         }
     }
 
-    fun deleteWord(wordId: Int) = viewModelScope.launch(Dispatchers.IO) {
-        deleteWordUseCase(wordId).collect() {
-            when (it) {
-                is Response.Loading -> { }
-                is Response.Success -> {
-                    _deleteWordState.value = DeleteWordState.Success(data = it.data)
-                }
-                is Response.Error -> {
-                    _deleteWordState.value = DeleteWordState.Error(message = it.message)
+    fun deleteWord(wordId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                deleteWordUseCase(wordId)
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(errorMessages = listOf(UiText.StringResource(R.string.error)))
                 }
             }
         }
     }
 
-    fun resetDeleteWordState() { _deleteWordState.value = DeleteWordState.Nothing }
+    fun addWord() {
+        if (foreignWord.isNotBlank() && meaningWord.isNotBlank() && categoryId != null) {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    categoryId?.let {
+                        addWordUseCase(
+                            word = Word(
+                                categoryId = it.toInt(),
+                                foreignWord = foreignWord,
+                                meaning = meaningWord
+                            )
+                        )
+                    } ?: {
+                        _uiState.update {
+                            it.copy(errorMessages = listOf(UiText.StringResource(R.string.error)))
+                        }
+                    }
 
+                    foreignWord = ""
+                    meaningWord = ""
+                } catch (e: Exception) {
+                    _uiState.update {
+                        it.copy(errorMessages = listOf(UiText.StringResource(R.string.error)))
+                    }
+                }
+            }
+        } else if (foreignWord.isBlank() && meaningWord.isBlank()) {
+            foreignWordFieldError = true
+            meaningWordFieldError = true
+        } else if (foreignWord.isBlank()) {
+            foreignWordFieldError = true
+            meaningWordFieldError = false
+        } else {
+            foreignWordFieldError = false
+            meaningWordFieldError = true
+        }
+    }
+
+    fun clearAddWordVars() {
+        foreignWord = ""
+        meaningWord = ""
+        foreignWordFieldError = false
+        meaningWordFieldError = false
+    }
+
+    fun consumedErrorMessage() {
+        _uiState.update {
+            it.copy(errorMessages = emptyList())
+        }
+    }
 }
+
+data class WordsUiState(
+    val isLoading: Boolean = true,
+    val words: List<WordWithId> = emptyList(),
+    val errorMessages: List<UiText> = emptyList()
+)

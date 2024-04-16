@@ -2,9 +2,10 @@ package com.yabancikelimedefteri.presentation.dictionary
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yabancikelimedefteri.core.helpers.Response
+import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.core.helpers.UiText
 import com.yabancikelimedefteri.domain.model.WordWithId
-import com.yabancikelimedefteri.domain.usecase.word.GetAllWordsUseCase
+import com.yabancikelimedefteri.domain.usecase.word.ObserveAllWordsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,7 @@ enum class SearchType {
 
 @HiltViewModel
 class DictionaryViewModel @Inject constructor(
-    private val getAllWordsUseCase: GetAllWordsUseCase
+    private val observeAllWordsUseCase: ObserveAllWordsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DictionaryUiState())
@@ -30,7 +31,7 @@ class DictionaryViewModel @Inject constructor(
     private var wordsList: List<WordWithId> = listOf()
 
     init {
-        getAllWords()
+        observeAllWords()
     }
 
     fun updateSearchField(newValue: String) {
@@ -46,22 +47,14 @@ class DictionaryViewModel @Inject constructor(
         }
     }
 
-    private fun getAllWords() {
+    private fun observeAllWords() {
         viewModelScope.launch(Dispatchers.IO) {
-            getAllWordsUseCase().collect { response ->
-                when (response) {
-                    is Response.Loading -> {}
-                    is Response.Success -> {
-                        wordsList = response.data
-                        _uiState.update {
-                            it.copy(isError = false)
-                        }
-                    }
-
-                    is Response.Error -> {
-                        _uiState.update {
-                            it.copy(isError = true)
-                        }
+            observeAllWordsUseCase().collect { wordsList ->
+                try {
+                    this@DictionaryViewModel.wordsList = wordsList
+                } catch (e: Exception) {
+                    _uiState.update {
+                        it.copy(errorMessages = listOf(UiText.StringResource(R.string.error)))
                     }
                 }
             }
@@ -117,6 +110,12 @@ class DictionaryViewModel @Inject constructor(
             )
         }
     }
+
+    fun consumedErrorMessage() {
+        _uiState.update {
+            it.copy(errorMessages = emptyList())
+        }
+    }
 }
 
 data class DictionaryUiState(
@@ -126,5 +125,6 @@ data class DictionaryUiState(
     val isSearching: Boolean = false,
     val isError: Boolean = false,
     val searchType: SearchType = SearchType.FOREIGN_WORD,
-    val wordMeaning: String? = null
+    val wordMeaning: String? = null,
+    val errorMessages: List<UiText> = emptyList()
 )

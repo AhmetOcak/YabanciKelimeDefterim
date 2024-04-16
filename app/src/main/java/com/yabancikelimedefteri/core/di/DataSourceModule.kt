@@ -1,18 +1,25 @@
 package com.yabancikelimedefteri.core.di
 
-import com.yabancikelimedefteri.data.datasource.local.word.WordsLocalDataSource
-import com.yabancikelimedefteri.data.datasource.local.word.WordsLocalDataSourceImpl
-import dagger.Binds
+import com.yabancikelimedefteri.data.datasource.local.WordsLocalDataSource
+import com.yabancikelimedefteri.data.datasource.local.WordsLocalDataSourceImpl
+import com.yabancikelimedefteri.data.datasource.local.dao.CategoryDao
+import com.yabancikelimedefteri.data.datasource.local.dao.WordDao
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class DataSourceModule {
+object DataSourceModule {
 
-    @Binds
     @Singleton
-    abstract fun bindWordsDataSource(wordsLocalDataSourceImpl: WordsLocalDataSourceImpl): WordsLocalDataSource
+    @Provides
+    fun provideWordsLocalDataSource(
+        wordDao: WordDao,
+        categoryDao: CategoryDao
+    ): WordsLocalDataSource {
+        return WordsLocalDataSourceImpl(categoryDao, wordDao)
+    }
 }

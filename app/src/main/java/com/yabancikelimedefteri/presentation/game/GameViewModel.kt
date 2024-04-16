@@ -1,175 +1,166 @@
 package com.yabancikelimedefteri.presentation.game
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.yabancikelimedefteri.core.helpers.Response
+import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.core.helpers.UiText
 import com.yabancikelimedefteri.domain.model.CategoryWithId
 import com.yabancikelimedefteri.domain.model.WordWithId
-import com.yabancikelimedefteri.domain.usecase.category.GetCategoriesUseCase
-import com.yabancikelimedefteri.domain.usecase.word.GetWordsUseCase
+import com.yabancikelimedefteri.domain.usecase.category.ObserveCategoriesUseCase
+import com.yabancikelimedefteri.domain.usecase.word.GetSpecificWordsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
-    private val getCategoriesUseCase: GetCategoriesUseCase,
-    private val getWordsUseCase: GetWordsUseCase
+    private val observeCategoriesUseCase: ObserveCategoriesUseCase,
+    private val getSpecificWordsUseCase: GetSpecificWordsUseCase
 ) : ViewModel() {
 
-    private val _gameState = MutableStateFlow<GameState>(GameState.Nothing)
-    val gameState = _gameState.asStateFlow()
+    private val _uiState = MutableStateFlow(GameUiState())
+    val uiState: StateFlow<GameUiState> = _uiState.asStateFlow()
 
-    private val _categoriesState = MutableStateFlow<GetGameCategoriesState>(GetGameCategoriesState.Loading)
-    val categoriesState = _categoriesState.asStateFlow()
+    init {
+        observeCategories()
+    }
 
     var guessWord by mutableStateOf("")
         private set
 
+    fun updateGuessWord(newValue: String) {
+        guessWord = newValue
+    }
+
     var guessWordFieldError by mutableStateOf(false)
         private set
 
-    var words: List<WordWithId>? = null
+    var wordIndex by mutableIntStateOf(0)
         private set
 
-    private var categories: List<CategoryWithId> = listOf()
-
-    var correctAnswerCount by mutableStateOf(0)
-        private set
-    var inCorrectAnswerCount by mutableStateOf(0)
-        private set
-
-    // Key = question, value = answer
-    var answers: MutableMap<String, String> = mutableMapOf()
-        private set
-
-    var wordIndex by mutableStateOf(0)
-        private set
-
-    var isAllCategorySelected by mutableStateOf(false)
-        private set
-
-    var selectedCategories: MutableList<Int> = mutableListOf()
-        private set
-
-    var isGameReadyToLaunch by mutableStateOf(false)
-        private set
-
-    init {
-        getCategories()
-    }
-
-    fun updateGuessWord(newValue: String) { guessWord = newValue }
-
-    fun setAllCategorySelect(newValue: Boolean) { isAllCategorySelected = newValue }
-
-    fun addAllCategories() {
-        categories.forEach {
-            addSelectedCategory(it.categoryId)
-        }
-        isGameReadyToLaunch = true
-    }
-
-    fun removeAllCategories() {
-        selectedCategories.clear()
-        isGameReadyToLaunch = false
-    }
-
-    fun addSelectedCategory(categoryId: Int) {
-        if (!selectedCategories.contains(categoryId)) {
-            selectedCategories.add(categoryId)
-            isGameReadyToLaunch = true
-        }
-    }
-
-    fun removeSelectedCategory(categoryId: Int) {
-        if (selectedCategories.contains(categoryId)) {
-            selectedCategories.remove(categoryId)
-
-            isGameReadyToLaunch = selectedCategories.isNotEmpty()
-        }
-    }
-
-    fun incWordIndex() {
-        if (isGameStillGoing()) {
-            wordIndex++
-        }
-    }
-
-    fun addAnswer(foreignWord: String) {
-        if (isGameStillGoing()) {
-            answers[foreignWord] = guessWord
-        }
-    }
-
-    fun resetGuessWord() { guessWord = "" }
-
-    fun isGuessWordReadyForSubmit(): Boolean {
-        return if (guessWord.isBlank()) {
-            guessWordFieldError = true
-            false
+    fun handleGuessClick(foreignWord: String) {
+        if (wordIndex < _uiState.value.words.size) {
+            if (guessWord.isNotBlank()) {
+                guessWord = ""
+                wordIndex++
+                guessWordFieldError = false
+            } else {
+                guessWordFieldError = true
+            }
         } else {
-            guessWordFieldError = false
-            true
+            // calculate result
+            _uiState.update {
+                it.copy(gameStatus = GameStatus.END)
+            }
         }
     }
 
-    fun isGameStillGoing(): Boolean {
-        return if (words.isNullOrEmpty()) {
-            true
-        } else wordIndex <= (words?.size ?: 0) - 1
-    }
+    // TODO: BUG
+    fun handleCategoryClick(categoryId: Int) {
+        val selectedCategories = _uiState.value.selectedCategories
 
-    fun launchTheGame() = viewModelScope.launch(Dispatchers.IO) {
-        getWordsUseCase(selectedCategories).collect() {
-            when (it) {
-                is Response.Loading -> {
-                    _gameState.value = GameState.Loading
-                }
-                is Response.Success -> {
-                    words = it.data
-                    words?.let { words ->
-                        _gameState.value = GameState.Success(data = words.shuffled())
+        when (categoryId) {
+            ALL_CATEGORY_ID -> {}
+
+            else -> {
+                if (selectedCategories.contains(categoryId)) {
+                    val updatedCategoryList = selectedCategories.toMutableList()
+                    updatedCategoryList.remove(categoryId)
+
+                    _uiState.update {
+                        it.copy(
+                            selectedCategories = updatedCategoryList,
+                            isGameReadyToLaunch = updatedCategoryList.isNotEmpty()
+                        )
+                    }
+                } else {
+                    val updatedCategoryList = selectedCategories.toMutableList()
+                    updatedCategoryList.add(categoryId)
+
+                    _uiState.update {
+                        it.copy(
+                            selectedCategories = updatedCategoryList,
+                            isGameReadyToLaunch = true
+                        )
                     }
                 }
-                is Response.Error -> {
-                    _gameState.value = GameState.Error(message = it.message)
+            }
+        }
+    }
+
+    fun launchTheGame() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val wordList = mutableListOf<WordWithId>()
+
+                _uiState.value.selectedCategories.forEach { categoryId ->
+                    wordList.addAll(getSpecificWordsUseCase(categoryId))
+                }
+
+                _uiState.update {
+                    it.copy(
+                        words = wordList.shuffled(),
+                        gameStatus = GameStatus.STARTED
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(errorMessages = listOf(UiText.StringResource(R.string.error)))
                 }
             }
         }
     }
 
-    private fun getCategories() = viewModelScope.launch(Dispatchers.IO) {
-        getCategoriesUseCase().collect() {
-            when(it) {
-                is Response.Loading -> {
-                    _categoriesState.value = GetGameCategoriesState.Loading
-                }
-                is Response.Success -> {
-                    categories = it.data
-                    _categoriesState.value = GetGameCategoriesState.Success(data = it.data)
-                }
-                is Response.Error -> {
-                    _categoriesState.value = GetGameCategoriesState.Error(message = it.message)
+    private fun observeCategories() {
+        viewModelScope.launch(Dispatchers.IO) {
+            observeCategoriesUseCase().collect { categories ->
+                try {
+                    _uiState.update {
+                        it.copy(categories = categories)
+                    }
+                } catch (e: Exception) {
+                    _uiState.update {
+                        it.copy(errorMessages = listOf(UiText.StringResource(R.string.error)))
+                    }
                 }
             }
         }
     }
 
-    fun calculateResult() {
-        answers.keys.forEach {
-            if (answers[it]?.uppercase() == words?.find { word -> word.foreignWord == it }?.meaning?.uppercase()) {
-                correctAnswerCount++
-            } else {
-                inCorrectAnswerCount++
-            }
+    fun consumedErrorMessage() {
+        _uiState.update {
+            it.copy(errorMessages = emptyList())
         }
     }
 
+    fun reLaunchTheGame() {
+        _uiState.update {
+            it.copy(gameStatus = GameStatus.PREPARATION)
+        }
+    }
+}
+
+data class GameUiState(
+    val categories: List<CategoryWithId> = emptyList(),
+    val words: List<WordWithId> = emptyList(),
+    val selectedCategories: List<Int> = emptyList(),
+    val isGameReadyToLaunch: Boolean = false,
+    val isAllCategoriesSelected: Boolean = false,
+    val errorMessages: List<UiText> = emptyList(),
+    val gameStatus: GameStatus = GameStatus.PREPARATION
+)
+
+enum class GameStatus {
+    PREPARATION,
+    STARTED,
+    END
 }

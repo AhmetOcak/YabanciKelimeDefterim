@@ -40,4 +40,9 @@
     <string name="word_game">Kelime oyunu</string>
 
     <string name="content_open_dict">Sözlüğü aç</string>
+
+    <string name="dict">Sözlük</string>
+    <string name="categories">Kategoriler</string>
+    <string name="games">Oyunlar</string>
+    <string name="ok">Tamam</string>
 </resources>

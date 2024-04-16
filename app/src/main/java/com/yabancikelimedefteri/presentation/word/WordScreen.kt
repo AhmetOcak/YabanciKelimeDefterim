@@ -1,220 +1,220 @@
 package com.yabancikelimedefteri.presentation.word
 
-import android.content.res.Configuration
-import android.content.res.Resources
-import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.*
+import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.runtime.*
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.R
-import com.yabancikelimedefteri.core.navigation.ListType
-import com.yabancikelimedefteri.core.ui.component.CustomToast
-import com.yabancikelimedefteri.core.ui.component.WordCard
+import com.yabancikelimedefteri.core.ui.component.EmptyListMessage
 import com.yabancikelimedefteri.domain.model.WordWithId
-import com.yabancikelimedefteri.presentation.main.OrientationState
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WordScreen(
-    modifier: Modifier = Modifier,
-    onNavigateBack: () -> Unit,
-    resources: Resources,
-    listType: ListType
-) {
-    val viewModel: WordViewModel = hiltViewModel()
+fun WordScreen(upPress: () -> Unit, viewModel: WordViewModel = hiltViewModel()) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    val getWordsState by viewModel.getWordState.collectAsState()
-    val deleteWordState by viewModel.deleteWordState.collectAsState()
+    var showAddWordSheet by remember { mutableStateOf(false) }
 
-    BackHandler {
-        onNavigateBack()
+    if (uiState.errorMessages.isNotEmpty()) {
+        Toast.makeText(
+            LocalContext.current,
+            uiState.errorMessages.first().asString(),
+            Toast.LENGTH_LONG
+        ).show()
+        viewModel.consumedErrorMessage()
     }
 
-    if (deleteWordState is DeleteWordState.Success) {
-        CustomToast(
-            context = LocalContext.current,
-            message = resources.getString(R.string.word_removed)
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopAppBar(
+                title = { Text(text = stringResource(id = R.string.my_words)) },
+                navigationIcon = {
+                    IconButton(onClick = upPress) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
+                            contentDescription = null
+                        )
+                    }
+                }
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { showAddWordSheet = true }) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = null
+                )
+            }
+        }
+    ) { paddingValues ->
+        WordScreenContent(
+            modifier = Modifier.padding(paddingValues),
+            onDeleteClick = viewModel::deleteWord,
+            words = uiState.words,
+            isLoading = uiState.isLoading
         )
-        CustomToast(context = LocalContext.current, message = stringResource(R.string.word_removed))
-        viewModel.resetDeleteWordState()
-    } else if (deleteWordState is DeleteWordState.Error) {
-        CustomToast(
-            context = LocalContext.current,
-            message = (deleteWordState as DeleteWordState.Error).message
-        )
-        viewModel.resetDeleteWordState()
-    }
 
-    WordScreenContent(
-        modifier = modifier,
-        getWordsState = getWordsState,
-        onDeleteClick = remember {
-            { viewModel.deleteWord(it) }
-        },
-        getWords = remember {
-            { viewModel.categoryId?.let { viewModel.getWords(it) } }
-        },
-        listType = listType
-    )
+        if (showAddWordSheet) {
+            AddWordSheet(
+                foreignWordValue = viewModel.foreignWord,
+                onForeignWordValueChange = viewModel::updateForeignWord,
+                isForeignWordFieldError = viewModel.foreignWordFieldError,
+                meaningWordValue = viewModel.meaningWord,
+                onMeaningWordValueChange = viewModel::updateMeaningWord,
+                isMeaningWordFieldError = viewModel.meaningWordFieldError,
+                onAddWordClick = {
+                    showAddWordSheet = false
+                    viewModel.addWord()
+                },
+                onDismissRequest = {
+                    showAddWordSheet = false
+                    viewModel.clearAddWordVars()
+                }
+            )
+        }
+    }
 }
 
 @Composable
 private fun WordScreenContent(
     modifier: Modifier,
-    getWordsState: GetWordState,
+    words: List<WordWithId>,
     onDeleteClick: (Int) -> Unit,
-    getWords: () -> Unit,
-    listType: ListType
+    isLoading: Boolean
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        when (getWordsState) {
-            is GetWordState.Loading -> {
-                Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator()
+        if (isLoading) {
+            Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else {
+            if (words.isEmpty()) {
+                EmptyListMessage(message = stringResource(R.string.empty_word_message))
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
+                ) {
+                    items(items = words, key = { it.wordId }) {
+                        WordCard(
+                            foreignWord = it.foreignWord,
+                            meaning = it.meaning,
+                            wordId = it.wordId,
+                            onDeleteClick = onDeleteClick
+                        )
+                    }
                 }
             }
+        }
+    }
+}
 
-            is GetWordState.Success -> {
-                WordList(
-                    getWordsState = getWordsState,
-                    onDeleteClick = onDeleteClick,
-                    getWords = getWords,
-                    listType = listType
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AddWordSheet(
+    foreignWordValue: String,
+    onForeignWordValueChange: (String) -> Unit,
+    isForeignWordFieldError: Boolean,
+    meaningWordValue: String,
+    onMeaningWordValueChange: (String) -> Unit,
+    isMeaningWordFieldError: Boolean,
+    onAddWordClick: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    val focusManager = LocalFocusManager.current
+
+    ModalBottomSheet(onDismissRequest = onDismissRequest) {
+        Column(
+            modifier = Modifier.padding(16.dp),
+            horizontalAlignment = Alignment.End
+        ) {
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = foreignWordValue,
+                onValueChange = onForeignWordValueChange,
+                label = {
+                    Text(
+                        text = stringResource(
+                            id = if (isForeignWordFieldError) R.string.text_field_error else R.string.foreign_word
+                        )
+                    )
+                },
+                isError = isForeignWordFieldError,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                keyboardActions = KeyboardActions(
+                    onNext = {
+                        focusManager.moveFocus(FocusDirection.Down)
+                    }
                 )
-            }
-
-            is GetWordState.Error -> {
-                CustomToast(context = LocalContext.current, message = getWordsState.message)
-            }
-        }
-    }
-}
-
-@Composable
-private fun WordList(
-    getWordsState: GetWordState.Success,
-    onDeleteClick: (Int) -> Unit,
-    getWords: () -> Unit,
-    listType: ListType
-) {
-    if (getWordsState.data.isEmpty()) {
-        EmptyWordListMessage()
-    } else {
-        ResponsiveWordList(
-            data = getWordsState.data,
-            onDeleteClick = onDeleteClick,
-            getWords = getWords,
-            listType = listType
-        )
-    }
-}
-
-@Composable
-private fun ResponsiveWordList(
-    data: List<WordWithId>,
-    onDeleteClick: (Int) -> Unit,
-    getWords: () -> Unit,
-    listType: ListType
-) {
-    if (OrientationState.orientation.value == Configuration.ORIENTATION_PORTRAIT) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
-        ) {
-            items(items = data, key = { it.wordId }) {
-                when (listType) {
-                    ListType.RECTANGLE -> {
-                        WordCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(LocalConfiguration.current.screenWidthDp.dp / 2),
-                            foreignWord = it.foreignWord,
-                            meaning = it.meaning,
-                            wordId = it.wordId,
-                            onDeleteClick = onDeleteClick,
-                            getWords = getWords
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                value = meaningWordValue,
+                onValueChange = onMeaningWordValueChange,
+                label = {
+                    Text(
+                        text = stringResource(
+                            id = if (isMeaningWordFieldError) R.string.text_field_error else R.string.meaning
                         )
+                    )
+                },
+                isError = isMeaningWordFieldError,
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        onAddWordClick()
                     }
-
-                    ListType.THIN -> {
-                        WordCard(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentHeight(),
-                            foreignWord = it.foreignWord,
-                            meaning = it.meaning,
-                            wordId = it.wordId,
-                            onDeleteClick = onDeleteClick,
-                            getWords = getWords
-                        )
-                    }
-                }
+                )
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = onAddWordClick) {
+                Text(text = stringResource(id = R.string.add_word))
             }
         }
-    } else {
-        LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize(),
-            columns = GridCells.Fixed(if (listType == ListType.RECTANGLE) 3 else 2),
-            contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(data) {
-                when (listType) {
-                    ListType.RECTANGLE -> {
-                        WordCard(
-                            modifier = Modifier.size(LocalConfiguration.current.screenWidthDp.dp / 3),
-                            foreignWord = it.foreignWord,
-                            meaning = it.meaning,
-                            wordId = it.wordId,
-                            onDeleteClick = onDeleteClick,
-                            getWords = getWords
-                        )
-                    }
-
-                    ListType.THIN -> {
-                        WordCard(
-                            modifier = Modifier
-                                .width(LocalConfiguration.current.screenWidthDp.dp / 3)
-                                .wrapContentHeight(),
-                            foreignWord = it.foreignWord,
-                            meaning = it.meaning,
-                            wordId = it.wordId,
-                            onDeleteClick = onDeleteClick,
-                            getWords = getWords
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun EmptyWordListMessage() {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 32.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = stringResource(R.string.empty_word_message), textAlign = TextAlign.Center)
     }
 }

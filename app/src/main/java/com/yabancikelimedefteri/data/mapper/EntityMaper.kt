@@ -1,7 +1,7 @@
 package com.yabancikelimedefteri.data.mapper
 
-import com.yabancikelimedefteri.data.datasource.local.word.db.entity.CategoryEntity
-import com.yabancikelimedefteri.data.datasource.local.word.db.entity.WordEntity
+import com.yabancikelimedefteri.data.datasource.local.entity.CategoryEntity
+import com.yabancikelimedefteri.data.datasource.local.entity.WordEntity
 import com.yabancikelimedefteri.domain.model.Category
 import com.yabancikelimedefteri.domain.model.CategoryWithId
 import com.yabancikelimedefteri.domain.model.Word
@@ -25,15 +25,6 @@ fun List<CategoryEntity>.toListCategory(): List<CategoryWithId> {
 
 fun Word.toWordEntity(): WordEntity {
     return WordEntity(
-        categoryId = categoryId,
-        foreignWord = foreignWord,
-        meaning = meaning
-    )
-}
-
-fun WordEntity.toWord(): WordWithId {
-    return WordWithId(
-        wordId = id,
         categoryId = categoryId,
         foreignWord = foreignWord,
         meaning = meaning

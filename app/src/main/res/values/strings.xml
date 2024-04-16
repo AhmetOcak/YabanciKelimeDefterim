@@ -39,4 +39,9 @@
     <string name="word_game">Word game</string>
 
     <string name="content_open_dict">Open dictionary</string>
+    
+    <string name="dict">Dictionary</string>
+    <string name="categories">Categories</string>
+    <string name="games">Games</string>
+    <string name="ok">OK</string>
 </resources>
