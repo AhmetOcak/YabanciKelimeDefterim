@@ -15,6 +15,7 @@ object MainDestinations {
     const val HOME_ROUTE = "home"
     const val WORDS_ROUTE = "word"
     const val WORD_ID_KEY = "word_id"
+    const val QUIZ_GAME_ROUTE = "quiz_game"
 }
 
 enum class HomeSections(

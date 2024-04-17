@@ -1,4 +1,4 @@
-package com.yabancikelimedefteri.presentation.main
+package com.yabancikelimedefteri.presentation
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

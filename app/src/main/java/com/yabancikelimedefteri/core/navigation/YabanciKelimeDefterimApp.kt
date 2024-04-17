@@ -4,6 +4,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
@@ -13,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.yabancikelimedefteri.core.ui.theme.YabanciKelimeDefteriTheme
+import com.yabancikelimedefteri.presentation.game.games.quiz.QuizGameScreen
 import com.yabancikelimedefteri.presentation.word.WordScreen
 
 @Composable
@@ -32,7 +34,8 @@ fun MyVocabularyApp(
                 appNavGraph(
                     onNavigateToRoute = appNavController::navigateToNavigationBar,
                     upPress = appNavController::upPress,
-                    onCategoryClick = appNavController::navigateWords
+                    onCategoryClick = appNavController::navigateWords,
+                    onReturnGamesScreenClick = {}
                 )
             }
         }
@@ -42,7 +45,8 @@ fun MyVocabularyApp(
 private fun NavGraphBuilder.appNavGraph(
     onNavigateToRoute: (String) -> Unit,
     upPress: () -> Unit,
-    onCategoryClick: (Int, NavBackStackEntry) -> Unit
+    onCategoryClick: (Int, NavBackStackEntry) -> Unit,
+    onReturnGamesScreenClick: (NavBackStackEntry) -> Unit
 ) {
     navigation(
         route = MainDestinations.HOME_ROUTE,
@@ -60,5 +64,10 @@ private fun NavGraphBuilder.appNavGraph(
         )
     ) {
         WordScreen(upPress = upPress)
+    }
+    composable(route = MainDestinations.QUIZ_GAME_ROUTE) { navBackStackEntry ->
+        QuizGameScreen(
+            upPress = upPress,
+            onReturnGamesScreenClick = remember { { onReturnGamesScreenClick(navBackStackEntry) } })
     }
 }

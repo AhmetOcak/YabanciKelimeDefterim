@@ -42,6 +42,12 @@ class AppNavController(val navController: NavHostController) {
             navController.navigate("${MainDestinations.WORDS_ROUTE}/$categoryId")
         }
     }
+
+    fun navigateQuizGame(from: NavBackStackEntry) {
+        if (shouldNavigate(from)) {
+            navController.navigate(MainDestinations.QUIZ_GAME_ROUTE)
+        }
+    }
 }
 
 private fun shouldNavigate(from: NavBackStackEntry): Boolean = from.isLifecycleResumed()
