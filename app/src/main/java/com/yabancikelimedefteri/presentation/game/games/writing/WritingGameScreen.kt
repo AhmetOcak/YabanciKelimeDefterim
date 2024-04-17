@@ -1,5 +1,6 @@
 package com.yabancikelimedefteri.presentation.game.games.writing
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,6 +8,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
@@ -18,18 +21,36 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.presentation.game.games.components.GameScreenSkeleton
 import com.yabancikelimedefteri.presentation.game.models.GameWordItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WritingGameScreen(upPress: () -> Unit, viewModel: WritingGameViewModel = hiltViewModel()) {
+fun WritingGameScreen(
+    upPress: () -> Unit,
+    viewModel: WritingGameViewModel = hiltViewModel()
+) {
+    val uiState by viewModel.writingGameUiState.collectAsStateWithLifecycle()
+
+    if (uiState.errorMessages.isNotEmpty()) {
+        Toast.makeText(
+            LocalContext.current,
+            uiState.errorMessages.first().asString(),
+            Toast.LENGTH_LONG
+        ).show()
+        viewModel.consumedErrorMessage()
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -49,18 +70,33 @@ fun WritingGameScreen(upPress: () -> Unit, viewModel: WritingGameViewModel = hil
             )
         },
     ) { paddingValues ->
-        WritingGameScreenContent(
-            modifier = Modifier.padding(paddingValues),
-            question = "this is a question",
-            answerValue = viewModel.answerValue,
-            onAnswerValueChange = viewModel::updateAnswerValue,
-            onSubmitClick = {}
-        )
+        GameScreenSkeleton(
+            gameStatus = uiState.gameStatus,
+            wordCategories = uiState.categories,
+            isGameReadyToLaunch = uiState.isGameReadyToLaunch,
+            launchTheGame = viewModel::launchTheGame,
+            handleCategoryClick = viewModel::handleCategoryClick,
+            correctAnswerCount = viewModel.correctAnswerCount,
+            wrongAnswerCount = viewModel.wrongAnswerCount,
+            successRate = viewModel.successRate,
+            userAnswers = viewModel.userAnswers,
+            onReturnGamesScreenClick = upPress,
+            gameResultEmote = uiState.gameResultEmote,
+            scaffoldPadding = paddingValues
+        ) {
+            WritingGame(
+                modifier = Modifier.padding(paddingValues),
+                question = viewModel.question,
+                answerValue = viewModel.answerValue,
+                onAnswerValueChange = viewModel::updateAnswerValue,
+                onSubmitClick = viewModel::playTheGame
+            )
+        }
     }
 }
 
 @Composable
-private fun WritingGameScreenContent(
+private fun WritingGame(
     modifier: Modifier,
     question: String,
     answerValue: String,
@@ -68,7 +104,7 @@ private fun WritingGameScreenContent(
     onSubmitClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
             .padding(top = LocalConfiguration.current.screenHeightDp.dp / 2),
@@ -83,7 +119,10 @@ private fun WritingGameScreenContent(
                 modifier = Modifier.fillMaxWidth(),
                 value = answerValue,
                 onValueChange = onAnswerValueChange,
-                maxLines = 1
+                maxLines = 1,
+                singleLine = true,
+                keyboardActions = KeyboardActions(onDone = { onSubmitClick() }),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = onSubmitClick, enabled = answerValue.isNotBlank()) {
