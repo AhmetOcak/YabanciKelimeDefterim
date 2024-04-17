@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -41,8 +42,11 @@ import com.yabancikelimedefteri.core.ui.component.MyVocabularyNavigationBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GamesScreen(onNavigateToRoute: (String) -> Unit, viewModel: GamesViewModel = hiltViewModel()) {
-
+fun GamesScreen(
+    onNavigateToRoute: (String) -> Unit,
+    navigateToQuizGame: () -> Unit,
+    viewModel: GamesViewModel = hiltViewModel()
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     if (uiState.errorMessages.isNotEmpty()) {
@@ -73,7 +77,15 @@ fun GamesScreen(onNavigateToRoute: (String) -> Unit, viewModel: GamesViewModel =
             modifier = Modifier.padding(paddingValues),
             isGamesCanPlay = uiState.isGamesCanPlay,
             games = viewModel.games,
-            onGameClick = { /* TODO: Navigate Game Screen */ }
+            onGameClick = remember {
+                { gameType ->
+                    when (gameType) {
+                        GameType.QUIZ -> navigateToQuizGame()
+
+                        else -> {}
+                    }
+                }
+            }
         )
     }
 }

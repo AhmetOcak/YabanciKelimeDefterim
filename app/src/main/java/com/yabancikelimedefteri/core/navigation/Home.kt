@@ -10,7 +10,8 @@ import com.yabancikelimedefteri.presentation.word_categories.WordCategoriesScree
 
 fun NavGraphBuilder.addHomeGraph(
     onNavigateToRoute: (String) -> Unit,
-    onCategoryClick: (Int, NavBackStackEntry) -> Unit
+    onCategoryClick: (Int, NavBackStackEntry) -> Unit,
+    navigateToQuizGame: (NavBackStackEntry) -> Unit
 ) {
     composable(HomeSections.DICTIONARY.route) {
         DictionaryScreen(onNavigateToRoute = onNavigateToRoute)
@@ -21,7 +22,10 @@ fun NavGraphBuilder.addHomeGraph(
             onNavigateToRoute = onNavigateToRoute
         )
     }
-    composable(HomeSections.GAMES.route) {
-        GamesScreen(onNavigateToRoute = onNavigateToRoute)
+    composable(HomeSections.GAMES.route) { from ->
+        GamesScreen(
+            onNavigateToRoute = onNavigateToRoute,
+            navigateToQuizGame = remember { { navigateToQuizGame(from) } }
+        )
     }
 }

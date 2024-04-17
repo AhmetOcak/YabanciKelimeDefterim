@@ -4,7 +4,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
@@ -35,7 +34,7 @@ fun MyVocabularyApp(
                     onNavigateToRoute = appNavController::navigateToNavigationBar,
                     upPress = appNavController::upPress,
                     onCategoryClick = appNavController::navigateWords,
-                    onReturnGamesScreenClick = {}
+                    navigateToQuizGame = appNavController::navigateQuizGame
                 )
             }
         }
@@ -46,7 +45,7 @@ private fun NavGraphBuilder.appNavGraph(
     onNavigateToRoute: (String) -> Unit,
     upPress: () -> Unit,
     onCategoryClick: (Int, NavBackStackEntry) -> Unit,
-    onReturnGamesScreenClick: (NavBackStackEntry) -> Unit
+    navigateToQuizGame: (NavBackStackEntry) -> Unit
 ) {
     navigation(
         route = MainDestinations.HOME_ROUTE,
@@ -54,7 +53,8 @@ private fun NavGraphBuilder.appNavGraph(
     ) {
         addHomeGraph(
             onNavigateToRoute = onNavigateToRoute,
-            onCategoryClick = onCategoryClick
+            onCategoryClick = onCategoryClick,
+            navigateToQuizGame = navigateToQuizGame
         )
     }
     composable(
@@ -66,8 +66,6 @@ private fun NavGraphBuilder.appNavGraph(
         WordScreen(upPress = upPress)
     }
     composable(route = MainDestinations.QUIZ_GAME_ROUTE) { navBackStackEntry ->
-        QuizGameScreen(
-            upPress = upPress,
-            onReturnGamesScreenClick = remember { { onReturnGamesScreenClick(navBackStackEntry) } })
+        QuizGameScreen(upPress = upPress)
     }
 }

@@ -62,7 +62,6 @@ const val ALL_CATEGORY_ID = -1
 @Composable
 fun QuizGameScreen(
     upPress: () -> Unit,
-    onReturnGamesScreenClick: () -> Unit,
     viewModel: QuizGameViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -123,7 +122,7 @@ fun QuizGameScreen(
                     wrongAnswerCount = viewModel.wrongAnswerCount,
                     successRate = viewModel.successRate,
                     userAnswers = viewModel.userAnswers,
-                    onReturnGamesScreenClick = onReturnGamesScreenClick,
+                    onReturnGamesScreenClick = upPress,
                     quizResultEmote = uiState.gameResultEmote
                 )
             }
