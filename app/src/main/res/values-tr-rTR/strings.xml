@@ -23,7 +23,7 @@
     <string name="add_word_success">Kelime defterine yeni bir kelime ekledin.</string>
     <string name="category_removed">Kategori kaldırıldı.</string>
     <string name="word_removed">Kelime kaldırıldı.</string>
-    <string name="at_least_two_word_warning">Kelime tahmin oyununu oynayabilmen için kelime defterinde en az 5 kelime bulunmalı.</string>
+    <string name="at_least_five_word_warning">Kelime tahmin oyununu oynayabilmen için kelime defterinde en az 5 kelime bulunmalı.</string>
     <string name="empty_category_message">Kelime defterinde hiç kategori yok 😥</string>
     <string name="empty_word_message">Kelime defterinde hiç kelime yok 😥</string>
     <string name="user_answer">Senin Cevabın</string>
@@ -50,10 +50,15 @@
     <string name="question">Soru</string>
     <string name="your_answer">Cevabın</string>
     <string name="return_games_screen">Oyunlar ekranına geri dön.</string>
+    <string name="choose_a_game">Bir Oyun Seç</string>
 
     <string name="quiz_result_very_bad">Sonuçlar felaket! Daha fazla pratik yapmaya ihtiyacın var, ama endişelenme, başaracaksın!</string>
     <string name="quiz_result_bad">Sonuçlar pek parlak değil, ama umutsuzluğa kapılma! Biraz daha çaba ve dikkatle çok daha iyi olabilirsin!</string>
     <string name="quiz_result_normal">Ortalama sonuçlar, ama unutma: her şeyin bir başlangıcı vardır! Bir sonraki seviyeye çıkmak için yeni stratejiler dene!</string>
     <string name="quiz_result_good">Harika iş! Sonuçlar iyi, ama senin için asıl önemli olan, hep daha iyiye gitmek. Devam et!</string>
     <string name="quiz_result_very_good">Muhteşem! Sonuçlar mükemmel! Elini attığın her şeyde altın dokunuşun var gibi görünüyor. Böyle devam et!</string>
+
+    <string name="word_quiz">Kelime Quiz</string>
+    <string name="word_pairing">Kelime Eşleştirme</string>
+    <string name="word_writing">Kelime Yazma</string>
 </resources>

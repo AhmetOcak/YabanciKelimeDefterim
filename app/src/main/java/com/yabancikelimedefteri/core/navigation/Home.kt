@@ -5,7 +5,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.yabancikelimedefteri.presentation.dictionary.DictionaryScreen
-import com.yabancikelimedefteri.presentation.game.GameScreen
+import com.yabancikelimedefteri.presentation.game.GamesScreen
 import com.yabancikelimedefteri.presentation.word_categories.WordCategoriesScreen
 
 fun NavGraphBuilder.addHomeGraph(
@@ -22,6 +22,6 @@ fun NavGraphBuilder.addHomeGraph(
         )
     }
     composable(HomeSections.GAMES.route) {
-        GameScreen(onNavigateToRoute = onNavigateToRoute)
+        GamesScreen(onNavigateToRoute = onNavigateToRoute)
     }
 }
