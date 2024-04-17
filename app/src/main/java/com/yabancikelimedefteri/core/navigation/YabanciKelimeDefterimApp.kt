@@ -13,7 +13,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.yabancikelimedefteri.core.ui.theme.YabanciKelimeDefteriTheme
+import com.yabancikelimedefteri.presentation.game.games.pairing.PairingGameScreen
 import com.yabancikelimedefteri.presentation.game.games.quiz.QuizGameScreen
+import com.yabancikelimedefteri.presentation.game.games.writing.WritingGameScreen
 import com.yabancikelimedefteri.presentation.word.WordScreen
 
 @Composable
@@ -34,7 +36,9 @@ fun MyVocabularyApp(
                     onNavigateToRoute = appNavController::navigateToNavigationBar,
                     upPress = appNavController::upPress,
                     onCategoryClick = appNavController::navigateWords,
-                    navigateToQuizGame = appNavController::navigateQuizGame
+                    navigateToQuizGame = appNavController::navigateQuizGame,
+                    navigateToWritingGame = appNavController::navigateWritingGame,
+                    navigateToPairingGame = appNavController::navigatePairingGame
                 )
             }
         }
@@ -45,7 +49,9 @@ private fun NavGraphBuilder.appNavGraph(
     onNavigateToRoute: (String) -> Unit,
     upPress: () -> Unit,
     onCategoryClick: (Int, NavBackStackEntry) -> Unit,
-    navigateToQuizGame: (NavBackStackEntry) -> Unit
+    navigateToQuizGame: (NavBackStackEntry) -> Unit,
+    navigateToWritingGame: (NavBackStackEntry) -> Unit,
+    navigateToPairingGame: (NavBackStackEntry) -> Unit
 ) {
     navigation(
         route = MainDestinations.HOME_ROUTE,
@@ -54,7 +60,9 @@ private fun NavGraphBuilder.appNavGraph(
         addHomeGraph(
             onNavigateToRoute = onNavigateToRoute,
             onCategoryClick = onCategoryClick,
-            navigateToQuizGame = navigateToQuizGame
+            navigateToQuizGame = navigateToQuizGame,
+            navigateToWritingGame = navigateToWritingGame,
+            navigateToPairingGame = navigateToPairingGame
         )
     }
     composable(
@@ -65,7 +73,13 @@ private fun NavGraphBuilder.appNavGraph(
     ) {
         WordScreen(upPress = upPress)
     }
-    composable(route = MainDestinations.QUIZ_GAME_ROUTE) { navBackStackEntry ->
+    composable(route = MainDestinations.QUIZ_GAME_ROUTE) {
         QuizGameScreen(upPress = upPress)
+    }
+    composable(route = MainDestinations.WRITING_GAME_ROUTE) {
+        WritingGameScreen(upPress = upPress)
+    }
+    composable(route = MainDestinations.PAIRING_GAME_ROUTE) {
+        PairingGameScreen(upPress = upPress)
     }
 }

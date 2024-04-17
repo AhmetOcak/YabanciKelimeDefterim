@@ -48,6 +48,18 @@ class AppNavController(val navController: NavHostController) {
             navController.navigate(MainDestinations.QUIZ_GAME_ROUTE)
         }
     }
+
+    fun navigateWritingGame(from: NavBackStackEntry) {
+        if (shouldNavigate(from)) {
+            navController.navigate(MainDestinations.WRITING_GAME_ROUTE)
+        }
+    }
+
+    fun navigatePairingGame(from: NavBackStackEntry) {
+        if (shouldNavigate(from)) {
+            navController.navigate(MainDestinations.PAIRING_GAME_ROUTE)
+        }
+    }
 }
 
 private fun shouldNavigate(from: NavBackStackEntry): Boolean = from.isLifecycleResumed()

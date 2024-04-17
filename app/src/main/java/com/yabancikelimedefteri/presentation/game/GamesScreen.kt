@@ -45,6 +45,8 @@ import com.yabancikelimedefteri.core.ui.component.MyVocabularyNavigationBar
 fun GamesScreen(
     onNavigateToRoute: (String) -> Unit,
     navigateToQuizGame: () -> Unit,
+    navigateToWritingGame: () -> Unit,
+    navigateToPairingGame: () -> Unit,
     viewModel: GamesViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -81,8 +83,8 @@ fun GamesScreen(
                 { gameType ->
                     when (gameType) {
                         GameType.QUIZ -> navigateToQuizGame()
-
-                        else -> {}
+                        GameType.WRITING -> navigateToWritingGame()
+                        GameType.PAIR -> navigateToPairingGame()
                     }
                 }
             }
@@ -123,7 +125,10 @@ private fun GameScreenContent(
 
 @Composable
 private fun GameItem(
-    gameName: String, gameImage: Int, gameType: GameType, onClick: (GameType) -> Unit
+    gameName: String,
+    gameImage: Int,
+    gameType: GameType,
+    onClick: (GameType) -> Unit
 ) {
     ElevatedCard(
         modifier = Modifier
