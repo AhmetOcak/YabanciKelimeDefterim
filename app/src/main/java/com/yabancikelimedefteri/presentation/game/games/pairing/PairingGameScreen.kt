@@ -7,6 +7,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -36,6 +37,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.R
@@ -87,16 +89,7 @@ fun PairingGameScreen(
             onReturnGamesScreenClick = upPress,
             gameResultEmote = uiState.gameResultEmote,
             scaffoldPadding = paddingValues,
-            gameEndContent = {
-                Box(
-                    modifier = Modifier
-                        .padding(paddingValues)
-                        .fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = viewModel.correctAnswerCount.toString())
-                }
-            }
+            gameEndContent = remember { { EndGameMessage(modifier = Modifier.padding(paddingValues)) } }
         ) {
             PairingGame(
                 modifier = Modifier.padding(paddingValues),
@@ -213,6 +206,23 @@ private fun PuzzleItem(
             modifier = Modifier
                 .width(puzzleWidth)
                 .height(puzzleHeight)
+        )
+    }
+}
+
+@Composable
+private fun EndGameMessage(modifier: Modifier) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(text = "😍", fontSize = 100.sp)
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            modifier = Modifier.padding(horizontal = 32.dp),
+            text = stringResource(id = R.string.pairing_game_end),
+            textAlign = TextAlign.Center
         )
     }
 }

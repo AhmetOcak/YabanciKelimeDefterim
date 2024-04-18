@@ -61,4 +61,6 @@
     <string name="word_quiz">Kelime Quiz</string>
     <string name="word_pairing">Kelime Eşleştirme</string>
     <string name="word_writing">Kelime Yazma</string>
+
+    <string name="pairing_game_end">Oyunu tamamladınız! Tebrikler! Başka bir kelime bulmaca macerasını daha başarıyla sonlandırdınız. Dinlenmeye değer bir mola hak ettiniz! İyi iş! 🎉</string>
 </resources>
