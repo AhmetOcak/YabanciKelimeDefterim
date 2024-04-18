@@ -98,10 +98,8 @@ fun WordScreen(upPress: () -> Unit, viewModel: WordViewModel = hiltViewModel()) 
             AddWordSheet(
                 foreignWordValue = viewModel.foreignWord,
                 onForeignWordValueChange = viewModel::updateForeignWord,
-                isForeignWordFieldError = viewModel.foreignWordFieldError,
                 meaningWordValue = viewModel.meaningWord,
                 onMeaningWordValueChange = viewModel::updateMeaningWord,
-                isMeaningWordFieldError = viewModel.meaningWordFieldError,
                 onAddWordClick = {
                     showAddWordSheet = false
                     viewModel.addWord()
@@ -158,10 +156,8 @@ private fun WordScreenContent(
 private fun AddWordSheet(
     foreignWordValue: String,
     onForeignWordValueChange: (String) -> Unit,
-    isForeignWordFieldError: Boolean,
     meaningWordValue: String,
     onMeaningWordValueChange: (String) -> Unit,
-    isMeaningWordFieldError: Boolean,
     onAddWordClick: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
@@ -177,13 +173,8 @@ private fun AddWordSheet(
                 value = foreignWordValue,
                 onValueChange = onForeignWordValueChange,
                 label = {
-                    Text(
-                        text = stringResource(
-                            id = if (isForeignWordFieldError) R.string.text_field_error else R.string.foreign_word
-                        )
-                    )
+                    Text(text = stringResource(id = R.string.foreign_word))
                 },
-                isError = isForeignWordFieldError,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(
                     onNext = {
@@ -197,13 +188,8 @@ private fun AddWordSheet(
                 value = meaningWordValue,
                 onValueChange = onMeaningWordValueChange,
                 label = {
-                    Text(
-                        text = stringResource(
-                            id = if (isMeaningWordFieldError) R.string.text_field_error else R.string.meaning
-                        )
-                    )
+                    Text(text = stringResource(id = R.string.meaning))
                 },
-                isError = isMeaningWordFieldError,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
                     onDone = {
@@ -212,7 +198,10 @@ private fun AddWordSheet(
                 )
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = onAddWordClick) {
+            Button(
+                onClick = onAddWordClick,
+                enabled = foreignWordValue.isNotBlank() && meaningWordValue.isNotBlank()
+            ) {
                 Text(text = stringResource(id = R.string.add_word))
             }
         }

@@ -24,17 +24,23 @@ fun GameScreenSkeleton(
     userAnswers: List<Answer>,
     onReturnGamesScreenClick: () -> Unit,
     gameResultEmote: GameResultEmote?,
+    gameEndContent: @Composable (() -> Unit)? = null,
+    gameStartContent: @Composable (() -> Unit)? = null,
     gameContent: @Composable (() -> Unit)
 ) {
     when (gameStatus) {
         GameStatus.PREPARATION -> {
-            ChooseWordCategorySection(
-                modifier = Modifier.padding(scaffoldPadding),
-                categories = wordCategories,
-                isGameReadyToLaunch = isGameReadyToLaunch,
-                launchTheGame = launchTheGame,
-                onCategoryClick = handleCategoryClick
-            )
+            if (gameStartContent == null) {
+                ChooseWordCategorySection(
+                    modifier = Modifier.padding(scaffoldPadding),
+                    categories = wordCategories,
+                    isGameReadyToLaunch = isGameReadyToLaunch,
+                    launchTheGame = launchTheGame,
+                    onCategoryClick = handleCategoryClick
+                )
+            } else {
+                gameStartContent()
+            }
         }
 
         GameStatus.STARTED -> {
@@ -42,15 +48,19 @@ fun GameScreenSkeleton(
         }
 
         GameStatus.END -> {
-            GameResultTableSection(
-                modifier = Modifier.padding(scaffoldPadding),
-                correctAnswerCount = correctAnswerCount,
-                wrongAnswerCount = wrongAnswerCount,
-                successRate = successRate,
-                userAnswers = userAnswers,
-                onReturnGamesScreenClick = onReturnGamesScreenClick,
-                quizResultEmote = gameResultEmote
-            )
+            if (gameEndContent == null) {
+                GameResultTableSection(
+                    modifier = Modifier.padding(scaffoldPadding),
+                    correctAnswerCount = correctAnswerCount,
+                    wrongAnswerCount = wrongAnswerCount,
+                    successRate = successRate,
+                    userAnswers = userAnswers,
+                    onReturnGamesScreenClick = onReturnGamesScreenClick,
+                    quizResultEmote = gameResultEmote
+                )
+            } else {
+                gameEndContent()
+            }
         }
     }
 }

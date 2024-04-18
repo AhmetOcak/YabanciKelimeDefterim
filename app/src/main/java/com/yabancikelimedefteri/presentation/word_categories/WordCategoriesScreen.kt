@@ -110,7 +110,6 @@ fun WordCategoriesScreen(
                         showUpdateCategoryNameSheet = false
                     }
                 },
-                isError = viewModel.updatedCategoryNameFieldError,
                 onDismissRequest = remember {
                     {
                         showUpdateCategoryNameSheet = false
@@ -124,7 +123,6 @@ fun WordCategoriesScreen(
             AddCategorySheet(
                 categoryNameValue = viewModel.newCategoryName,
                 onCategoryValueChange = viewModel::updateNewCategoryName,
-                isError = viewModel.newCategoryFieldError,
                 onAddCategoryClick = remember {
                     {
                         viewModel.addCategory()
@@ -189,7 +187,6 @@ private fun UpdateCategoryNameSheet(
     categoryNameValue: String,
     onCategoryNameChanged: (String) -> Unit,
     updateCategoryName: () -> Unit,
-    isError: Boolean,
     onDismissRequest: () -> Unit
 ) {
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
@@ -203,14 +200,12 @@ private fun UpdateCategoryNameSheet(
                 value = categoryNameValue,
                 onValueChange = onCategoryNameChanged,
                 label = {
-                    Text(
-                        text = if (isError) stringResource(id = R.string.text_field_error)
-                        else stringResource(R.string.new_cat_name)
-                    )
+                    Text(text = stringResource(R.string.new_cat_name))
                 }
             )
             Button(
-                onClick = updateCategoryName
+                onClick = updateCategoryName,
+                enabled = categoryNameValue.isNotBlank()
             ) {
                 Text(text = stringResource(R.string.save))
             }
@@ -223,7 +218,6 @@ private fun UpdateCategoryNameSheet(
 private fun AddCategorySheet(
     categoryNameValue: String,
     onCategoryValueChange: (String) -> Unit,
-    isError: Boolean,
     onAddCategoryClick: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
@@ -238,11 +232,8 @@ private fun AddCategorySheet(
                 value = categoryNameValue,
                 onValueChange = onCategoryValueChange,
                 label = {
-                    Text(text = stringResource(
-                        id = if (isError) R.string.text_field_error else R.string.category_name)
-                    )
+                    Text(text = stringResource(id = R.string.category_name))
                 },
-                isError = isError,
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
                     onDone = {
@@ -250,7 +241,7 @@ private fun AddCategorySheet(
                     }
                 )
             )
-            Button(onClick = onAddCategoryClick) {
+            Button(onClick = onAddCategoryClick, enabled = categoryNameValue.isNotBlank()) {
                 Text(text = stringResource(id = R.string.create_category))
             }
         }

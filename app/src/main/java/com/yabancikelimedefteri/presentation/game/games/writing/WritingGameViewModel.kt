@@ -29,12 +29,6 @@ class WritingGameViewModel @Inject constructor(
 
     val writingGameUiState: StateFlow<GameUiState> = super.uiState.asStateFlow()
 
-    override val userAnswers: MutableList<Answer> = mutableListOf()
-
-    override var correctAnswerCount: Int = 0
-    override var wrongAnswerCount: Int = 0
-    override var successRate: String = ""
-
     private var wordIndex = 0
 
     var answerValue by mutableStateOf("")

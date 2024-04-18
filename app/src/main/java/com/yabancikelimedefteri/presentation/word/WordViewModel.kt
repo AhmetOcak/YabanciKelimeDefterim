@@ -47,11 +47,6 @@ class WordViewModel @Inject constructor(
     var meaningWord by mutableStateOf("")
         private set
 
-    var foreignWordFieldError by mutableStateOf(false)
-        private set
-    var meaningWordFieldError by mutableStateOf(false)
-        private set
-
     fun updateForeignWord(newValue: String) {
         foreignWord = newValue
     }
@@ -117,23 +112,12 @@ class WordViewModel @Inject constructor(
                     }
                 }
             }
-        } else if (foreignWord.isBlank() && meaningWord.isBlank()) {
-            foreignWordFieldError = true
-            meaningWordFieldError = true
-        } else if (foreignWord.isBlank()) {
-            foreignWordFieldError = true
-            meaningWordFieldError = false
-        } else {
-            foreignWordFieldError = false
-            meaningWordFieldError = true
         }
     }
 
     fun clearAddWordVars() {
         foreignWord = ""
         meaningWord = ""
-        foreignWordFieldError = false
-        meaningWordFieldError = false
     }
 
     fun consumedErrorMessage() {

@@ -42,16 +42,11 @@ class WordCategoriesViewModel @Inject constructor(
     var updatedCategoryName by mutableStateOf("")
         private set
 
-    var updatedCategoryNameFieldError by mutableStateOf(false)
-        private set
 
     private var selectedCatId by mutableIntStateOf(-1)
 
     // Create Category
     var newCategoryName by mutableStateOf("")
-        private set
-
-    var newCategoryFieldError by mutableStateOf(false)
         private set
 
     fun updateUpdatedCategoryName(newValue: String) {
@@ -112,10 +107,7 @@ class WordCategoriesViewModel @Inject constructor(
                     }
                 }
             }
-        } else {
-            updatedCategoryNameFieldError = true
         }
-
     }
 
     fun addCategory() {
@@ -130,8 +122,6 @@ class WordCategoriesViewModel @Inject constructor(
                     }
                 }
             }
-        } else {
-            newCategoryFieldError = true
         }
     }
 
@@ -143,12 +133,10 @@ class WordCategoriesViewModel @Inject constructor(
 
     fun clearUpdateCategoryNameVars() {
         updatedCategoryName = ""
-        updatedCategoryNameFieldError = false
     }
 
     fun clearNewCategoryVars() {
         newCategoryName = ""
-        newCategoryFieldError = false
     }
 }
 

@@ -29,12 +29,6 @@ class QuizGameViewModel @Inject constructor(
 
     val quizGameUiState: StateFlow<GameUiState> = super.uiState.asStateFlow()
 
-    override val userAnswers: MutableList<Answer> = mutableListOf()
-
-    override var correctAnswerCount: Int = 0
-    override var wrongAnswerCount: Int = 0
-    override var successRate: String = ""
-
     private var wordIndex = 0
 
     var question by mutableStateOf("")

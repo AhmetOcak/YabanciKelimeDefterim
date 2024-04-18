@@ -23,13 +23,13 @@ abstract class BaseGameViewModel(
         observeCategories()
     }
 
-    abstract val userAnswers: MutableList<Answer>
+    val userAnswers: MutableList<Answer> = mutableListOf()
 
-    abstract var correctAnswerCount: Int
+    var correctAnswerCount: Int = 0
         protected set
-    abstract var wrongAnswerCount: Int
+    var wrongAnswerCount: Int = 0
         protected set
-    abstract var successRate: String
+    var successRate: String = ""
         protected set
 
     abstract fun launchTheGame()
@@ -113,6 +113,12 @@ abstract class BaseGameViewModel(
     fun consumedErrorMessage() {
         uiState.update {
             it.copy(errorMessages = emptyList())
+        }
+    }
+
+    fun setGameIsOver() {
+        uiState.update {
+            it.copy(gameStatus = GameStatus.END)
         }
     }
 }

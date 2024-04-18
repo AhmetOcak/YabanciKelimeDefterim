@@ -37,7 +37,7 @@ class GamesViewModel @Inject constructor(
             try {
                 observeAllWordsUseCase().collect { words ->
                     _uiState.update {
-                        it.copy(isGamesCanPlay = words.size >= 5)
+                        it.copy(isGamesCanPlay = words.size >= 4)
                     }
                 }
             } catch (e: Exception) {
