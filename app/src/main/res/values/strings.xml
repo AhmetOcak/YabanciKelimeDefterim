@@ -75,4 +75,6 @@
 
     <string name="themes">Themes</string>
     <string name="word_lists">Word Lists</string>
+
+    <string name="word_categories">Word Categories</string>
 </resources>

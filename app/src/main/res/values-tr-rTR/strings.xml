@@ -76,4 +76,6 @@
 
     <string name="themes">Temalar</string>
     <string name="word_lists">Kelime Listeleri</string>
+
+    <string name="word_categories">Kelime Kategorileri</string>
 </resources>
