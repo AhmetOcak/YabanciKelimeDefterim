@@ -5,9 +5,11 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Book
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Games
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.outlined.Book
 import androidx.compose.material.icons.outlined.Category
 import androidx.compose.material.icons.outlined.Games
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.yabancikelimedefteri.R
 
@@ -29,4 +31,5 @@ enum class HomeSections(
     DICTIONARY(R.string.dict, Icons.Filled.Book, Icons.Outlined.Book, "home/dictionary"),
     CATEGORIES(R.string.categories, Icons.Filled.Category, Icons.Outlined.Category, "home/categories"),
     GAMES(R.string.games, Icons.Filled.Games, Icons.Outlined.Games, "home/games"),
+    SETTINGS(R.string.settings, Icons.Filled.Settings, Icons.Outlined.Settings, "home/settings")
 }

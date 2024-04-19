@@ -6,6 +6,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.yabancikelimedefteri.presentation.dictionary.DictionaryScreen
 import com.yabancikelimedefteri.presentation.game.GamesScreen
+import com.yabancikelimedefteri.presentation.settings.SettingsScreen
 import com.yabancikelimedefteri.presentation.word_categories.WordCategoriesScreen
 
 fun NavGraphBuilder.addHomeGraph(
@@ -31,5 +32,8 @@ fun NavGraphBuilder.addHomeGraph(
             navigateToWritingGame = remember { { navigateToWritingGame(from) } },
             navigateToPairingGame = remember { { navigateToPairingGame(from) } }
         )
+    }
+    composable(HomeSections.SETTINGS.route) {
+        SettingsScreen(onNavigateToRoute = onNavigateToRoute)
     }
 }

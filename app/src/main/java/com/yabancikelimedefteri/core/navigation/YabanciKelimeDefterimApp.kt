@@ -14,7 +14,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.yabancikelimedefteri.core.ui.theme.YabanciKelimeDefteriTheme
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.CustomColorScheme
-import com.yabancikelimedefteri.core.ui.theme.color_schemes.SeaColorScheme
+import com.yabancikelimedefteri.core.ui.theme.color_schemes.NatureColorScheme
 import com.yabancikelimedefteri.presentation.game.games.pairing.PairingGameScreen
 import com.yabancikelimedefteri.presentation.game.games.quiz.QuizGameScreen
 import com.yabancikelimedefteri.presentation.game.games.writing.WritingGameScreen
@@ -24,7 +24,7 @@ import com.yabancikelimedefteri.presentation.word.WordScreen
 fun MyVocabularyApp(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
-    customColorScheme: CustomColorScheme = SeaColorScheme
+    customColorScheme: CustomColorScheme = NatureColorScheme
 ) {
     YabanciKelimeDefteriTheme(
         darkTheme = darkTheme,

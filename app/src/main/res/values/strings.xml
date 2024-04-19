@@ -64,4 +64,15 @@
     <string name="pairing_game_end">You completed the game! Congratulations! You\'ve successfully finished another word puzzle adventure. You\'ve earned a well-deserved break! Good job! 🎉</string>
 
     <string name="min_word_warning">In order to play the word guessing game, there must be at least %d words in the word book.</string>
+
+    <string name="settings">Settings</string>
+    <string name="dark_theme">Dark Theme</string>
+    <string name="color_themes">Color Themes</string>
+    <string name="dynamic_color">Dynamic Color</string>
+    <string name="list_type">Thin List Type</string>
+    <string name="rate_app">Rate App</string>
+    <string name="share_app">Share App</string>
+
+    <string name="themes">Themes</string>
+    <string name="word_lists">Word Lists</string>
 </resources>

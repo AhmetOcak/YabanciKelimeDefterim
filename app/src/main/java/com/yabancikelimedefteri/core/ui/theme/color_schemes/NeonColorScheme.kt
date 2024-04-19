@@ -5,7 +5,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-object NeonCustomColorScheme : CustomColorScheme {
+object NeonColorScheme : CustomColorScheme {
     override val lightColorScheme: ColorScheme
         get() = lightColorScheme(
             primary = Color(0xFF68548E),

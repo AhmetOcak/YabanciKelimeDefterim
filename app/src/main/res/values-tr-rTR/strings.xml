@@ -65,4 +65,15 @@
     <string name="pairing_game_end">Oyunu tamamladınız! Tebrikler! Başka bir kelime bulmaca macerasını daha başarıyla sonlandırdınız. Dinlenmeye değer bir mola hak ettiniz! İyi iş! 🎉</string>
 
     <string name="min_word_warning">In order to play the word guessing game, there must be at least %d words in the word book.</string>
+
+    <string name="settings">Ayarlar</string>
+    <string name="dark_theme">Karanlık Tema</string>
+    <string name="color_themes">Renk Temaları</string>
+    <string name="dynamic_color">Dinamik Renk</string>
+    <string name="list_type">İnce Liste Türü</string>
+    <string name="rate_app">Uygulamayı Değerlendir</string>
+    <string name="share_app">Uygulamayı Paylaş</string>
+
+    <string name="themes">Temalar</string>
+    <string name="word_lists">Kelime Listeleri</string>
 </resources>
