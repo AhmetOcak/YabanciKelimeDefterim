@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.getValue
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.core.navigation.MyVocabularyApp
 import dagger.hilt.android.AndroidEntryPoint
@@ -16,16 +17,21 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen().setKeepOnScreenCondition(condition = {
+            !viewModel.isPreferencesReady
+        })
 
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-            MyVocabularyApp(
-                isDarkThemeChecked = uiState.isDarkTheme,
-                isDynamicColorChecked = uiState.isDynamicColor,
-                isThinListTypeChecked = uiState.isWordListTypeThin,
-                currentScheme = uiState.colorScheme
-            )
+            if (viewModel.isPreferencesReady) {
+                MyVocabularyApp(
+                    isDarkThemeChecked = uiState.isDarkTheme,
+                    isDynamicColorChecked = uiState.isDynamicColor,
+                    isThinListTypeChecked = uiState.isWordListTypeThin,
+                    currentScheme = uiState.colorScheme
+                )
+            }
         }
     }
 }

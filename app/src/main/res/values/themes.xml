@@ -3,8 +3,4 @@
     <style name="Theme.YabanciKelimeDefteri" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@color/black</item>
     </style>
-
-    <style name="SplashScreenTheme" parent="android:Theme.Material.Light.NoActionBar">
-        <item name="android:windowBackground">@drawable/splash_screen</item>
-    </style>
 </resources>

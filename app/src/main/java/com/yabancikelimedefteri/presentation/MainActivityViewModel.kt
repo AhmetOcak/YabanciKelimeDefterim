@@ -1,5 +1,8 @@
 package com.yabancikelimedefteri.presentation
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.CustomColorScheme
@@ -31,6 +34,9 @@ class MainActivityViewModel @Inject constructor(
         observeUserPreferences()
     }
 
+    var isPreferencesReady by mutableStateOf(false)
+        private set
+
     private fun observeUserPreferences() {
         viewModelScope.launch(Dispatchers.IO) {
             userPreferencesRepository.userPreferencesFlow.collect { preferences ->
@@ -48,6 +54,7 @@ class MainActivityViewModel @Inject constructor(
                         }
                     )
                 }
+                isPreferencesReady = true
             }
         }
     }

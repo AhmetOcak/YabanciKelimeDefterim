@@ -80,4 +80,7 @@ dependencies {
 
     // Proto Datastore
     implementation("androidx.datastore:datastore-preferences:1.1.0")
+
+    // Splash Api
+    implementation("androidx.core:core-splashscreen:1.0.1")
 }
