@@ -13,6 +13,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.yabancikelimedefteri.core.ui.theme.YabanciKelimeDefteriTheme
+import com.yabancikelimedefteri.core.ui.theme.color_schemes.CustomColorScheme
+import com.yabancikelimedefteri.core.ui.theme.color_schemes.SeaColorScheme
 import com.yabancikelimedefteri.presentation.game.games.pairing.PairingGameScreen
 import com.yabancikelimedefteri.presentation.game.games.quiz.QuizGameScreen
 import com.yabancikelimedefteri.presentation.game.games.writing.WritingGameScreen
@@ -21,9 +23,14 @@ import com.yabancikelimedefteri.presentation.word.WordScreen
 @Composable
 fun MyVocabularyApp(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false
+    dynamicColor: Boolean = false,
+    customColorScheme: CustomColorScheme = SeaColorScheme
 ) {
-    YabanciKelimeDefteriTheme(darkTheme = darkTheme, dynamicColor = dynamicColor) {
+    YabanciKelimeDefteriTheme(
+        darkTheme = darkTheme,
+        dynamicColor = dynamicColor,
+        customColorScheme = customColorScheme
+    ) {
         val appNavController = rememberAppNavController()
 
         Surface {
