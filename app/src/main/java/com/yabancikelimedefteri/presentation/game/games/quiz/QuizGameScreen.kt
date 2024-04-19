@@ -81,6 +81,7 @@ fun QuizGameScreen(
             userAnswers = viewModel.userAnswers,
             onReturnGamesScreenClick = upPress,
             gameResultEmote = uiState.gameResultEmote,
+            isCategorySelected = viewModel::isCategorySelected,
             scaffoldPadding = paddingValues
         ) {
             QuizGame(

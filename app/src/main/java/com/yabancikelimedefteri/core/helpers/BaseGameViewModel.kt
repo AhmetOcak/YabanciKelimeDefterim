@@ -63,36 +63,49 @@ abstract class BaseGameViewModel(
     }
 
     fun handleCategoryClick(categoryId: Int) {
-        val selectedCategories = uiState.value.selectedCategories
+        val selectedCategories = uiState.value.selectedCategories.toMutableList()
+        val categories = uiState.value.categories
 
         when (categoryId) {
-            ALL_CATEGORY_ID -> {}
-
-            else -> {
-                if (selectedCategories.contains(categoryId)) {
-                    val updatedCategoryList = selectedCategories.toMutableList()
-                    updatedCategoryList.remove(categoryId)
+            ALL_CATEGORY_ID -> {
+                // +1 coming from All Category Option
+                if (selectedCategories.size < categories.size + 1) {
+                    selectedCategories.apply {
+                        clear()
+                        addAll(categories.map { it.categoryId })
+                        add(ALL_CATEGORY_ID)
+                    }
 
                     uiState.update {
-                        it.copy(
-                            selectedCategories = updatedCategoryList,
-                            isGameReadyToLaunch = updatedCategoryList.isNotEmpty()
-                        )
+                        it.copy(isAllCategoriesOptionSelected = true)
                     }
                 } else {
-                    val updatedCategoryList = selectedCategories.toMutableList()
-                    updatedCategoryList.add(categoryId)
+                    selectedCategories.clear()
 
                     uiState.update {
-                        it.copy(
-                            selectedCategories = updatedCategoryList,
-                            isGameReadyToLaunch = true
-                        )
+                        it.copy(isAllCategoriesOptionSelected = false)
                     }
                 }
             }
+
+            else -> {
+                if (selectedCategories.contains(categoryId)) {
+                    selectedCategories.remove(categoryId)
+                } else {
+                    selectedCategories.add(categoryId)
+                }
+            }
+        }
+
+        uiState.update {
+            it.copy(
+                selectedCategories = selectedCategories,
+                isGameReadyToLaunch = selectedCategories.isNotEmpty()
+            )
         }
     }
+
+    fun isCategorySelected(categoryId: Int) = uiState.value.selectedCategories.contains(categoryId)
 
     private fun observeCategories() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -130,7 +143,8 @@ data class GameUiState(
     val isGameReadyToLaunch: Boolean = false,
     val errorMessages: List<UiText> = emptyList(),
     val gameStatus: GameStatus = GameStatus.PREPARATION,
-    val gameResultEmote: GameResultEmote? = null
+    val gameResultEmote: GameResultEmote? = null,
+    val isAllCategoriesOptionSelected: Boolean = false
 )
 
 @Immutable

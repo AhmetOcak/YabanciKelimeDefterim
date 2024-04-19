@@ -24,6 +24,7 @@ fun GameScreenSkeleton(
     userAnswers: List<Answer>,
     onReturnGamesScreenClick: () -> Unit,
     gameResultEmote: GameResultEmote?,
+    isCategorySelected: (Int) -> Boolean,
     gameEndContent: @Composable (() -> Unit)? = null,
     gameStartContent: @Composable (() -> Unit)? = null,
     gameContent: @Composable (() -> Unit)
@@ -36,7 +37,8 @@ fun GameScreenSkeleton(
                     categories = wordCategories,
                     isGameReadyToLaunch = isGameReadyToLaunch,
                     launchTheGame = launchTheGame,
-                    onCategoryClick = handleCategoryClick
+                    onCategoryClick = handleCategoryClick,
+                    isCategorySelected = isCategorySelected
                 )
             } else {
                 gameStartContent()

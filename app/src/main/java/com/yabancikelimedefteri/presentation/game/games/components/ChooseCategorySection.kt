@@ -32,7 +32,8 @@ fun ChooseWordCategorySection(
     categories: List<CategoryWithId>,
     isGameReadyToLaunch: Boolean,
     launchTheGame: () -> Unit,
-    onCategoryClick: (Int) -> Unit
+    onCategoryClick: (Int) -> Unit,
+    isCategorySelected: (Int) -> Boolean
 ) {
     Column(
         modifier = modifier
@@ -59,13 +60,15 @@ fun ChooseWordCategorySection(
                     categoryName = stringResource(R.string.category_all),
                     categoryId = ALL_CATEGORY_ID,
                     onClick = onCategoryClick,
+                    isSelected = isCategorySelected(ALL_CATEGORY_ID)
                 )
             }
             items(categories) {
                 GameCategoryItem(
                     categoryName = it.categoryName,
                     categoryId = it.categoryId,
-                    onClick = onCategoryClick
+                    onClick = onCategoryClick,
+                    isSelected = isCategorySelected(it.categoryId)
                 )
             }
         }

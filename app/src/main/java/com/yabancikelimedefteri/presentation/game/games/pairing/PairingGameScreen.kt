@@ -89,6 +89,7 @@ fun PairingGameScreen(
             onReturnGamesScreenClick = upPress,
             gameResultEmote = uiState.gameResultEmote,
             scaffoldPadding = paddingValues,
+            isCategorySelected = viewModel::isCategorySelected,
             gameEndContent = remember { { EndGameMessage(modifier = Modifier.padding(paddingValues)) } }
         ) {
             PairingGame(
