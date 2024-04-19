@@ -57,8 +57,11 @@ class QuizGameViewModel @Inject constructor(
                     )
                 }
 
-                // init question
-                question = uiState.value.words[0].foreignWord
+                // Empty situation already handled
+                if (uiState.value.words.isNotEmpty()) {
+                    // init question
+                    question = uiState.value.words[0].foreignWord
+                }
             } catch (e: Exception) {
                 uiState.update {
                     it.copy(errorMessages = listOf(UiText.StringResource(R.string.error)))

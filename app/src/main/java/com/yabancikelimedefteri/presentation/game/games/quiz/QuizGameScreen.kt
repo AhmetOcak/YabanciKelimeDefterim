@@ -32,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.presentation.game.games.components.GameScreenSkeleton
+import com.yabancikelimedefteri.presentation.game.games.components.MinWordWarning
 import com.yabancikelimedefteri.presentation.game.models.GameWordItem
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -84,13 +85,17 @@ fun QuizGameScreen(
             isCategorySelected = viewModel::isCategorySelected,
             scaffoldPadding = paddingValues
         ) {
-            QuizGame(
-                modifier = Modifier.padding(paddingValues),
-                question = viewModel.question,
-                answerValue = viewModel.answerValue,
-                onAnswerValueChanged = viewModel::updateAnswerValue,
-                onSubmitClicked = viewModel::playTheGame
-            )
+            if (uiState.words.size < 5) {
+                MinWordWarning()
+            } else {
+                QuizGame(
+                    modifier = Modifier.padding(paddingValues),
+                    question = viewModel.question,
+                    answerValue = viewModel.answerValue,
+                    onAnswerValueChanged = viewModel::updateAnswerValue,
+                    onSubmitClicked = viewModel::playTheGame
+                )
+            }
         }
     }
 }

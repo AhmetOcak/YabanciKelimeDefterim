@@ -43,6 +43,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.ui.theme.successGreen
 import com.yabancikelimedefteri.presentation.game.games.components.GameScreenSkeleton
+import com.yabancikelimedefteri.presentation.game.games.components.MinWordWarning
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,22 +93,26 @@ fun PairingGameScreen(
             isCategorySelected = viewModel::isCategorySelected,
             gameEndContent = remember { { EndGameMessage(modifier = Modifier.padding(paddingValues)) } }
         ) {
-            PairingGame(
-                modifier = Modifier.padding(paddingValues),
-                wordList = viewModel.getQuestions(),
-                pairStatus = viewModel.pairStatus,
-                onPuzzleClick = viewModel::handlePuzzleClick,
-                selectedPuzzle1Index = viewModel.selectedPuzzle1.second,
-                selectedPuzzle2Index = viewModel.selectedPuzzle2.second,
-                isPuzzlesEnable = viewModel.isPuzzlesEnabled,
-                hidePuzzle = remember {
-                    { index ->
-                        viewModel.getCorrectPuzzles().contains(index)
-                    }
-                },
-                puzzleWidth = puzzleWidth,
-                puzzleHeight = puzzleHeight
-            )
+            if (uiState.words.size < 5) {
+                MinWordWarning()
+            } else {
+                PairingGame(
+                    modifier = Modifier.padding(paddingValues),
+                    wordList = viewModel.getQuestions(),
+                    pairStatus = viewModel.pairStatus,
+                    onPuzzleClick = viewModel::handlePuzzleClick,
+                    selectedPuzzle1Index = viewModel.selectedPuzzle1.second,
+                    selectedPuzzle2Index = viewModel.selectedPuzzle2.second,
+                    isPuzzlesEnable = viewModel.isPuzzlesEnabled,
+                    hidePuzzle = remember {
+                        { index ->
+                            viewModel.getCorrectPuzzles().contains(index)
+                        }
+                    },
+                    puzzleWidth = puzzleWidth,
+                    puzzleHeight = puzzleHeight
+                )
+            }
         }
     }
 }

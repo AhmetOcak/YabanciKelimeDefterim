@@ -63,4 +63,6 @@
     <string name="word_writing">Kelime Yazma</string>
 
     <string name="pairing_game_end">Oyunu tamamladınız! Tebrikler! Başka bir kelime bulmaca macerasını daha başarıyla sonlandırdınız. Dinlenmeye değer bir mola hak ettiniz! İyi iş! 🎉</string>
+
+    <string name="min_word_warning">In order to play the word guessing game, there must be at least %d words in the word book.</string>
 </resources>

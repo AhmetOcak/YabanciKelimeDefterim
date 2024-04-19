@@ -62,4 +62,6 @@
     <string name="word_writing">Word Writing</string>
 
     <string name="pairing_game_end">You completed the game! Congratulations! You\'ve successfully finished another word puzzle adventure. You\'ve earned a well-deserved break! Good job! 🎉</string>
+
+    <string name="min_word_warning">In order to play the word guessing game, there must be at least %d words in the word book.</string>
 </resources>
