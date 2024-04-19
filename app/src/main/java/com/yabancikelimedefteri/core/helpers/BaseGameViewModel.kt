@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 
 abstract class BaseGameViewModel(
     private val observeCategoriesUseCase: ObserveCategoriesUseCase
@@ -46,7 +47,7 @@ abstract class BaseGameViewModel(
         }
 
         val correctRate = (correctAnswerCount.toDouble() / words.size) * 100
-        successRate = "%$correctRate"
+        successRate = "%${DecimalFormat("#.##").format(correctRate)}"
 
         uiState.update {
             it.copy(
@@ -130,6 +131,7 @@ abstract class BaseGameViewModel(
     }
 
     fun setGameIsOver() {
+        calculateResult(uiState.value.words)
         uiState.update {
             it.copy(gameStatus = GameStatus.END)
         }

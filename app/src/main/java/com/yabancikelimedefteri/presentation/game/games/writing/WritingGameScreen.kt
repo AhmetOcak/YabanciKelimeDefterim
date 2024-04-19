@@ -10,16 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -36,7 +29,6 @@ import com.yabancikelimedefteri.presentation.game.games.components.GameScreenSke
 import com.yabancikelimedefteri.presentation.game.games.components.MinWordWarning
 import com.yabancikelimedefteri.presentation.game.models.GameWordItem
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WritingGameScreen(
     upPress: () -> Unit,
@@ -53,50 +45,33 @@ fun WritingGameScreen(
         viewModel.consumedErrorMessage()
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = stringResource(id = R.string.word_writing))
-                },
-                navigationIcon = {
-                    IconButton(onClick = upPress) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = null
-                        )
-                    }
-                }
-            )
-        },
+    GameScreenSkeleton(
+        gameStatus = uiState.gameStatus,
+        wordCategories = uiState.categories,
+        isGameReadyToLaunch = uiState.isGameReadyToLaunch,
+        launchTheGame = viewModel::launchTheGame,
+        handleCategoryClick = viewModel::handleCategoryClick,
+        correctAnswerCount = viewModel.correctAnswerCount,
+        wrongAnswerCount = viewModel.wrongAnswerCount,
+        successRate = viewModel.successRate,
+        userAnswers = viewModel.userAnswers,
+        onReturnGamesScreenClick = upPress,
+        gameResultEmote = uiState.gameResultEmote,
+        isCategorySelected = viewModel::isCategorySelected,
+        onFinishGameClicked = viewModel::setGameIsOver,
+        upPress = upPress,
+        topBarTitle = stringResource(id = R.string.word_writing)
     ) { paddingValues ->
-        GameScreenSkeleton(
-            gameStatus = uiState.gameStatus,
-            wordCategories = uiState.categories,
-            isGameReadyToLaunch = uiState.isGameReadyToLaunch,
-            launchTheGame = viewModel::launchTheGame,
-            handleCategoryClick = viewModel::handleCategoryClick,
-            correctAnswerCount = viewModel.correctAnswerCount,
-            wrongAnswerCount = viewModel.wrongAnswerCount,
-            successRate = viewModel.successRate,
-            userAnswers = viewModel.userAnswers,
-            onReturnGamesScreenClick = upPress,
-            gameResultEmote = uiState.gameResultEmote,
-            isCategorySelected = viewModel::isCategorySelected,
-            scaffoldPadding = paddingValues
-        ) {
-            if (uiState.words.size < 5) {
-                MinWordWarning()
-            } else {
-                WritingGame(
-                    modifier = Modifier.padding(paddingValues),
-                    question = viewModel.question,
-                    answerValue = viewModel.answerValue,
-                    onAnswerValueChange = viewModel::updateAnswerValue,
-                    onSubmitClick = viewModel::playTheGame
-                )
-            }
+        if (uiState.words.size < 5) {
+            MinWordWarning()
+        } else {
+            WritingGame(
+                modifier = Modifier.padding(paddingValues),
+                question = viewModel.question,
+                answerValue = viewModel.answerValue,
+                onAnswerValueChange = viewModel::updateAnswerValue,
+                onSubmitClick = viewModel::playTheGame
+            )
         }
     }
 }

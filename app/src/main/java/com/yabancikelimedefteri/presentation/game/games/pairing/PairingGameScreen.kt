@@ -15,17 +15,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -45,7 +38,6 @@ import com.yabancikelimedefteri.core.ui.theme.successGreen
 import com.yabancikelimedefteri.presentation.game.games.components.GameScreenSkeleton
 import com.yabancikelimedefteri.presentation.game.games.components.MinWordWarning
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PairingGameScreen(
     upPress: () -> Unit,
@@ -59,60 +51,47 @@ fun PairingGameScreen(
     val puzzleWidth = screenWidth - 48.dp
     val puzzleHeight = (screenHeight - 128.dp) / 5
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(text = stringResource(id = R.string.word_pairing))
-                },
-                navigationIcon = {
-                    IconButton(onClick = upPress) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Default.ArrowBack,
-                            contentDescription = null
-                        )
-                    }
-                }
-            )
+    GameScreenSkeleton(
+        gameStatus = uiState.gameStatus,
+        wordCategories = uiState.categories,
+        isGameReadyToLaunch = uiState.isGameReadyToLaunch,
+        launchTheGame = viewModel::launchTheGame,
+        handleCategoryClick = viewModel::handleCategoryClick,
+        correctAnswerCount = viewModel.correctAnswerCount,
+        wrongAnswerCount = viewModel.wrongAnswerCount,
+        successRate = viewModel.successRate,
+        userAnswers = viewModel.userAnswers,
+        onReturnGamesScreenClick = upPress,
+        gameResultEmote = uiState.gameResultEmote,
+        isCategorySelected = viewModel::isCategorySelected,
+        onFinishGameClicked = viewModel::setGameIsOver,
+        topBarTitle = stringResource(id = R.string.word_pairing),
+        upPress = upPress,
+        gameEndContent = remember {
+            { paddingValues ->
+                EndGameMessage(modifier = Modifier.padding(paddingValues))
+            }
         }
     ) { paddingValues ->
-        GameScreenSkeleton(
-            gameStatus = uiState.gameStatus,
-            wordCategories = uiState.categories,
-            isGameReadyToLaunch = uiState.isGameReadyToLaunch,
-            launchTheGame = viewModel::launchTheGame,
-            handleCategoryClick = viewModel::handleCategoryClick,
-            correctAnswerCount = viewModel.correctAnswerCount,
-            wrongAnswerCount = viewModel.wrongAnswerCount,
-            successRate = viewModel.successRate,
-            userAnswers = viewModel.userAnswers,
-            onReturnGamesScreenClick = upPress,
-            gameResultEmote = uiState.gameResultEmote,
-            scaffoldPadding = paddingValues,
-            isCategorySelected = viewModel::isCategorySelected,
-            gameEndContent = remember { { EndGameMessage(modifier = Modifier.padding(paddingValues)) } }
-        ) {
-            if (uiState.words.size < 5) {
-                MinWordWarning()
-            } else {
-                PairingGame(
-                    modifier = Modifier.padding(paddingValues),
-                    wordList = viewModel.getQuestions(),
-                    pairStatus = viewModel.pairStatus,
-                    onPuzzleClick = viewModel::handlePuzzleClick,
-                    selectedPuzzle1Index = viewModel.selectedPuzzle1.second,
-                    selectedPuzzle2Index = viewModel.selectedPuzzle2.second,
-                    isPuzzlesEnable = viewModel.isPuzzlesEnabled,
-                    hidePuzzle = remember {
-                        { index ->
-                            viewModel.getCorrectPuzzles().contains(index)
-                        }
-                    },
-                    puzzleWidth = puzzleWidth,
-                    puzzleHeight = puzzleHeight
-                )
-            }
+        if (uiState.words.size < 5) {
+            MinWordWarning()
+        } else {
+            PairingGame(
+                modifier = Modifier.padding(paddingValues),
+                wordList = viewModel.getQuestions(),
+                pairStatus = viewModel.pairStatus,
+                onPuzzleClick = viewModel::handlePuzzleClick,
+                selectedPuzzle1Index = viewModel.selectedPuzzle1.second,
+                selectedPuzzle2Index = viewModel.selectedPuzzle2.second,
+                isPuzzlesEnable = viewModel.isPuzzlesEnabled,
+                hidePuzzle = remember {
+                    { index ->
+                        viewModel.getCorrectPuzzles().contains(index)
+                    }
+                },
+                puzzleWidth = puzzleWidth,
+                puzzleHeight = puzzleHeight
+            )
         }
     }
 }
