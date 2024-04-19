@@ -24,15 +24,16 @@ import androidx.compose.ui.unit.dp
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.CustomColorScheme
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.NatureColorScheme
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.NeonColorScheme
-import com.yabancikelimedefteri.core.ui.theme.color_schemes.PinkSchemeCustom
+import com.yabancikelimedefteri.core.ui.theme.color_schemes.PinkColorScheme
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.RedColorScheme
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.SeaColorScheme
+import com.yabancikelimedefteri.domain.model.datastore.ColorSchemeKeys
 
 @Composable
 fun ColorSchemesSettingItem(
     nameId: Int,
     icon: ImageVector,
-    onClick: (CustomColorScheme) -> Unit,
+    onClick: (ColorSchemeKeys) -> Unit,
     currentScheme: CustomColorScheme,
     isDarkTheme: Boolean
 ) {
@@ -72,7 +73,7 @@ fun ColorSchemesSettingItem(
 @Composable
 private fun ColorScheme(
     isCurrentScheme: Boolean,
-    onClick: (CustomColorScheme) -> Unit,
+    onClick: (ColorSchemeKeys) -> Unit,
     schemeType: CustomColorScheme,
     isDarkTheme: Boolean
 ) {
@@ -89,7 +90,17 @@ private fun ColorScheme(
 
     Card(
         modifier = Modifier.size(32.dp),
-        onClick = { onClick(schemeType) },
+        onClick = {
+            onClick(
+                when (schemeType) {
+                    is NeonColorScheme -> ColorSchemeKeys.NEON
+                    is NatureColorScheme -> ColorSchemeKeys.NATURE
+                    is RedColorScheme -> ColorSchemeKeys.RED
+                    is SeaColorScheme -> ColorSchemeKeys.SEA
+                    else -> ColorSchemeKeys.PINK
+                }
+            )
+        },
         shape = CircleShape,
         border = if (isCurrentScheme) BorderStroke(2.dp, MaterialTheme.colorScheme.error) else null
     ) {
@@ -105,7 +116,7 @@ private fun ColorScheme(
 private val colorSchemes = listOf(
     NeonColorScheme,
     NatureColorScheme,
-    PinkSchemeCustom,
+    PinkColorScheme,
     SeaColorScheme,
     RedColorScheme
 )

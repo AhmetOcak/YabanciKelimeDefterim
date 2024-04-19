@@ -8,8 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.helpers.UiText
-import com.yabancikelimedefteri.domain.model.Category
-import com.yabancikelimedefteri.domain.model.CategoryWithId
+import com.yabancikelimedefteri.domain.model.word.Category
+import com.yabancikelimedefteri.domain.model.word.CategoryWithId
 import com.yabancikelimedefteri.domain.usecase.category.AddCategoryUseCase
 import com.yabancikelimedefteri.domain.usecase.category.DeleteCategoryUseCase
 import com.yabancikelimedefteri.domain.usecase.category.ObserveCategoriesUseCase

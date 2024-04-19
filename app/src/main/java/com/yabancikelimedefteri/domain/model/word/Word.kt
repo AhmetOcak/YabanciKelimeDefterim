@@ -1,4 +1,4 @@
-package com.yabancikelimedefteri.domain.model
+package com.yabancikelimedefteri.domain.model.word
 
 data class Word(
     var categoryId: Int,

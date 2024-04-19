@@ -43,7 +43,7 @@ import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.navigation.HomeSections
 import com.yabancikelimedefteri.core.ui.component.EmptyListMessage
 import com.yabancikelimedefteri.core.ui.component.MyVocabularyNavigationBar
-import com.yabancikelimedefteri.domain.model.WordWithId
+import com.yabancikelimedefteri.domain.model.word.WordWithId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

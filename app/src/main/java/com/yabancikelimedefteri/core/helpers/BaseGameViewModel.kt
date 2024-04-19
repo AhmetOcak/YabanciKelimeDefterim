@@ -4,8 +4,8 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yabancikelimedefteri.R
-import com.yabancikelimedefteri.domain.model.CategoryWithId
-import com.yabancikelimedefteri.domain.model.WordWithId
+import com.yabancikelimedefteri.domain.model.word.CategoryWithId
+import com.yabancikelimedefteri.domain.model.word.WordWithId
 import com.yabancikelimedefteri.domain.usecase.category.ObserveCategoriesUseCase
 import com.yabancikelimedefteri.presentation.game.games.components.ALL_CATEGORY_ID
 import kotlinx.coroutines.Dispatchers

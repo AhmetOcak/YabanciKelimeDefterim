@@ -45,7 +45,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.ui.component.EmptyListMessage
-import com.yabancikelimedefteri.domain.model.WordWithId
+import com.yabancikelimedefteri.domain.model.word.WordWithId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

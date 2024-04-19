@@ -1,9 +1,9 @@
 package com.yabancikelimedefteri.domain.repository
 
-import com.yabancikelimedefteri.domain.model.Category
-import com.yabancikelimedefteri.domain.model.CategoryWithId
-import com.yabancikelimedefteri.domain.model.Word
-import com.yabancikelimedefteri.domain.model.WordWithId
+import com.yabancikelimedefteri.domain.model.word.Category
+import com.yabancikelimedefteri.domain.model.word.CategoryWithId
+import com.yabancikelimedefteri.domain.model.word.Word
+import com.yabancikelimedefteri.domain.model.word.WordWithId
 import kotlinx.coroutines.flow.Flow
 
 interface WordsRepository {

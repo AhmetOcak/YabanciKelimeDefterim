@@ -21,7 +21,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.yabancikelimedefteri.R
-import com.yabancikelimedefteri.domain.model.CategoryWithId
+import com.yabancikelimedefteri.domain.model.word.CategoryWithId
 import com.yabancikelimedefteri.presentation.game.models.GameCategoryItem
 
 const val ALL_CATEGORY_ID = -1

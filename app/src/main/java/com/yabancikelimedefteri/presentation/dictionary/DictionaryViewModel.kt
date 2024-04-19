@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.helpers.UiText
-import com.yabancikelimedefteri.domain.model.WordWithId
+import com.yabancikelimedefteri.domain.model.word.WordWithId
 import com.yabancikelimedefteri.domain.usecase.word.ObserveAllWordsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

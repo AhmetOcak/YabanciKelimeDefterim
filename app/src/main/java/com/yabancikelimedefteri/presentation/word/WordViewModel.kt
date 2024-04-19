@@ -9,8 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.helpers.UiText
 import com.yabancikelimedefteri.core.navigation.MainDestinations
-import com.yabancikelimedefteri.domain.model.Word
-import com.yabancikelimedefteri.domain.model.WordWithId
+import com.yabancikelimedefteri.domain.model.word.Word
+import com.yabancikelimedefteri.domain.model.word.WordWithId
 import com.yabancikelimedefteri.domain.usecase.word.AddWordUseCase
 import com.yabancikelimedefteri.domain.usecase.word.DeleteWordUseCase
 import com.yabancikelimedefteri.domain.usecase.word.ObserveSpecificWordsUseCase

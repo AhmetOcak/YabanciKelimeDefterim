@@ -10,7 +10,7 @@ import com.yabancikelimedefteri.core.helpers.BaseGameViewModel
 import com.yabancikelimedefteri.core.helpers.GameStatus
 import com.yabancikelimedefteri.core.helpers.GameUiState
 import com.yabancikelimedefteri.core.helpers.UiText
-import com.yabancikelimedefteri.domain.model.WordWithId
+import com.yabancikelimedefteri.domain.model.word.WordWithId
 import com.yabancikelimedefteri.domain.usecase.category.ObserveCategoriesUseCase
 import com.yabancikelimedefteri.domain.usecase.word.GetSpecificWordsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel

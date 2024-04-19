@@ -1,6 +1,5 @@
 package com.yabancikelimedefteri.core.navigation
 
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -14,7 +13,6 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.yabancikelimedefteri.core.ui.theme.YabanciKelimeDefteriTheme
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.CustomColorScheme
-import com.yabancikelimedefteri.core.ui.theme.color_schemes.NatureColorScheme
 import com.yabancikelimedefteri.presentation.game.games.pairing.PairingGameScreen
 import com.yabancikelimedefteri.presentation.game.games.quiz.QuizGameScreen
 import com.yabancikelimedefteri.presentation.game.games.writing.WritingGameScreen
@@ -22,14 +20,15 @@ import com.yabancikelimedefteri.presentation.word.WordScreen
 
 @Composable
 fun MyVocabularyApp(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,
-    customColorScheme: CustomColorScheme = NatureColorScheme
+    isDarkThemeChecked: Boolean,
+    isDynamicColorChecked: Boolean,
+    isThinListTypeChecked: Boolean,
+    currentScheme: CustomColorScheme,
 ) {
     YabanciKelimeDefteriTheme(
-        darkTheme = darkTheme,
-        dynamicColor = dynamicColor,
-        customColorScheme = customColorScheme
+        darkTheme = isDarkThemeChecked,
+        dynamicColor = isDynamicColorChecked,
+        customColorScheme = currentScheme
     ) {
         val appNavController = rememberAppNavController()
 
@@ -45,7 +44,11 @@ fun MyVocabularyApp(
                     onCategoryClick = appNavController::navigateWords,
                     navigateToQuizGame = appNavController::navigateQuizGame,
                     navigateToWritingGame = appNavController::navigateWritingGame,
-                    navigateToPairingGame = appNavController::navigatePairingGame
+                    navigateToPairingGame = appNavController::navigatePairingGame,
+                    isDarkThemeChecked = isDarkThemeChecked,
+                    isDynamicColorChecked = isDynamicColorChecked,
+                    isThinListTypeChecked = isThinListTypeChecked,
+                    currentScheme = currentScheme
                 )
             }
         }
@@ -58,7 +61,11 @@ private fun NavGraphBuilder.appNavGraph(
     onCategoryClick: (Int, NavBackStackEntry) -> Unit,
     navigateToQuizGame: (NavBackStackEntry) -> Unit,
     navigateToWritingGame: (NavBackStackEntry) -> Unit,
-    navigateToPairingGame: (NavBackStackEntry) -> Unit
+    navigateToPairingGame: (NavBackStackEntry) -> Unit,
+    isDarkThemeChecked: Boolean,
+    isDynamicColorChecked: Boolean,
+    isThinListTypeChecked: Boolean,
+    currentScheme: CustomColorScheme
 ) {
     navigation(
         route = MainDestinations.HOME_ROUTE,
@@ -69,7 +76,11 @@ private fun NavGraphBuilder.appNavGraph(
             onCategoryClick = onCategoryClick,
             navigateToQuizGame = navigateToQuizGame,
             navigateToWritingGame = navigateToWritingGame,
-            navigateToPairingGame = navigateToPairingGame
+            navigateToPairingGame = navigateToPairingGame,
+            isDarkThemeChecked = isDarkThemeChecked,
+            isDynamicColorChecked = isDynamicColorChecked,
+            isThinListTypeChecked = isThinListTypeChecked,
+            currentScheme = currentScheme
         )
     }
     composable(

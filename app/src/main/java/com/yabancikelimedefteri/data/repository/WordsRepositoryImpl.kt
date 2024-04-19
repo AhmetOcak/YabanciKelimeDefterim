@@ -5,10 +5,10 @@ import com.yabancikelimedefteri.data.mapper.toCategoryEntity
 import com.yabancikelimedefteri.data.mapper.toListCategory
 import com.yabancikelimedefteri.data.mapper.toListWord
 import com.yabancikelimedefteri.data.mapper.toWordEntity
-import com.yabancikelimedefteri.domain.model.Category
-import com.yabancikelimedefteri.domain.model.CategoryWithId
-import com.yabancikelimedefteri.domain.model.Word
-import com.yabancikelimedefteri.domain.model.WordWithId
+import com.yabancikelimedefteri.domain.model.word.Category
+import com.yabancikelimedefteri.domain.model.word.CategoryWithId
+import com.yabancikelimedefteri.domain.model.word.Word
+import com.yabancikelimedefteri.domain.model.word.WordWithId
 import com.yabancikelimedefteri.domain.repository.WordsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

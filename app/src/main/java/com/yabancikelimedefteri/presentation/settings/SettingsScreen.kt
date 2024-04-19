@@ -19,7 +19,7 @@ import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.navigation.HomeSections
 import com.yabancikelimedefteri.core.ui.component.MyVocabularyNavigationBar
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.CustomColorScheme
-import com.yabancikelimedefteri.core.ui.theme.color_schemes.NatureColorScheme
+import com.yabancikelimedefteri.domain.model.datastore.ColorSchemeKeys
 import com.yabancikelimedefteri.presentation.settings.models.ColorSchemesSettingItem
 import com.yabancikelimedefteri.presentation.settings.models.SettingItem
 import com.yabancikelimedefteri.presentation.settings.models.SettingSection
@@ -28,6 +28,10 @@ import com.yabancikelimedefteri.presentation.settings.models.SettingSection
 @Composable
 fun SettingsScreen(
     onNavigateToRoute: (String) -> Unit,
+    isDarkThemeChecked: Boolean,
+    isDynamicColorChecked: Boolean,
+    isThinListTypeChecked: Boolean,
+    currentScheme: CustomColorScheme,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
 
@@ -48,14 +52,14 @@ fun SettingsScreen(
     ) { paddingValues ->
         SettingsScreenContent(
             modifier = Modifier.padding(paddingValues),
-            isDarkThemeChecked = false,
-            onDarkThemeCheckedChange = {},
-            isDynamicColorChecked = false,
-            onDynamicColorCheckedChange = {},
-            onColorSchemeClick = {},
-            currentScheme = NatureColorScheme,
-            isThinListTypeChecked = false,
-            onThinListTypeCheckedChange = {},
+            isDarkThemeChecked = isDarkThemeChecked,
+            onDarkThemeCheckedChange = viewModel::updateDarkTheme,
+            isDynamicColorChecked = isDynamicColorChecked,
+            onDynamicColorCheckedChange = viewModel::updateDynamicColor,
+            onColorSchemeClick = viewModel::updateColorScheme,
+            currentScheme = currentScheme,
+            isThinListTypeChecked = isThinListTypeChecked,
+            onThinListTypeCheckedChange = viewModel::updateWordListType,
             onRateAppClick = {},
             onShareAppClick = {}
         )
@@ -69,7 +73,7 @@ private fun SettingsScreenContent(
     onDarkThemeCheckedChange: (Boolean) -> Unit,
     isDynamicColorChecked: Boolean,
     onDynamicColorCheckedChange: (Boolean) -> Unit,
-    onColorSchemeClick: (CustomColorScheme) -> Unit,
+    onColorSchemeClick: (ColorSchemeKeys) -> Unit,
     currentScheme: CustomColorScheme,
     isThinListTypeChecked: Boolean,
     onThinListTypeCheckedChange: (Boolean) -> Unit,

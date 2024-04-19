@@ -5,7 +5,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-object PinkSchemeCustom : CustomColorScheme {
+object PinkColorScheme : CustomColorScheme {
 
     override val lightColorScheme: ColorScheme
         get() = lightColorScheme(

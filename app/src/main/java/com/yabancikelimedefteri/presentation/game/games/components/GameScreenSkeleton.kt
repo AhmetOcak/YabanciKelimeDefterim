@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.dp
 import com.yabancikelimedefteri.core.helpers.Answer
 import com.yabancikelimedefteri.core.helpers.GameResultEmote
 import com.yabancikelimedefteri.core.helpers.GameStatus
-import com.yabancikelimedefteri.domain.model.CategoryWithId
+import com.yabancikelimedefteri.domain.model.word.CategoryWithId
 
 @Composable
 fun GameScreenSkeleton(

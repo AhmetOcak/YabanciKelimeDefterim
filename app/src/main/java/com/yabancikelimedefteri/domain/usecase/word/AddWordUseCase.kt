@@ -1,6 +1,6 @@
 package com.yabancikelimedefteri.domain.usecase.word
 
-import com.yabancikelimedefteri.domain.model.Word
+import com.yabancikelimedefteri.domain.model.word.Word
 import com.yabancikelimedefteri.domain.repository.WordsRepository
 import javax.inject.Inject
 

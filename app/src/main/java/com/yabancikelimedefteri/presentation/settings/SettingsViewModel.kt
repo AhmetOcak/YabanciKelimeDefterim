@@ -9,12 +9,43 @@ import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.filled.StarRate
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.domain.model.datastore.ColorSchemeKeys
+import com.yabancikelimedefteri.domain.repository.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SettingsViewModel @Inject constructor(): ViewModel() {
+class SettingsViewModel @Inject constructor(
+    private val userPreferencesRepository: UserPreferencesRepository
+): ViewModel() {
+
+    fun updateDarkTheme(value: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            userPreferencesRepository.updateDarkTheme(value)
+        }
+    }
+
+    fun updateDynamicColor(value: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            userPreferencesRepository.updateDynamicColor(value)
+        }
+    }
+
+    fun updateWordListType(value: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            userPreferencesRepository.updateWordListType(value)
+        }
+    }
+
+    fun updateColorScheme(colorScheme: ColorSchemeKeys) {
+        viewModelScope.launch(Dispatchers.IO) {
+            userPreferencesRepository.updateColorScheme(colorScheme)
+        }
+    }
 }
 
 enum class Settings(val nameId: Int, val icon: ImageVector) {

@@ -2,10 +2,10 @@ package com.yabancikelimedefteri.data.mapper
 
 import com.yabancikelimedefteri.data.datasource.local.entity.CategoryEntity
 import com.yabancikelimedefteri.data.datasource.local.entity.WordEntity
-import com.yabancikelimedefteri.domain.model.Category
-import com.yabancikelimedefteri.domain.model.CategoryWithId
-import com.yabancikelimedefteri.domain.model.Word
-import com.yabancikelimedefteri.domain.model.WordWithId
+import com.yabancikelimedefteri.domain.model.word.Category
+import com.yabancikelimedefteri.domain.model.word.CategoryWithId
+import com.yabancikelimedefteri.domain.model.word.Word
+import com.yabancikelimedefteri.domain.model.word.WordWithId
 
 fun Category.toCategoryEntity(): CategoryEntity {
     return CategoryEntity(categoryName = categoryName)
