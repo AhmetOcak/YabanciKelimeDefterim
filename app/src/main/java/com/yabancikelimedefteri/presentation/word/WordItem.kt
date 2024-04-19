@@ -11,6 +11,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,10 +24,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.yabancikelimedefteri.R
 
 @Composable
 fun WordCard(
@@ -58,7 +59,7 @@ fun WordCard(
                         }
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_baseline_delete_forever),
+                            imageVector = Icons.Filled.DeleteForever,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.secondary
                         )
@@ -77,7 +78,7 @@ fun WordCard(
                     )
                     Icon(
                         modifier = Modifier.rotate(90f).padding(vertical = 4.dp),
-                        painter = painterResource(id = R.drawable.ic_baseline_compare_arrows),
+                        imageVector = Icons.AutoMirrored.Default.CompareArrows,
                         contentDescription = null
                     )
                     Text(

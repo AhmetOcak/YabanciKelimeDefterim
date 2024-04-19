@@ -6,6 +6,7 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -15,10 +16,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.yabancikelimedefteri.R
 
 @Composable
 fun CategoryCard(
@@ -83,7 +82,7 @@ private fun CardFeatures(
         }
         IconButton(onClick = onDeleteClick) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_baseline_delete_forever),
+                imageVector = Icons.Filled.DeleteForever,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.secondary
             )
