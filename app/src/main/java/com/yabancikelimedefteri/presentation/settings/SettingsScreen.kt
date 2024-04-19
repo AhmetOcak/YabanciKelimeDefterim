@@ -1,5 +1,8 @@
 package com.yabancikelimedefteri.presentation.settings
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,7 +14,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,6 +29,8 @@ import com.yabancikelimedefteri.presentation.settings.models.ColorSchemesSetting
 import com.yabancikelimedefteri.presentation.settings.models.SettingItem
 import com.yabancikelimedefteri.presentation.settings.models.SettingSection
 
+private const val APP_URL = "https://play.google.com/store/apps/details?id=com.yabancikelimedefteri"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -34,6 +41,7 @@ fun SettingsScreen(
     currentScheme: CustomColorScheme,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -60,8 +68,28 @@ fun SettingsScreen(
             currentScheme = currentScheme,
             isThinListTypeChecked = isThinListTypeChecked,
             onThinListTypeCheckedChange = viewModel::updateWordListType,
-            onRateAppClick = {},
-            onShareAppClick = {}
+            onRateAppClick = remember {
+                {
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.data = Uri.parse(APP_URL)
+                    context.startActivity(intent)
+                }
+            },
+            onShareAppClick = remember {
+                {
+                    val intent = Intent(Intent.ACTION_SEND)
+                    intent.apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, APP_URL)
+                    }
+                    context.startActivity(
+                        Intent.createChooser(
+                            intent,
+                            context.getString(R.string.share_app)
+                        )
+                    )
+                }
+            }
         )
     }
 }
@@ -101,12 +129,14 @@ private fun SettingsScreenContent(
                 currentScheme = currentScheme,
                 isDarkTheme = isDarkThemeChecked
             )
-            SettingItem(
-                nameId = Settings.DYNAMIC_COLOR.nameId,
-                icon = Settings.DYNAMIC_COLOR.icon,
-                checked = isDynamicColorChecked,
-                onCheckedChange = onDynamicColorCheckedChange
-            )
+            if (Build.VERSION.SDK_INT >= 31) {
+                SettingItem(
+                    nameId = Settings.DYNAMIC_COLOR.nameId,
+                    icon = Settings.DYNAMIC_COLOR.icon,
+                    checked = isDynamicColorChecked,
+                    onCheckedChange = onDynamicColorCheckedChange
+                )
+            }
         }
         SettingSection(title = stringResource(id = R.string.word_lists)) {
             SettingItem(
