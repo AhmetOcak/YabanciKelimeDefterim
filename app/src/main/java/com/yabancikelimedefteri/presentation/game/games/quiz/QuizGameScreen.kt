@@ -8,10 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -19,11 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.core.ui.theme.successGreen
 import com.yabancikelimedefteri.presentation.game.games.components.GameScreenSkeleton
 import com.yabancikelimedefteri.presentation.game.games.components.MinWordWarning
 import com.yabancikelimedefteri.presentation.game.models.GameWordItem
@@ -37,9 +37,7 @@ fun QuizGameScreen(
 
     if (uiState.errorMessages.isNotEmpty()) {
         Toast.makeText(
-            LocalContext.current,
-            uiState.errorMessages.first().asString(),
-            Toast.LENGTH_LONG
+            LocalContext.current, uiState.errorMessages.first().asString(), Toast.LENGTH_LONG
         ).show()
         viewModel.consumedErrorMessage()
     }
@@ -67,9 +65,10 @@ fun QuizGameScreen(
             QuizGame(
                 modifier = Modifier.padding(paddingValues),
                 question = viewModel.question,
-                answerValue = viewModel.answerValue,
-                onAnswerValueChanged = viewModel::updateAnswerValue,
-                onSubmitClicked = viewModel::playTheGame
+                options = viewModel.getOptions(),
+                onOptionClick = viewModel::handleOptionClick,
+                correctAnswer = viewModel.correctAnswer,
+                selectedOptionIndex = viewModel.selectedOptionIndex
             )
         }
     }
@@ -79,9 +78,10 @@ fun QuizGameScreen(
 private fun QuizGame(
     modifier: Modifier,
     question: String,
-    answerValue: String,
-    onAnswerValueChanged: (String) -> Unit,
-    onSubmitClicked: () -> Unit
+    options: List<String>,
+    onOptionClick: (Int, String) -> Unit,
+    correctAnswer: String,
+    selectedOptionIndex: Int
 ) {
     Column(
         modifier = modifier
@@ -91,20 +91,45 @@ private fun QuizGame(
         verticalArrangement = Arrangement.Center
     ) {
         GameWordItem(word = question)
-        Spacer(modifier = modifier.height(32.dp))
-        OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
-            value = answerValue,
-            onValueChange = onAnswerValueChanged,
-            label = {
-                Text(text = stringResource(R.string.user_guess))
-            },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { onSubmitClicked() }),
-        )
-        Spacer(modifier = modifier.height(32.dp))
-        Button(onClick = onSubmitClicked, enabled = answerValue.isNotBlank()) {
-            Text(text = stringResource(R.string.submit_answer))
+        Spacer(modifier = Modifier.height(64.dp))
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            options.forEachIndexed { index, option ->
+                OptionItem(
+                    index = index,
+                    word = option,
+                    onClick = onOptionClick,
+                    isCorrectOption = option == correctAnswer,
+                    isSelectedOption = index == selectedOptionIndex
+                )
+            }
         }
+    }
+}
+
+@Composable
+private fun OptionItem(
+    index: Int,
+    word: String,
+    onClick: (Int, String) -> Unit,
+    isCorrectOption: Boolean,
+    isSelectedOption: Boolean
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        onClick = { onClick(index, word) },
+        colors = CardDefaults.cardColors(
+            containerColor = if (isCorrectOption && isSelectedOption) successGreen
+            else if (!isCorrectOption && isSelectedOption) MaterialTheme.colorScheme.errorContainer
+            else if (isCorrectOption) successGreen
+            else MaterialTheme.colorScheme.surfaceVariant
+        )
+    ) {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            text = word,
+            textAlign = TextAlign.Center
+        )
     }
 }

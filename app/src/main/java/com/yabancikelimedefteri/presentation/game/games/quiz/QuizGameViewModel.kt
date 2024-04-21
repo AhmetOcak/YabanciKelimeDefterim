@@ -1,6 +1,8 @@
 package com.yabancikelimedefteri.presentation.game.games.quiz
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewModelScope
@@ -15,6 +17,7 @@ import com.yabancikelimedefteri.domain.usecase.category.ObserveCategoriesUseCase
 import com.yabancikelimedefteri.domain.usecase.word.GetSpecificWordsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -29,16 +32,40 @@ class QuizGameViewModel @Inject constructor(
 
     val quizGameUiState: StateFlow<GameUiState> = super.uiState.asStateFlow()
 
-    private var wordIndex = 0
-
     var question by mutableStateOf("")
         private set
 
-    var answerValue by mutableStateOf("")
+    private var options = mutableStateListOf<String>()
+
+    private val allOptions = mutableListOf<String>()
+
+    private var index = 0
+
+    var correctAnswer by mutableStateOf("")
+        private set
+    var selectedOptionIndex by mutableIntStateOf(-1)
         private set
 
-    fun updateAnswerValue(value: String) {
-        answerValue = value
+    fun handleOptionClick(index: Int, word: String) {
+        val words = uiState.value.words
+        correctAnswer = words.find { it.foreignWord == question }!!.meaning
+
+        selectedOptionIndex = index
+
+        if (words.find { it.foreignWord == question && it.meaning == word } == null) {
+            wrongAnswerCount++
+        } else {
+            correctAnswerCount++
+        }
+
+        userAnswers.add(
+            Answer(
+                question = question,
+                userAnswer = word,
+                correctAnswer = correctAnswer
+            )
+        )
+        playTheGame()
     }
 
     override fun launchTheGame() {
@@ -59,8 +86,18 @@ class QuizGameViewModel @Inject constructor(
 
                 // Empty situation already handled
                 if (uiState.value.words.isNotEmpty()) {
-                    // init question
-                    question = uiState.value.words[0].foreignWord
+                    uiState.value.words.forEach { word ->
+                        allOptions.add(word.meaning)
+                    }
+
+                    val shuffledWordList = allOptions.shuffled()
+                    allOptions.apply {
+                        clear()
+                        addAll(shuffledWordList)
+                    }
+
+                    question = uiState.value.words[index].foreignWord
+                    createOptions(true)
                 }
             } catch (e: Exception) {
                 uiState.update {
@@ -71,33 +108,49 @@ class QuizGameViewModel @Inject constructor(
     }
 
     override fun playTheGame() {
-        val words = uiState.value.words
-
-        if (userAnswers.size < words.size) {
-            if (answerValue.isNotBlank()) {
-                userAnswers.add(
-                    Answer(
-                        question = words[wordIndex].foreignWord,
-                        correctAnswer = words[wordIndex].meaning,
-                        userAnswer = answerValue
-                    )
-                )
-
-                // We are increasing the wordIndex. We need to check the wordIndex value.
-                // Otherwise, a "NoSuchElementException: No value present" error may occur.
-                wordIndex++
-
-                if (wordIndex >= words.size) {
-                    calculateResult(words)
-                } else {
-                    question = words[wordIndex].foreignWord
-                }
-
-                answerValue = ""
-            }
+        if (allOptions.size >= 3) {
+            createOptions(false)
         } else {
-            // calculate result
-            calculateResult(words)
+            viewModelScope.launch {
+                delay(500)
+                calculateResults()
+            }
+        }
+    }
+
+    fun getOptions() = options
+
+    private fun createOptions(isItInitial: Boolean) {
+        viewModelScope.launch {
+            if (!isItInitial) {
+                delay(500)
+            }
+
+            question = uiState.value.words[index].foreignWord
+
+            options.clear()
+
+            val wordList = uiState.value.words
+            val correctAnswer = wordList.find { it.foreignWord == question }!!.meaning
+            options.add(correctAnswer)
+            allOptions.remove(correctAnswer)
+
+            while (options.size != 3) {
+                val randOpt = allOptions.random()
+                if (!options.contains(randOpt)) {
+                    options.add(randOpt)
+                }
+            }
+            selectedOptionIndex = -1
+            this@QuizGameViewModel.correctAnswer = ""
+
+            val shuffledOptions = options.shuffled()
+            options.apply {
+                clear()
+                addAll(shuffledOptions)
+            }
+
+            index++
         }
     }
 }

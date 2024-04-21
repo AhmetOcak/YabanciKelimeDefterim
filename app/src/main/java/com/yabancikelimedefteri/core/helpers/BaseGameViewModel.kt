@@ -63,6 +63,24 @@ abstract class BaseGameViewModel(
         }
     }
 
+    protected fun calculateResults() {
+        val correctRate = (correctAnswerCount.toDouble() / uiState.value.words.size) * 100
+        successRate = "%${DecimalFormat("#.##").format(correctRate)}"
+
+        uiState.update {
+            it.copy(
+                gameResultEmote = when (correctRate.toInt()) {
+                    in 0..20 -> GameResultEmote.VERY_BAD
+                    in 21..40 -> GameResultEmote.BAD
+                    in 41..60 -> GameResultEmote.NORMAL
+                    in 61..80 -> GameResultEmote.GOOD
+                    else -> GameResultEmote.VERY_GOOD
+                },
+                gameStatus = GameStatus.END
+            )
+        }
+    }
+
     fun handleCategoryClick(categoryId: Int) {
         val selectedCategories = uiState.value.selectedCategories.toMutableList()
         val categories = uiState.value.categories
