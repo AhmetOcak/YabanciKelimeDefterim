@@ -48,7 +48,11 @@ import com.yabancikelimedefteri.domain.model.word.WordWithId
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WordScreen(upPress: () -> Unit, viewModel: WordViewModel = hiltViewModel()) {
+fun WordScreen(
+    upPress: () -> Unit,
+    viewModel: WordViewModel = hiltViewModel(),
+    isWordListTypeThin: Boolean
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var showAddWordSheet by remember { mutableStateOf(false) }
@@ -85,7 +89,8 @@ fun WordScreen(upPress: () -> Unit, viewModel: WordViewModel = hiltViewModel()) 
             modifier = Modifier.padding(paddingValues),
             onDeleteClick = viewModel::deleteWord,
             words = uiState.words,
-            isLoading = uiState.isLoading
+            isLoading = uiState.isLoading,
+            isWordListTypeThin = isWordListTypeThin
         )
 
         if (showAddWordSheet) {
@@ -112,7 +117,8 @@ private fun WordScreenContent(
     modifier: Modifier,
     words: List<WordWithId>,
     onDeleteClick: (Int) -> Unit,
-    isLoading: Boolean
+    isLoading: Boolean,
+    isWordListTypeThin: Boolean
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -136,7 +142,8 @@ private fun WordScreenContent(
                             foreignWord = it.foreignWord,
                             meaning = it.meaning,
                             wordId = it.wordId,
-                            onDeleteClick = onDeleteClick
+                            onDeleteClick = onDeleteClick,
+                            isWordListTypeThin = isWordListTypeThin
                         )
                     }
                 }

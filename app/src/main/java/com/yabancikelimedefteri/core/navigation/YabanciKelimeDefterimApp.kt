@@ -48,7 +48,8 @@ fun MyVocabularyApp(
                     isDarkThemeChecked = isDarkThemeChecked,
                     isDynamicColorChecked = isDynamicColorChecked,
                     isThinListTypeChecked = isThinListTypeChecked,
-                    currentScheme = currentScheme
+                    currentScheme = currentScheme,
+                    isWordListTypeThin = isThinListTypeChecked
                 )
             }
         }
@@ -65,7 +66,8 @@ private fun NavGraphBuilder.appNavGraph(
     isDarkThemeChecked: Boolean,
     isDynamicColorChecked: Boolean,
     isThinListTypeChecked: Boolean,
-    currentScheme: CustomColorScheme
+    currentScheme: CustomColorScheme,
+    isWordListTypeThin: Boolean
 ) {
     navigation(
         route = MainDestinations.HOME_ROUTE,
@@ -89,7 +91,7 @@ private fun NavGraphBuilder.appNavGraph(
             navArgument(MainDestinations.WORD_ID_KEY) { NavType.IntType }
         )
     ) {
-        WordScreen(upPress = upPress)
+        WordScreen(upPress = upPress, isWordListTypeThin = isWordListTypeThin)
     }
     composable(route = MainDestinations.QUIZ_GAME_ROUTE) {
         QuizGameScreen(upPress = upPress)

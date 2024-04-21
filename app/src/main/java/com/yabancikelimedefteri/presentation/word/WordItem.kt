@@ -7,6 +7,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -32,7 +33,8 @@ fun WordCard(
     foreignWord: String,
     meaning: String,
     onDeleteClick: (Int) -> Unit,
-    wordId: Int
+    wordId: Int,
+    isWordListTypeThin: Boolean
 ) {
     val state = remember { MutableTransitionState(false).apply { targetState = true } }
 
@@ -65,29 +67,54 @@ fun WordCard(
                         )
                     }
                 }
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                FlexContent(isWordListTypeThin = isWordListTypeThin) {
                     Text(
-                        modifier = Modifier.fillMaxWidth(),
                         text = foreignWord,
                         textAlign = TextAlign.Center
                     )
                     Icon(
-                        modifier = Modifier.rotate(90f).padding(vertical = 4.dp),
+                        modifier = Modifier
+                            .rotate(if (isWordListTypeThin) 0f else 90f)
+                            .then(
+                                if (isWordListTypeThin) {
+                                    Modifier.padding(horizontal = 8.dp)
+                                } else {
+                                    Modifier.padding(vertical = 4.dp)
+                                }
+                            ),
                         imageVector = Icons.AutoMirrored.Default.CompareArrows,
                         contentDescription = null
                     )
                     Text(
-                        modifier = Modifier.fillMaxWidth(),
                         text = meaning,
                         textAlign = TextAlign.Center
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun FlexContent(isWordListTypeThin: Boolean, content: @Composable (() -> Unit)) {
+    if (isWordListTypeThin) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            content()
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            content()
         }
     }
 }
