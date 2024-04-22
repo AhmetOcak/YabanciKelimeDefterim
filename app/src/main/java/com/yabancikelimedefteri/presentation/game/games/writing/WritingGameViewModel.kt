@@ -15,6 +15,7 @@ import com.yabancikelimedefteri.domain.usecase.category.ObserveCategoriesUseCase
 import com.yabancikelimedefteri.domain.usecase.word.GetSpecificWordsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -34,6 +35,10 @@ class WritingGameViewModel @Inject constructor(
     var answerValue by mutableStateOf("")
         private set
     var question by mutableStateOf("")
+        private set
+    var correctAnswer by mutableStateOf("")
+        private set
+    var showCorrectAnswer by mutableStateOf(false)
         private set
 
     fun updateAnswerValue(value: String) {
@@ -70,33 +75,41 @@ class WritingGameViewModel @Inject constructor(
     }
 
     override fun playTheGame() {
-        val words = uiState.value.words
+        viewModelScope.launch {
+            val words = uiState.value.words
 
-        if (userAnswers.size < words.size) {
-            if (answerValue.isNotBlank()) {
-                userAnswers.add(
-                    Answer(
-                        question = words[wordIndex].meaning,
-                        correctAnswer = words[wordIndex].foreignWord,
-                        userAnswer = answerValue
+            showCorrectAnswer = true
+            correctAnswer = uiState.value.words.find { it.meaning == question }?.foreignWord ?: ""
+            delay(1000)
+            showCorrectAnswer = false
+            delay(500)
+            correctAnswer = ""
+
+            if (userAnswers.size < words.size) {
+                if (answerValue.isNotBlank()) {
+                    userAnswers.add(
+                        Answer(
+                            question = words[wordIndex].meaning,
+                            correctAnswer = words[wordIndex].foreignWord,
+                            userAnswer = answerValue
+                        )
                     )
-                )
 
-                // We are increasing the wordIndex. We need to check the wordIndex value.
-                // Otherwise, a "NoSuchElementException: No value present" error may occur.
-                wordIndex++
+                    // We are increasing the wordIndex. We need to check the wordIndex value.
+                    // Otherwise, a "NoSuchElementException: No value present" error may occur.
+                    wordIndex++
 
-                if (wordIndex >= words.size) {
-                    calculateResult(words)
-                } else {
-                    question = words[wordIndex].meaning
+                    if (wordIndex >= words.size) {
+                        calculateResult(words)
+                    } else {
+                        question = words[wordIndex].meaning
+                    }
+
+                    answerValue = ""
                 }
-
-                answerValue = ""
+            } else {
+                calculateResult(words)
             }
-        } else {
-            // calculate result
-            calculateResult(words)
         }
     }
 }
