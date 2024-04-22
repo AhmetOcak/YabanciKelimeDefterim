@@ -236,9 +236,9 @@ private fun AddCategorySheet(
                 },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
-                    onDone = {
-                        onAddCategoryClick()
-                    }
+                    onDone = if (categoryNameValue.isNotBlank()) {
+                        { onAddCategoryClick() }
+                    } else null
                 )
             )
             Button(onClick = onAddCategoryClick, enabled = categoryNameValue.isNotBlank()) {

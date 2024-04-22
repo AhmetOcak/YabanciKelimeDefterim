@@ -193,9 +193,9 @@ private fun AddWordSheet(
                 },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(
-                    onDone = {
-                        onAddWordClick()
-                    }
+                    onDone = if (foreignWordValue.isNotBlank() && meaningWordValue.isNotBlank()) {
+                        { onAddWordClick() }
+                    } else null
                 )
             )
             Spacer(modifier = Modifier.height(16.dp))
