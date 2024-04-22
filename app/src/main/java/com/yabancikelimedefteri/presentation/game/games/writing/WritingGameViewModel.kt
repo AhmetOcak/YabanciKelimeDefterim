@@ -59,7 +59,7 @@ class WritingGameViewModel @Inject constructor(
                 // Empty situation already handled
                 if (uiState.value.words.isNotEmpty()) {
                     // init question
-                    question = uiState.value.words[0].foreignWord
+                    question = uiState.value.words[0].meaning
                 }
             } catch (e: Exception) {
                 uiState.update {
@@ -76,8 +76,8 @@ class WritingGameViewModel @Inject constructor(
             if (answerValue.isNotBlank()) {
                 userAnswers.add(
                     Answer(
-                        question = words[wordIndex].foreignWord,
-                        correctAnswer = words[wordIndex].meaning,
+                        question = words[wordIndex].meaning,
+                        correctAnswer = words[wordIndex].foreignWord,
                         userAnswer = answerValue
                     )
                 )
@@ -89,7 +89,7 @@ class WritingGameViewModel @Inject constructor(
                 if (wordIndex >= words.size) {
                     calculateResult(words)
                 } else {
-                    question = words[wordIndex].foreignWord
+                    question = words[wordIndex].meaning
                 }
 
                 answerValue = ""

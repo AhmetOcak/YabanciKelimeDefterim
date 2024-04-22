@@ -48,11 +48,11 @@ class QuizGameViewModel @Inject constructor(
 
     fun handleOptionClick(index: Int, word: String) {
         val words = uiState.value.words
-        correctAnswer = words.find { it.foreignWord == question }!!.meaning
+        correctAnswer = words.find { it.meaning == question }!!.foreignWord
 
         selectedOptionIndex = index
 
-        if (words.find { it.foreignWord == question && it.meaning == word } == null) {
+        if (words.find { it.meaning == question && it.foreignWord == word } == null) {
             wrongAnswerCount++
         } else {
             correctAnswerCount++
@@ -87,7 +87,7 @@ class QuizGameViewModel @Inject constructor(
                 // Empty situation already handled
                 if (uiState.value.words.isNotEmpty()) {
                     uiState.value.words.forEach { word ->
-                        allOptions.add(word.meaning)
+                        allOptions.add(word.foreignWord)
                     }
 
                     val shuffledWordList = allOptions.shuffled()
@@ -96,7 +96,7 @@ class QuizGameViewModel @Inject constructor(
                         addAll(shuffledWordList)
                     }
 
-                    question = uiState.value.words[index].foreignWord
+                    question = uiState.value.words[index].meaning
                     createOptions(true)
                 }
             } catch (e: Exception) {
@@ -126,12 +126,12 @@ class QuizGameViewModel @Inject constructor(
                 delay(500)
             }
 
-            question = uiState.value.words[index].foreignWord
+            question = uiState.value.words[index].meaning
 
             options.clear()
 
             val wordList = uiState.value.words
-            val correctAnswer = wordList.find { it.foreignWord == question }!!.meaning
+            val correctAnswer = wordList.find { it.meaning == question }!!.foreignWord
             options.add(correctAnswer)
             allOptions.remove(correctAnswer)
 
