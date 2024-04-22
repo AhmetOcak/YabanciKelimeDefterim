@@ -134,7 +134,6 @@ private fun WordScreenContent(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
                     contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
                 ) {
                     items(items = words, key = { it.wordId }) {

@@ -113,7 +113,8 @@ private fun WritingGame(
             ) {
                 HorizontalDivider(
                     color = if (answerValue == correctAnswer) successGreen
-                    else MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.error,
+                    thickness = 2.dp
                 )
                 Text(text = correctAnswer, textAlign = TextAlign.Center)
             }

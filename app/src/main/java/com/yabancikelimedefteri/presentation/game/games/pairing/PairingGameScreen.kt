@@ -41,6 +41,7 @@ import com.yabancikelimedefteri.presentation.game.games.components.MinWordWarnin
 @Composable
 fun PairingGameScreen(
     upPress: () -> Unit,
+    isCurrentSchemeRed: Boolean,
     viewModel: PairingGameViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.pairingGameUiState.collectAsStateWithLifecycle()
@@ -90,7 +91,8 @@ fun PairingGameScreen(
                     }
                 },
                 puzzleWidth = puzzleWidth,
-                puzzleHeight = puzzleHeight
+                puzzleHeight = puzzleHeight,
+                isCurrentSchemeRed = isCurrentSchemeRed
             )
         }
     }
@@ -107,7 +109,8 @@ private fun PairingGame(
     isPuzzlesEnable: Boolean,
     hidePuzzle: (Int) -> Boolean,
     puzzleWidth: Dp,
-    puzzleHeight: Dp
+    puzzleHeight: Dp,
+    isCurrentSchemeRed: Boolean
 ) {
     LazyVerticalGrid(
         modifier = modifier
@@ -127,9 +130,13 @@ private fun PairingGame(
                 containerColor = if (index == selectedPuzzle1Index || index == selectedPuzzle2Index) {
                     when (pairStatus) {
                         PairStatus.NOTHING -> MaterialTheme.colorScheme.surfaceVariant
-                        PairStatus.SELECTED -> MaterialTheme.colorScheme.primary
+                        PairStatus.SELECTED -> MaterialTheme.colorScheme.primaryContainer
                         PairStatus.TRUE -> successGreen
-                        PairStatus.FALSE -> MaterialTheme.colorScheme.error
+                        PairStatus.FALSE -> if (isCurrentSchemeRed) {
+                            Color(0xFFBA1A1A)
+                        } else {
+                            MaterialTheme.colorScheme.errorContainer
+                        }
                     }
                 } else {
                     MaterialTheme.colorScheme.surfaceVariant

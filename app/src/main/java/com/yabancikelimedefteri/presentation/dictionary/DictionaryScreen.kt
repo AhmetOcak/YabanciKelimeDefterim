@@ -184,7 +184,7 @@ private fun WordItem(
                     word.meaning
                 }
             },
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center
         )
     }
@@ -206,7 +206,7 @@ private fun WordMeaning(meaningOfWord: String, onDismiss: () -> Unit) {
                     .wrapContentSize(Alignment.Center)
                     .padding(horizontal = 8.dp),
                 text = meaningOfWord,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center
             )
         }

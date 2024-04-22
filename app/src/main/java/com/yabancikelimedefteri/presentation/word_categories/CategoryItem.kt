@@ -1,9 +1,7 @@
 package com.yabancikelimedefteri.presentation.word_categories
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeleteForever
@@ -14,10 +12,16 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun CategoryCard(
@@ -27,25 +31,29 @@ fun CategoryCard(
     onCategoryCardClick: (Int) -> Unit,
     onEditClick: (Int) -> Unit
 ) {
-    val state = remember { MutableTransitionState(false).apply { targetState = true } }
+    val scope = rememberCoroutineScope()
+    var visible by remember { mutableStateOf(true) }
 
     AnimatedVisibility(
-        visibleState = state,
-        enter = EnterTransition.None,
-        exit = slideOutHorizontally()
+        visible = visible,
+        exit = scaleOut()
     ) {
         ElevatedCard(
             modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(),
+                .wrapContentHeight()
+                .padding(vertical = 8.dp),
             onClick = remember { { onCategoryCardClick(categoryId) } }
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 CardFeatures(
                     onDeleteClick = remember {
                         {
-                            onDeleteClick(categoryId)
-                            state.targetState = false
+                            scope.launch {
+                                visible = false
+                                delay(1000)
+                                onDeleteClick(categoryId)
+                            }
                         }
                     },
                     onEditClick = remember { { onEditClick(categoryId) } }

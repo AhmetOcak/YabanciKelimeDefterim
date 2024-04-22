@@ -1,9 +1,7 @@
 package com.yabancikelimedefteri.presentation.word
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,12 +19,18 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun WordCard(
@@ -36,17 +40,18 @@ fun WordCard(
     wordId: Int,
     isWordListTypeThin: Boolean
 ) {
-    val state = remember { MutableTransitionState(false).apply { targetState = true } }
+    val scope = rememberCoroutineScope()
+    var visible by remember { mutableStateOf(true) }
 
     AnimatedVisibility(
-        visibleState = state,
-        enter = EnterTransition.None,
-        exit = slideOutHorizontally()
+        visible = visible,
+        exit = scaleOut()
     ) {
         ElevatedCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
+                .padding(vertical = 8.dp)
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -56,8 +61,11 @@ fun WordCard(
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
                     IconButton(
                         onClick = {
-                            onDeleteClick(wordId)
-                            state.targetState = false
+                            scope.launch {
+                                visible = false
+                                delay(1000)
+                                onDeleteClick(wordId)
+                            }
                         }
                     ) {
                         Icon(

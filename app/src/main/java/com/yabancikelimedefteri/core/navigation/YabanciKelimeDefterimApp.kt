@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.yabancikelimedefteri.core.ui.theme.YabanciKelimeDefteriTheme
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.CustomColorScheme
+import com.yabancikelimedefteri.core.ui.theme.color_schemes.RedColorScheme
 import com.yabancikelimedefteri.presentation.game.games.pairing.PairingGameScreen
 import com.yabancikelimedefteri.presentation.game.games.quiz.QuizGameScreen
 import com.yabancikelimedefteri.presentation.game.games.writing.WritingGameScreen
@@ -49,7 +50,8 @@ fun MyVocabularyApp(
                     isDynamicColorChecked = isDynamicColorChecked,
                     isThinListTypeChecked = isThinListTypeChecked,
                     currentScheme = currentScheme,
-                    isWordListTypeThin = isThinListTypeChecked
+                    isWordListTypeThin = isThinListTypeChecked,
+                    isCurrentSchemeRed = currentScheme == RedColorScheme
                 )
             }
         }
@@ -67,7 +69,8 @@ private fun NavGraphBuilder.appNavGraph(
     isDynamicColorChecked: Boolean,
     isThinListTypeChecked: Boolean,
     currentScheme: CustomColorScheme,
-    isWordListTypeThin: Boolean
+    isWordListTypeThin: Boolean,
+    isCurrentSchemeRed: Boolean
 ) {
     navigation(
         route = MainDestinations.HOME_ROUTE,
@@ -100,6 +103,6 @@ private fun NavGraphBuilder.appNavGraph(
         WritingGameScreen(upPress = upPress)
     }
     composable(route = MainDestinations.PAIRING_GAME_ROUTE) {
-        PairingGameScreen(upPress = upPress)
+        PairingGameScreen(upPress = upPress, isCurrentSchemeRed = isCurrentSchemeRed)
     }
 }
