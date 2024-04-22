@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.helpers.UiText
 import com.yabancikelimedefteri.core.navigation.MainDestinations
+import com.yabancikelimedefteri.core.ui.component.SortType
 import com.yabancikelimedefteri.domain.model.word.Word
 import com.yabancikelimedefteri.domain.model.word.WordWithId
 import com.yabancikelimedefteri.domain.usecase.word.AddWordUseCase
@@ -47,12 +48,40 @@ class WordViewModel @Inject constructor(
     var meaningWord by mutableStateOf("")
         private set
 
+    var searchValue by mutableStateOf("")
+        private set
+
     fun updateForeignWord(newValue: String) {
         foreignWord = newValue
     }
 
     fun updateMeaningWord(newValue: String) {
         meaningWord = newValue
+    }
+
+    fun updateSearchValueAndSearch(newValue: String) {
+        searchValue = newValue
+
+        val words = _uiState.value.words
+
+        if (searchValue.isNotBlank()) {
+            _uiState.update {
+                it.copy(
+                    uiEvent = UiEvent.SEARCHING,
+                    searchResults = words.filter { word ->
+                        word.foreignWord.contains(searchValue.lowercase())
+                                || word.meaning.contains(searchValue.lowercase())
+                    }
+                )
+            }
+        } else {
+            _uiState.update {
+                it.copy(
+                    uiEvent = UiEvent.WORDS,
+                    searchResults = emptyList()
+                )
+            }
+        }
     }
 
     private fun getWords(categoryId: Int) {
@@ -125,10 +154,30 @@ class WordViewModel @Inject constructor(
             it.copy(errorMessages = emptyList())
         }
     }
+
+    // More sort types may be added in the future.
+    fun handleOnMenuItemClick(sortType: SortType) {
+        when (sortType) {
+            SortType.ALPHABETICALLY -> {
+                _uiState.update {
+                    it.copy(
+                        words = _uiState.value.words.sortedBy { word -> word.foreignWord }
+                    )
+                }
+            }
+        }
+    }
 }
 
 data class WordsUiState(
     val isLoading: Boolean = true,
     val words: List<WordWithId> = emptyList(),
-    val errorMessages: List<UiText> = emptyList()
+    val errorMessages: List<UiText> = emptyList(),
+    val uiEvent: UiEvent = UiEvent.WORDS,
+    val searchResults: List<WordWithId> = emptyList()
 )
+
+enum class UiEvent {
+    SEARCHING,
+    WORDS
+}

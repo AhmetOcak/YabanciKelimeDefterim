@@ -88,7 +88,7 @@ fun WordCategoriesScreen(
             }
         }
     ) { paddingValues ->
-        HomeScreenContent(
+        WordCategoriesScreenContent(
             modifier = Modifier.padding(paddingValues),
             onDeleteClick = viewModel::deleteCategory,
             onCategoryCardClick = onCategoryClick,
@@ -141,7 +141,7 @@ fun WordCategoriesScreen(
 }
 
 @Composable
-private fun HomeScreenContent(
+private fun WordCategoriesScreenContent(
     modifier: Modifier,
     onDeleteClick: (Int) -> Unit,
     categories: List<CategoryWithId>,
@@ -163,7 +163,7 @@ private fun HomeScreenContent(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
+                    contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp)
                 ) {
                     items(items = categories, key = { it.categoryId }) {
                         CategoryCard(
@@ -223,8 +223,7 @@ private fun AddCategorySheet(
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
         Column(
             modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.End,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalAlignment = Alignment.End
         ) {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),

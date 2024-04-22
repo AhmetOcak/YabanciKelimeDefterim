@@ -78,4 +78,6 @@
     <string name="word_lists">Kelime Listeleri</string>
 
     <string name="word_categories">Kelime Kategorileri</string>
+    <string name="sort_alphabetically">Alfabetik Sırala</string>
+    <string name="word_not_found">Aradığınız kelime mevcut kelime listenizde yok. 😥.</string>
 </resources>

@@ -1,7 +1,6 @@
 package com.yabancikelimedefteri.presentation.word
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -25,7 +24,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,11 +40,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.R
-import com.yabancikelimedefteri.core.ui.component.BackButton
 import com.yabancikelimedefteri.core.ui.component.EmptyListMessage
+import com.yabancikelimedefteri.core.ui.component.MultiActionBar
 import com.yabancikelimedefteri.domain.model.word.WordWithId
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WordScreen(
     upPress: () -> Unit,
@@ -69,11 +66,12 @@ fun WordScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            TopAppBar(
-                title = { Text(text = stringResource(id = R.string.my_words)) },
-                navigationIcon = {
-                    BackButton(onClick = upPress)
-                }
+            MultiActionBar(
+                upPress = upPress,
+                title = stringResource(id = R.string.my_words),
+                searchValue = viewModel.searchValue,
+                onSearchValueChange = viewModel::updateSearchValueAndSearch,
+                onMenuItemClick = viewModel::handleOnMenuItemClick
             )
         },
         floatingActionButton = {
@@ -85,13 +83,26 @@ fun WordScreen(
             }
         }
     ) { paddingValues ->
-        WordScreenContent(
-            modifier = Modifier.padding(paddingValues),
-            onDeleteClick = viewModel::deleteWord,
-            words = uiState.words,
-            isLoading = uiState.isLoading,
-            isWordListTypeThin = isWordListTypeThin
-        )
+        when (uiState.uiEvent) {
+            UiEvent.WORDS -> {
+                WordScreenContent(
+                    modifier = Modifier.padding(paddingValues),
+                    onDeleteClick = viewModel::deleteWord,
+                    words = uiState.words,
+                    isLoading = uiState.isLoading,
+                    isWordListTypeThin = isWordListTypeThin
+                )
+            }
+
+            UiEvent.SEARCHING -> {
+                SearchWordContent(
+                    modifier = Modifier.padding(paddingValues),
+                    searchResults = uiState.searchResults,
+                    onDeleteClick = viewModel::deleteWord,
+                    isWordListTypeThin = isWordListTypeThin
+                )
+            }
+        }
 
         if (showAddWordSheet) {
             AddWordSheet(
@@ -134,7 +145,7 @@ private fun WordScreenContent(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(vertical = 16.dp, horizontal = 16.dp)
+                    contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp)
                 ) {
                     items(items = words, key = { it.wordId }) {
                         WordCard(
@@ -203,6 +214,38 @@ private fun AddWordSheet(
                 enabled = foreignWordValue.isNotBlank() && meaningWordValue.isNotBlank()
             ) {
                 Text(text = stringResource(id = R.string.add_word))
+            }
+        }
+    }
+}
+
+@Composable
+private fun SearchWordContent(
+    modifier: Modifier,
+    searchResults: List<WordWithId>,
+    onDeleteClick: (Int) -> Unit,
+    isWordListTypeThin: Boolean
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (searchResults.isEmpty()) {
+            EmptyListMessage(message = stringResource(id = R.string.word_not_found))
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp)
+            ) {
+                items(items = searchResults, key = { it.wordId }) {
+                    WordCard(
+                        foreignWord = it.foreignWord,
+                        meaning = it.meaning,
+                        wordId = it.wordId,
+                        onDeleteClick = onDeleteClick,
+                        isWordListTypeThin = isWordListTypeThin
+                    )
+                }
             }
         }
     }
