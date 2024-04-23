@@ -119,10 +119,10 @@ class WordViewModel @Inject constructor(
         if (foreignWord.isNotBlank() && meaningWord.isNotBlank() && categoryId != null) {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    categoryId?.let {
+                    categoryId?.let { categoryId ->
                         addWordUseCase(
                             word = Word(
-                                categoryId = it.toInt(),
+                                categoryId = categoryId.toInt(),
                                 foreignWord = foreignWord,
                                 meaning = meaningWord
                             )

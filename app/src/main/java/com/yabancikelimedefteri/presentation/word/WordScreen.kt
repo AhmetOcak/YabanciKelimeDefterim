@@ -206,7 +206,10 @@ private fun AddWordSheet(
                     onDone = if (foreignWordValue.isNotBlank() && meaningWordValue.isNotBlank()) {
                         { onAddWordClick() }
                     } else null
-                )
+                ),
+                supportingText = {
+                    Text(text = stringResource(id = R.string.add_word_info))
+                }
             )
             Spacer(modifier = Modifier.height(16.dp))
             Button(

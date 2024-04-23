@@ -56,7 +56,7 @@ class UserPreferencesRepositoryImpl @Inject constructor(
     }
 
     private fun mapUserPreferences(preferences: Preferences): UserPreferences {
-        val isDarkTheme = preferences[PreferencesKeys.DARK_THEME] ?: false
+        val isDarkTheme = preferences[PreferencesKeys.DARK_THEME] ?: true
         val isDynamicColor = preferences[PreferencesKeys.DYNAMIC_COLOR] ?: false
         val isWordListTypeThin = preferences[PreferencesKeys.WORD_LIST_TYPE] ?: false
         val colorScheme = preferences[PreferencesKeys.COLOR_SCHEME] ?: ColorSchemeKeys.PINK.name

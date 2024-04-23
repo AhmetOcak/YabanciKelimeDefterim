@@ -75,36 +75,18 @@ fun WordCard(
                         )
                     }
                 }
-                FlexContent(isWordListTypeThin = isWordListTypeThin) {
-                    Text(
-                        text = foreignWord,
-                        textAlign = TextAlign.Center
-                    )
-                    Icon(
-                        modifier = Modifier
-                            .rotate(if (isWordListTypeThin) 0f else 90f)
-                            .then(
-                                if (isWordListTypeThin) {
-                                    Modifier.padding(horizontal = 8.dp)
-                                } else {
-                                    Modifier.padding(vertical = 4.dp)
-                                }
-                            ),
-                        imageVector = Icons.AutoMirrored.Default.CompareArrows,
-                        contentDescription = null
-                    )
-                    Text(
-                        text = meaning,
-                        textAlign = TextAlign.Center
-                    )
-                }
+                WordItemContent(
+                    isWordListTypeThin = isWordListTypeThin,
+                    foreignWord = foreignWord,
+                    meaning = meaning
+                )
             }
         }
     }
 }
 
 @Composable
-private fun FlexContent(isWordListTypeThin: Boolean, content: @Composable (() -> Unit)) {
+private fun WordItemContent(isWordListTypeThin: Boolean, foreignWord: String, meaning: String) {
     if (isWordListTypeThin) {
         Row(
             modifier = Modifier
@@ -113,7 +95,24 @@ private fun FlexContent(isWordListTypeThin: Boolean, content: @Composable (() ->
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            content()
+            Text(
+                modifier = Modifier.weight(1f),
+                text = foreignWord,
+                textAlign = TextAlign.End
+            )
+            Icon(
+                modifier = Modifier.padding(horizontal = 8.dp),
+                imageVector = Icons.AutoMirrored.Default.CompareArrows,
+                contentDescription = null
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                meaning.split(",").map { it.trim() }.forEach { s ->
+                    Text(
+                        text = s,
+                        textAlign = TextAlign.Start
+                    )
+                }
+            }
         }
     } else {
         Column(
@@ -122,7 +121,21 @@ private fun FlexContent(isWordListTypeThin: Boolean, content: @Composable (() ->
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            content()
+            Text(
+                text = foreignWord,
+                textAlign = TextAlign.Center
+            )
+            Icon(
+                modifier = Modifier
+                    .rotate(90f)
+                    .then(Modifier.padding(vertical = 4.dp)),
+                imageVector = Icons.AutoMirrored.Default.CompareArrows,
+                contentDescription = null
+            )
+            Text(
+                text = meaning,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
