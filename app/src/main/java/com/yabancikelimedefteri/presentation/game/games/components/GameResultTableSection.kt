@@ -1,6 +1,7 @@
 package com.yabancikelimedefteri.presentation.game.games.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -47,51 +48,59 @@ fun GameResultTableSection(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.SpaceAround
     ) {
-        Subtitle(
-            title = stringResource(id = R.string.correct_answer),
-            contentText = "$correctAnswerCount"
-        )
-        Subtitle(
-            title = stringResource(id = R.string.wrong_answer),
-            contentText = "$wrongAnswerCount"
-        )
-        Subtitle(
-            title = stringResource(id = R.string.success_rate),
-            contentText = successRate
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Subtitle(
+                title = stringResource(id = R.string.correct_answer),
+                contentText = "$correctAnswerCount"
+            )
+            Subtitle(
+                title = stringResource(id = R.string.wrong_answer),
+                contentText = "$wrongAnswerCount"
+            )
+            Subtitle(
+                title = stringResource(id = R.string.success_rate),
+                contentText = successRate
+            )
+        }
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(3f),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             stickyHeader {
                 RowCellTitle(
                     s1 = stringResource(id = R.string.question),
                     s2 = stringResource(id = R.string.correct_answer),
-                    s3 = stringResource(id = R.string.your_answer)
+                    s3 = stringResource(id = R.string.your_answer),
+                    backgroundColor = MaterialTheme.colorScheme.background
                 )
             }
             items(userAnswers) { result ->
                 RowCell(s1 = result.question, s2 = result.correctAnswer, s3 = result.userAnswer)
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        if (quizResultEmote != null) {
-            Column(
-                Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Text(text = quizResultEmote.emote, fontSize = 100.sp)
-                Text(text = quizResultEmote.message.asString(), textAlign = TextAlign.Center)
+        Column(modifier = Modifier.weight(3f)) {
+            if (quizResultEmote != null) {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Text(text = quizResultEmote.emote, fontSize = 100.sp)
+                    Text(text = quizResultEmote.message.asString(), textAlign = TextAlign.Center)
+                }
             }
-        }
-        Spacer(modifier = Modifier.height(16.dp))
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            Button(onClick = onReturnGamesScreenClick) {
-                Text(text = stringResource(id = R.string.return_games_screen))
+            Spacer(modifier = Modifier.height(16.dp))
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                Button(onClick = onReturnGamesScreenClick) {
+                    Text(text = stringResource(id = R.string.return_games_screen))
+                }
             }
         }
     }
@@ -148,6 +157,7 @@ private fun RowCellTitle(
     s1: String,
     s2: String,
     s3: String,
+    backgroundColor: Color = Color.Transparent
 ) {
     Row(
         modifier = Modifier
@@ -157,6 +167,7 @@ private fun RowCellTitle(
                 shape = RectangleShape,
                 color = MaterialTheme.colorScheme.primary
             )
+            .background(backgroundColor, RectangleShape)
     ) {
         Text(
             modifier = Modifier

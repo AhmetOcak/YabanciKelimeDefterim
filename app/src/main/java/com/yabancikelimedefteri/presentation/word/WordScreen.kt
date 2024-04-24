@@ -1,6 +1,9 @@
 package com.yabancikelimedefteri.presentation.word
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -10,7 +13,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -40,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.core.helpers.isScrollingUp
 import com.yabancikelimedefteri.core.ui.component.EmptyListMessage
 import com.yabancikelimedefteri.core.ui.component.MultiActionBar
 import com.yabancikelimedefteri.domain.model.word.WordWithId
@@ -53,6 +59,8 @@ fun WordScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var showAddWordSheet by remember { mutableStateOf(false) }
+
+    val lazyListState = rememberLazyListState()
 
     if (uiState.errorMessages.isNotEmpty()) {
         Toast.makeText(
@@ -75,11 +83,18 @@ fun WordScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showAddWordSheet = true }) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null
-                )
+            AnimatedVisibility(
+                visible = lazyListState.isScrollingUp().value,
+                enter = scaleIn(),
+                exit = scaleOut()
+
+            ) {
+                FloatingActionButton(onClick = { showAddWordSheet = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null
+                    )
+                }
             }
         }
     ) { paddingValues ->
@@ -90,7 +105,8 @@ fun WordScreen(
                     onDeleteClick = viewModel::deleteWord,
                     words = uiState.words,
                     isLoading = uiState.isLoading,
-                    isWordListTypeThin = isWordListTypeThin
+                    isWordListTypeThin = isWordListTypeThin,
+                    lazyListState = lazyListState
                 )
             }
 
@@ -129,7 +145,8 @@ private fun WordScreenContent(
     words: List<WordWithId>,
     onDeleteClick: (Int) -> Unit,
     isLoading: Boolean,
-    isWordListTypeThin: Boolean
+    isWordListTypeThin: Boolean,
+    lazyListState: LazyListState
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -145,6 +162,7 @@ private fun WordScreenContent(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
+                    state = lazyListState,
                     contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp)
                 ) {
                     items(items = words, key = { it.wordId }) {

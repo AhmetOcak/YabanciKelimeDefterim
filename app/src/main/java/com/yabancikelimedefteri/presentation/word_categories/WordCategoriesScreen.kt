@@ -1,6 +1,9 @@
 package com.yabancikelimedefteri.presentation.word_categories
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,7 +12,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -38,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.core.helpers.isScrollingUp
 import com.yabancikelimedefteri.core.navigation.HomeSections
 import com.yabancikelimedefteri.core.ui.component.EmptyListMessage
 import com.yabancikelimedefteri.core.ui.component.MyVocabularyNavigationBar
@@ -54,6 +60,8 @@ fun WordCategoriesScreen(
 
     var showUpdateCategoryNameSheet by remember { mutableStateOf(false) }
     var showAddCategorySheet by remember { mutableStateOf(false) }
+
+    val lazyListState = rememberLazyListState()
 
     if (uiState.errorMessages.isNotEmpty()) {
         Toast.makeText(
@@ -80,11 +88,17 @@ fun WordCategoriesScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { showAddCategorySheet = true }) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = null
-                )
+            AnimatedVisibility(
+                visible = lazyListState.isScrollingUp().value,
+                enter = scaleIn(),
+                exit = scaleOut()
+            ) {
+                FloatingActionButton(onClick = { showAddCategorySheet = true }) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = null
+                    )
+                }
             }
         }
     ) { paddingValues ->
@@ -97,7 +111,8 @@ fun WordCategoriesScreen(
                 showUpdateCategoryNameSheet = true
             },
             categories = uiState.categories,
-            isLoading = uiState.isLoading
+            isLoading = uiState.isLoading,
+            lazyListState = lazyListState
         )
 
         if (showUpdateCategoryNameSheet) {
@@ -147,7 +162,8 @@ private fun WordCategoriesScreenContent(
     categories: List<CategoryWithId>,
     isLoading: Boolean,
     onCategoryCardClick: (Int) -> Unit,
-    onEditClick: (Int) -> Unit
+    onEditClick: (Int) -> Unit,
+    lazyListState: LazyListState
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -163,6 +179,7 @@ private fun WordCategoriesScreenContent(
             } else {
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
+                    state = lazyListState,
                     contentPadding = PaddingValues(vertical = 8.dp, horizontal = 16.dp)
                 ) {
                     items(items = categories, key = { it.categoryId }) {
@@ -223,6 +240,7 @@ private fun AddCategorySheet(
     ModalBottomSheet(onDismissRequest = onDismissRequest) {
         Column(
             modifier = Modifier.padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.End
         ) {
             OutlinedTextField(
