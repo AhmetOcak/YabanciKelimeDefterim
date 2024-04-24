@@ -82,4 +82,8 @@
     <string name="word_not_found">The word you are looking for is not on your current word list 😥.</string>
 
     <string name="add_word_info">If you add more than one word meaning, separate the words with commas.</string>
+    <string name="add_category">Add category</string>
+
+    <string name="add">Add</string>
+    <string name="cancel">Cancel</string>
 </resources>

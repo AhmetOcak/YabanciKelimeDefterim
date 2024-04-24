@@ -4,13 +4,12 @@ import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -20,15 +19,15 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Button
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -180,66 +179,6 @@ private fun WordScreenContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun AddWordSheet(
-    foreignWordValue: String,
-    onForeignWordValueChange: (String) -> Unit,
-    meaningWordValue: String,
-    onMeaningWordValueChange: (String) -> Unit,
-    onAddWordClick: () -> Unit,
-    onDismissRequest: () -> Unit
-) {
-    val focusManager = LocalFocusManager.current
-
-    ModalBottomSheet(onDismissRequest = onDismissRequest) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.End
-        ) {
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = foreignWordValue,
-                onValueChange = onForeignWordValueChange,
-                label = {
-                    Text(text = stringResource(id = R.string.foreign_word))
-                },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                keyboardActions = KeyboardActions(
-                    onNext = {
-                        focusManager.moveFocus(FocusDirection.Down)
-                    }
-                )
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = meaningWordValue,
-                onValueChange = onMeaningWordValueChange,
-                label = {
-                    Text(text = stringResource(id = R.string.meaning))
-                },
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(
-                    onDone = if (foreignWordValue.isNotBlank() && meaningWordValue.isNotBlank()) {
-                        { onAddWordClick() }
-                    } else null
-                ),
-                supportingText = {
-                    Text(text = stringResource(id = R.string.add_word_info))
-                }
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onAddWordClick,
-                enabled = foreignWordValue.isNotBlank() && meaningWordValue.isNotBlank()
-            ) {
-                Text(text = stringResource(id = R.string.add_word))
-            }
-        }
-    }
-}
-
 @Composable
 private fun SearchWordContent(
     modifier: Modifier,
@@ -270,4 +209,74 @@ private fun SearchWordContent(
             }
         }
     }
+}
+
+@Composable
+private fun AddWordSheet(
+    foreignWordValue: String,
+    onForeignWordValueChange: (String) -> Unit,
+    meaningWordValue: String,
+    onMeaningWordValueChange: (String) -> Unit,
+    onAddWordClick: () -> Unit,
+    onDismissRequest: () -> Unit
+) {
+    val focusManager = LocalFocusManager.current
+
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(
+                onClick = onAddWordClick,
+                enabled = foreignWordValue.isNotBlank() && meaningWordValue.isNotBlank()
+            ) {
+                Text(text = stringResource(id = R.string.add))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = stringResource(id = R.string.cancel))
+            }
+        },
+        title = {
+            Text(
+                text = stringResource(id = R.string.add_word),
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = foreignWordValue,
+                    onValueChange = onForeignWordValueChange,
+                    label = {
+                        Text(text = stringResource(id = R.string.foreign_word))
+                    },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                    keyboardActions = KeyboardActions(
+                        onNext = {
+                            focusManager.moveFocus(FocusDirection.Down)
+                        }
+                    )
+                )
+                OutlinedTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = meaningWordValue,
+                    onValueChange = onMeaningWordValueChange,
+                    label = {
+                        Text(text = stringResource(id = R.string.meaning))
+                    },
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    keyboardActions = KeyboardActions(
+                        onDone = if (foreignWordValue.isNotBlank() && meaningWordValue.isNotBlank()) {
+                            { onAddWordClick() }
+                        } else null
+                    ),
+                    supportingText = {
+                        Text(text = stringResource(id = R.string.add_word_info))
+                    }
+                )
+            }
+        }
+    )
 }

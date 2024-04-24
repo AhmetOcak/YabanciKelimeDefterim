@@ -19,15 +19,18 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -59,15 +62,13 @@ fun WordCategoriesScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     var showUpdateCategoryNameSheet by remember { mutableStateOf(false) }
-    var showAddCategorySheet by remember { mutableStateOf(false) }
+    var showAddCategoryDialog by remember { mutableStateOf(false) }
 
     val lazyListState = rememberLazyListState()
 
     if (uiState.errorMessages.isNotEmpty()) {
         Toast.makeText(
-            LocalContext.current,
-            uiState.errorMessages.first().asString(),
-            Toast.LENGTH_LONG
+            LocalContext.current, uiState.errorMessages.first().asString(), Toast.LENGTH_LONG
         ).show()
         viewModel.consumedErrorMessage()
     }
@@ -77,10 +78,8 @@ fun WordCategoriesScreen(
         topBar = {
             TopAppBar(title = {
                 Text(text = stringResource(id = R.string.word_categories))
-            }
-            )
-        },
-        bottomBar = {
+            })
+        }, bottomBar = {
             MyVocabularyNavigationBar(
                 tabs = HomeSections.values(),
                 currentRoute = HomeSections.CATEGORIES.route,
@@ -93,10 +92,9 @@ fun WordCategoriesScreen(
                 enter = scaleIn(),
                 exit = scaleOut()
             ) {
-                FloatingActionButton(onClick = { showAddCategorySheet = true }) {
+                FloatingActionButton(onClick = { showAddCategoryDialog = true }) {
                     Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = null
+                        imageVector = Icons.Default.Add, contentDescription = null
                     )
                 }
             }
@@ -134,19 +132,19 @@ fun WordCategoriesScreen(
             )
         }
 
-        if (showAddCategorySheet) {
-            AddCategorySheet(
+        if (showAddCategoryDialog) {
+            AddCategoryDialog(
                 categoryNameValue = viewModel.newCategoryName,
                 onCategoryValueChange = viewModel::updateNewCategoryName,
                 onAddCategoryClick = remember {
                     {
                         viewModel.addCategory()
-                        showAddCategorySheet = false
+                        showAddCategoryDialog = false
                     }
                 },
                 onDismissRequest = remember {
                     {
-                        showAddCategorySheet = false
+                        showAddCategoryDialog = false
                         viewModel.clearNewCategoryVars()
                     }
                 }
@@ -166,8 +164,7 @@ private fun WordCategoriesScreenContent(
     lazyListState: LazyListState
 ) {
     Column(
-        modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (isLoading) {
             Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -211,17 +208,14 @@ private fun UpdateCategoryNameSheet(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.End
         ) {
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
+            OutlinedTextField(modifier = Modifier.fillMaxWidth(),
                 value = categoryNameValue,
                 onValueChange = onCategoryNameChanged,
                 label = {
                     Text(text = stringResource(R.string.new_cat_name))
-                }
-            )
+                })
             Button(
-                onClick = updateCategoryName,
-                enabled = categoryNameValue.isNotBlank()
+                onClick = updateCategoryName, enabled = categoryNameValue.isNotBlank()
             ) {
                 Text(text = stringResource(R.string.save))
             }
@@ -229,20 +223,35 @@ private fun UpdateCategoryNameSheet(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AddCategorySheet(
+private fun AddCategoryDialog(
     categoryNameValue: String,
     onCategoryValueChange: (String) -> Unit,
     onAddCategoryClick: () -> Unit,
     onDismissRequest: () -> Unit
 ) {
-    ModalBottomSheet(onDismissRequest = onDismissRequest) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.End
-        ) {
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        confirmButton = {
+            TextButton(
+                onClick = onAddCategoryClick,
+                enabled = categoryNameValue.isNotBlank()
+            ) {
+                Text(text = stringResource(id = R.string.add))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = stringResource(id = R.string.cancel))
+            }
+        },
+        title = {
+            Text(
+                text = stringResource(id = R.string.create_category),
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
+        text = {
             OutlinedTextField(
                 modifier = Modifier.fillMaxWidth(),
                 value = categoryNameValue,
@@ -251,15 +260,10 @@ private fun AddCategorySheet(
                     Text(text = stringResource(id = R.string.category_name))
                 },
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(
-                    onDone = if (categoryNameValue.isNotBlank()) {
-                        { onAddCategoryClick() }
-                    } else null
-                )
+                keyboardActions = KeyboardActions(onDone = if (categoryNameValue.isNotBlank()) {
+                    { onAddCategoryClick() }
+                } else null)
             )
-            Button(onClick = onAddCategoryClick, enabled = categoryNameValue.isNotBlank()) {
-                Text(text = stringResource(id = R.string.create_category))
-            }
         }
-    }
+    )
 }

@@ -82,4 +82,8 @@
     <string name="word_not_found">Aradığınız kelime mevcut kelime listenizde yok. 😥.</string>
 
     <string name="add_word_info">Eğer birden fazla kelime anlamı ekleyecekseniz, ekleyeceğiniz kelimeleri virgül ile ayırın.</string>
+    <string name="add_category">Kategori ekle</string>
+
+    <string name="add">Ekle</string>
+    <string name="cancel">İptal</string>
 </resources>
