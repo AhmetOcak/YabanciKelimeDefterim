@@ -12,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.DecimalFormat
 
 abstract class BaseGameViewModel(
     private val observeCategoriesUseCase: ObserveCategoriesUseCase
@@ -37,49 +36,7 @@ abstract class BaseGameViewModel(
 
     abstract fun playTheGame()
 
-    protected fun calculateResult(words: List<WordWithId>) {
-        userAnswers.forEach { result ->
-            if (result.correctAnswer.lowercase() == result.userAnswer.lowercase()) {
-                correctAnswerCount++
-            } else {
-                wrongAnswerCount++
-            }
-        }
-
-        val correctRate = (correctAnswerCount.toDouble() / words.size) * 100
-        successRate = "%${DecimalFormat("#.##").format(correctRate)}"
-
-        uiState.update {
-            it.copy(
-                gameResultEmote = when (correctRate.toInt()) {
-                    in 0..20 -> GameResultEmote.VERY_BAD
-                    in 21..40 -> GameResultEmote.BAD
-                    in 41..60 -> GameResultEmote.NORMAL
-                    in 61..80 -> GameResultEmote.GOOD
-                    else -> GameResultEmote.VERY_GOOD
-                },
-                gameStatus = GameStatus.END
-            )
-        }
-    }
-
-    protected fun calculateResults() {
-        val correctRate = (correctAnswerCount.toDouble() / uiState.value.words.size) * 100
-        successRate = "%${DecimalFormat("#.##").format(correctRate)}"
-
-        uiState.update {
-            it.copy(
-                gameResultEmote = when (correctRate.toInt()) {
-                    in 0..20 -> GameResultEmote.VERY_BAD
-                    in 21..40 -> GameResultEmote.BAD
-                    in 41..60 -> GameResultEmote.NORMAL
-                    in 61..80 -> GameResultEmote.GOOD
-                    else -> GameResultEmote.VERY_GOOD
-                },
-                gameStatus = GameStatus.END
-            )
-        }
-    }
+    abstract fun calculateResult()
 
     fun handleCategoryClick(categoryId: Int) {
         val selectedCategories = uiState.value.selectedCategories.toMutableList()
@@ -149,7 +106,7 @@ abstract class BaseGameViewModel(
     }
 
     fun setGameIsOver() {
-        calculateResult(uiState.value.words)
+        calculateResult()
         uiState.update {
             it.copy(gameStatus = GameStatus.END)
         }
@@ -173,7 +130,7 @@ enum class GameResultEmote(val emote: String, val message: UiText) {
     BAD(emote = "😢", message = UiText.StringResource(R.string.quiz_result_bad)),
     NORMAL(emote = "😐", message = UiText.StringResource(R.string.quiz_result_normal)),
     GOOD(emote = "🙂", message = UiText.StringResource(R.string.quiz_result_good)),
-    VERY_GOOD(emote = "😍", message = UiText.StringResource(R.string.quiz_result_very_bad))
+    VERY_GOOD(emote = "😍", message = UiText.StringResource(R.string.quiz_result_very_good))
 }
 
 @Immutable

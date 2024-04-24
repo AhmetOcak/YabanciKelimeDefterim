@@ -163,6 +163,8 @@ class PairingGameViewModel @Inject constructor(
         }
     }
 
+    override fun calculateResult() {}
+
     private fun shuffleQuestionList() {
         val shuffledQuestions = questions.shuffled()
         questions.apply {

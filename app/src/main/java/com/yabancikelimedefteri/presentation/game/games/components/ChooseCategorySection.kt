@@ -44,7 +44,7 @@ fun ChooseWordCategorySection(
     ) {
         Text(
             modifier = Modifier.fillMaxWidth(),
-            text = stringResource(R.string.game_description),
+            text = stringResource(R.string.select_category),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleLarge
         )

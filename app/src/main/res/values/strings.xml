@@ -7,7 +7,7 @@
     <string name="foreign_word">Foreign Word</string>
     <string name="meaning">Meaning of the word</string>
     <string name="word_guessing_game">Word Guessing Game</string>
-    <string name="game_description">Select the category you want to play the game</string>
+    <string name="select_category">Select the category/categories you want to play the game.</string>
     <string name="category_all">All</string>
     <string name="start_the_game">Start the game</string>
     <string name="user_guess">Your guess</string>
@@ -61,7 +61,7 @@
     <string name="word_pairing">Word Pairing</string>
     <string name="word_writing">Word Writing</string>
 
-    <string name="pairing_game_end">You completed the game! Congratulations! You\'ve successfully finished another word puzzle adventure. You\'ve earned a well-deserved break! Good job! 🎉</string>
+    <string name="pairing_game_end">You completed the game! Congratulations! You\'ve earned a well-deserved break! Good job! 🎉</string>
 
     <string name="min_word_warning">In order to play the word guessing game, there must be at least %d words in the word book.</string>
 
@@ -79,7 +79,7 @@
     <string name="word_categories">Word Categories</string>
     
     <string name="sort_alphabetically">Sort Alphabetically</string>
-    <string name="word_not_found">The word you are looking for is not on your current word list 😥.</string>
+    <string name="word_not_found">The word you are looking for is not on your current word list 😥</string>
 
     <string name="add_word_info">If you add more than one word meaning, separate the words with commas.</string>
     <string name="add_category">Add category</string>

@@ -83,7 +83,7 @@ fun GameResultTableSection(
                 RowCell(s1 = result.question, s2 = result.correctAnswer, s3 = result.userAnswer)
             }
         }
-        Column(modifier = Modifier.weight(3f)) {
+        Column(modifier = Modifier.weight(3f).padding(top = 16.dp)) {
             if (quizResultEmote != null) {
                 Column(
                     Modifier

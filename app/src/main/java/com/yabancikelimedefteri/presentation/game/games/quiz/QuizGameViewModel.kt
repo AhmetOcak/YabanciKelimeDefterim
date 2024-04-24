@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.helpers.Answer
 import com.yabancikelimedefteri.core.helpers.BaseGameViewModel
+import com.yabancikelimedefteri.core.helpers.GameResultEmote
 import com.yabancikelimedefteri.core.helpers.GameStatus
 import com.yabancikelimedefteri.core.helpers.GameUiState
 import com.yabancikelimedefteri.core.helpers.UiText
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.DecimalFormat
 import javax.inject.Inject
 
 @HiltViewModel
@@ -113,8 +115,26 @@ class QuizGameViewModel @Inject constructor(
         } else {
             viewModelScope.launch {
                 delay(500)
-                calculateResults()
+                calculateResult()
             }
+        }
+    }
+
+    override fun calculateResult() {
+        val correctRate = (correctAnswerCount.toDouble() / index) * 100
+        successRate = "%${DecimalFormat("#.##").format(correctRate)}"
+
+        uiState.update {
+            it.copy(
+                gameResultEmote = when (correctRate.toInt()) {
+                    in 0..20 -> GameResultEmote.VERY_BAD
+                    in 21..40 -> GameResultEmote.BAD
+                    in 41..60 -> GameResultEmote.NORMAL
+                    in 61..80 -> GameResultEmote.GOOD
+                    else -> GameResultEmote.VERY_GOOD
+                },
+                gameStatus = GameStatus.END
+            )
         }
     }
 
