@@ -68,7 +68,7 @@
 
     <string name="settings">Ayarlar</string>
     <string name="dark_theme">Karanlık Tema</string>
-    <string name="color_themes">Renk Temaları</string>
+    <string name="color_themes">Temalar</string>
     <string name="dynamic_color">Dinamik Renk</string>
     <string name="list_type">İnce Liste Türü</string>
     <string name="rate_app">Uygulamayı Değerlendir</string>

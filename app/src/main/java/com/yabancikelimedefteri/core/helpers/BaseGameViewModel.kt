@@ -125,12 +125,12 @@ data class GameUiState(
 )
 
 @Immutable
-enum class GameResultEmote(val emote: String, val message: UiText) {
-    VERY_BAD(emote = "😭", message = UiText.StringResource(R.string.quiz_result_very_bad)),
-    BAD(emote = "😢", message = UiText.StringResource(R.string.quiz_result_bad)),
-    NORMAL(emote = "😐", message = UiText.StringResource(R.string.quiz_result_normal)),
-    GOOD(emote = "🙂", message = UiText.StringResource(R.string.quiz_result_good)),
-    VERY_GOOD(emote = "😍", message = UiText.StringResource(R.string.quiz_result_very_good))
+enum class GameResultEmote(val emoteId: Int, val message: UiText) {
+    VERY_BAD(emoteId = R.drawable.ic_very_bad, message = UiText.StringResource(R.string.quiz_result_very_bad)),
+    BAD(emoteId = R.drawable.ic_bad, message = UiText.StringResource(R.string.quiz_result_bad)),
+    NORMAL(emoteId = R.drawable.ic_normal, message = UiText.StringResource(R.string.quiz_result_normal)),
+    GOOD(emoteId = R.drawable.ic_good, message = UiText.StringResource(R.string.quiz_result_good)),
+    VERY_GOOD(emoteId = R.drawable.ic_very_good, message = UiText.StringResource(R.string.quiz_result_very_good))
 }
 
 @Immutable

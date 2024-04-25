@@ -4,10 +4,12 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
@@ -22,10 +24,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.CustomColorScheme
-import com.yabancikelimedefteri.core.ui.theme.color_schemes.NatureColorScheme
+import com.yabancikelimedefteri.core.ui.theme.color_schemes.YellowColorScheme
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.NeonColorScheme
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.PinkColorScheme
-import com.yabancikelimedefteri.core.ui.theme.color_schemes.RedColorScheme
+import com.yabancikelimedefteri.core.ui.theme.color_schemes.OrangeColorScheme
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.SeaColorScheme
 import com.yabancikelimedefteri.domain.model.datastore.ColorSchemeKeys
 
@@ -56,6 +58,7 @@ fun ColorSchemesSettingItem(
                 Icon(imageVector = icon, contentDescription = null)
                 Text(text = stringResource(id = nameId))
             }
+            Spacer(modifier = Modifier.width(8.dp))
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                 colorSchemes.forEach { scheme ->
                     ColorScheme(
@@ -94,8 +97,8 @@ private fun ColorScheme(
             onClick(
                 when (schemeType) {
                     is NeonColorScheme -> ColorSchemeKeys.NEON
-                    is NatureColorScheme -> ColorSchemeKeys.NATURE
-                    is RedColorScheme -> ColorSchemeKeys.RED
+                    is YellowColorScheme -> ColorSchemeKeys.YELLOW
+                    is OrangeColorScheme -> ColorSchemeKeys.ORANGE
                     is SeaColorScheme -> ColorSchemeKeys.SEA
                     else -> ColorSchemeKeys.PINK
                 }
@@ -115,8 +118,8 @@ private fun ColorScheme(
 
 private val colorSchemes = listOf(
     NeonColorScheme,
-    NatureColorScheme,
+    YellowColorScheme,
     PinkColorScheme,
     SeaColorScheme,
-    RedColorScheme
+    OrangeColorScheme
 )

@@ -9,8 +9,8 @@ data class UserPreferences(
 
 enum class ColorSchemeKeys {
     NEON,
-    NATURE,
+    YELLOW,
     PINK,
-    RED,
+    ORANGE,
     SEA
 }

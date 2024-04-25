@@ -6,10 +6,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.CustomColorScheme
-import com.yabancikelimedefteri.core.ui.theme.color_schemes.NatureColorScheme
+import com.yabancikelimedefteri.core.ui.theme.color_schemes.YellowColorScheme
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.NeonColorScheme
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.PinkColorScheme
-import com.yabancikelimedefteri.core.ui.theme.color_schemes.RedColorScheme
+import com.yabancikelimedefteri.core.ui.theme.color_schemes.OrangeColorScheme
 import com.yabancikelimedefteri.core.ui.theme.color_schemes.SeaColorScheme
 import com.yabancikelimedefteri.domain.model.datastore.ColorSchemeKeys
 import com.yabancikelimedefteri.domain.repository.UserPreferencesRepository
@@ -46,9 +46,9 @@ class MainActivityViewModel @Inject constructor(
                         isDynamicColor = preferences.isDynamicColor,
                         isWordListTypeThin = preferences.isWordListTypeThin,
                         colorScheme = when (preferences.colorScheme) {
-                            ColorSchemeKeys.NATURE.name -> NatureColorScheme
+                            ColorSchemeKeys.YELLOW.name -> YellowColorScheme
                             ColorSchemeKeys.NEON.name -> NeonColorScheme
-                            ColorSchemeKeys.RED.name -> RedColorScheme
+                            ColorSchemeKeys.ORANGE.name -> OrangeColorScheme
                             ColorSchemeKeys.SEA.name -> SeaColorScheme
                             else -> PinkColorScheme
                         }

@@ -112,7 +112,7 @@ private fun WritingGame(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 HorizontalDivider(
-                    color = if (answerValue == correctAnswer) successGreen
+                    color = if (answerValue.trim() == correctAnswer.trim()) successGreen
                     else MaterialTheme.colorScheme.error,
                     thickness = 2.dp
                 )

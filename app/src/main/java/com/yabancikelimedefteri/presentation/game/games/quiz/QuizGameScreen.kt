@@ -119,7 +119,7 @@ private fun OptionItem(
         onClick = { onClick(index, word) },
         colors = CardDefaults.cardColors(
             containerColor = if (isCorrectOption && isSelectedOption) successGreen
-            else if (!isCorrectOption && isSelectedOption) MaterialTheme.colorScheme.errorContainer
+            else if (!isCorrectOption && isSelectedOption) MaterialTheme.colorScheme.error
             else if (isCorrectOption) successGreen
             else MaterialTheme.colorScheme.surfaceVariant
         )

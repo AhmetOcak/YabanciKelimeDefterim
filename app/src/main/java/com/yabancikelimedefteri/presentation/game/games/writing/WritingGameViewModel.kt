@@ -92,8 +92,8 @@ class WritingGameViewModel @Inject constructor(
                     userAnswers.add(
                         Answer(
                             question = words[wordIndex].meaning,
-                            correctAnswer = words[wordIndex].foreignWord,
-                            userAnswer = answerValue
+                            correctAnswer = words[wordIndex].foreignWord.trim(),
+                            userAnswer = answerValue.trim()
                         )
                     )
 
