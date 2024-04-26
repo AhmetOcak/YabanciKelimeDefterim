@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.helpers.Answer
 import com.yabancikelimedefteri.core.helpers.GameResultEmote
+import com.yabancikelimedefteri.core.helpers.plain
 import com.yabancikelimedefteri.core.ui.theme.successGreen
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -143,7 +144,7 @@ private fun RowCell(
     s3: String,
     color: Color? = null
 ) {
-    val isAnswerCorrect = s2.trim() == s3.trim()
+    val isAnswerCorrect = s2.plain() == s3.plain()
 
     Row(
         modifier = Modifier
@@ -156,9 +157,15 @@ private fun RowCell(
                 .padding(start = 4.dp),
             text = s1
         )
-        Text(modifier = Modifier.weight(1.5f), text = s2)
         Text(
-            modifier = Modifier.weight(1.5f),
+            modifier = Modifier
+                .weight(1.5f)
+                .padding(start = 4.dp), text = s2
+        )
+        Text(
+            modifier = Modifier
+                .weight(1.5f)
+                .padding(start = 4.dp),
             text = s3,
             color = color ?: if (isAnswerCorrect) successGreen else MaterialTheme.colorScheme.error,
             fontWeight = FontWeight.Bold
@@ -191,12 +198,16 @@ private fun RowCellTitle(
             fontWeight = FontWeight.Bold
         )
         Text(
-            modifier = Modifier.weight(1.5f),
+            modifier = Modifier
+                .weight(1.5f)
+                .padding(start = 4.dp),
             text = s2,
             fontWeight = FontWeight.Bold
         )
         Text(
-            modifier = Modifier.weight(1.5f),
+            modifier = Modifier
+                .weight(1.5f)
+                .padding(start = 4.dp),
             text = s3,
             fontWeight = FontWeight.Bold
         )

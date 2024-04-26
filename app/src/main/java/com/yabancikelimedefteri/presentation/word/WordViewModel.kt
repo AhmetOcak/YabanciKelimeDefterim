@@ -14,6 +14,7 @@ import com.yabancikelimedefteri.domain.model.word.Word
 import com.yabancikelimedefteri.domain.model.word.WordWithId
 import com.yabancikelimedefteri.domain.usecase.word.AddWordUseCase
 import com.yabancikelimedefteri.domain.usecase.word.DeleteWordUseCase
+import com.yabancikelimedefteri.domain.usecase.word.IsWordExistUseCase
 import com.yabancikelimedefteri.domain.usecase.word.ObserveSpecificWordsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +30,7 @@ class WordViewModel @Inject constructor(
     private val observeSpecificWordsUseCase: ObserveSpecificWordsUseCase,
     private val deleteWordUseCase: DeleteWordUseCase,
     private val addWordUseCase: AddWordUseCase,
+    private val isWordExistUseCase: IsWordExistUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -119,22 +121,31 @@ class WordViewModel @Inject constructor(
         if (foreignWord.isNotBlank() && meaningWord.isNotBlank() && categoryId != null) {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    categoryId?.let { categoryId ->
-                        addWordUseCase(
-                            word = Word(
-                                categoryId = categoryId.toInt(),
-                                foreignWord = foreignWord,
-                                meaning = meaningWord
-                            )
-                        )
-                    } ?: {
+                    if (isWordExistUseCase(foreignWord)) {
                         _uiState.update {
-                            it.copy(errorMessages = listOf(UiText.StringResource(R.string.error)))
+                            it.copy(errorMessages = listOf(UiText.StringResource(R.string.word_exist)))
                         }
-                    }
+                        showAddWordDialog()
+                    } else {
+                        categoryId?.let { categoryId ->
+                            addWordUseCase(
+                                word = Word(
+                                    categoryId = categoryId.toInt(),
+                                    foreignWord = foreignWord,
+                                    meaning = meaningWord
+                                )
+                            )
+                        } ?: {
+                            _uiState.update {
+                                it.copy(errorMessages = listOf(UiText.StringResource(R.string.error)))
+                            }
+                        }
 
-                    foreignWord = ""
-                    meaningWord = ""
+                        dismissAddWordDialog()
+
+                        foreignWord = ""
+                        meaningWord = ""
+                    }
                 } catch (e: Exception) {
                     _uiState.update {
                         it.copy(errorMessages = listOf(UiText.StringResource(R.string.error)))
@@ -144,9 +155,11 @@ class WordViewModel @Inject constructor(
         }
     }
 
-    fun clearAddWordVars() {
+    fun handleDismissAddWordDialog() {
         foreignWord = ""
         meaningWord = ""
+
+        dismissAddWordDialog()
     }
 
     fun consumedErrorMessage() {
@@ -161,10 +174,26 @@ class WordViewModel @Inject constructor(
             SortType.ALPHABETICALLY -> {
                 _uiState.update {
                     it.copy(
-                        words = _uiState.value.words.sortedBy { word -> word.foreignWord }
+                        words = _uiState.value.words.sortedWith(
+                            compareBy(String.CASE_INSENSITIVE_ORDER) { word ->
+                                word.foreignWord
+                            }
+                        )
                     )
                 }
             }
+        }
+    }
+
+    fun showAddWordDialog() {
+        _uiState.update {
+            it.copy(showAddWordDialog = true)
+        }
+    }
+
+    fun dismissAddWordDialog() {
+        _uiState.update {
+            it.copy(showAddWordDialog = false)
         }
     }
 }
@@ -174,7 +203,8 @@ data class WordsUiState(
     val words: List<WordWithId> = emptyList(),
     val errorMessages: List<UiText> = emptyList(),
     val uiEvent: UiEvent = UiEvent.WORDS,
-    val searchResults: List<WordWithId> = emptyList()
+    val searchResults: List<WordWithId> = emptyList(),
+    val showAddWordDialog: Boolean = false
 )
 
 enum class UiEvent {

@@ -42,4 +42,7 @@ class WordsRepositoryImpl @Inject constructor(
 
     override suspend fun getSpecificWords(categoryId: Int): List<WordWithId> =
         localDataSource.getSpecificWords(categoryId).toListWord()
+
+    override suspend fun getAllWords(): List<WordWithId> =
+        localDataSource.getAllWords().toListWord()
 }

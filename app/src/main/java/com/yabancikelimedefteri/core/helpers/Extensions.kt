@@ -23,3 +23,5 @@ fun LazyListState.isScrollingUp(): State<Boolean> {
         }
     }
 }
+
+fun String.plain() = this.lowercase().trim()

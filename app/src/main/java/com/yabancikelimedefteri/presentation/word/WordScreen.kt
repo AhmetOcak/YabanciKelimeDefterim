@@ -30,9 +30,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -48,6 +47,7 @@ import com.yabancikelimedefteri.core.helpers.isScrollingUp
 import com.yabancikelimedefteri.core.ui.component.EmptyListMessage
 import com.yabancikelimedefteri.core.ui.component.MultiActionBar
 import com.yabancikelimedefteri.domain.model.word.WordWithId
+import kotlinx.coroutines.launch
 
 @Composable
 fun WordScreen(
@@ -57,9 +57,9 @@ fun WordScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    var showAddWordSheet by remember { mutableStateOf(false) }
-
     val lazyListState = rememberLazyListState()
+
+    val coroutineScope = rememberCoroutineScope()
 
     if (uiState.errorMessages.isNotEmpty()) {
         Toast.makeText(
@@ -78,7 +78,14 @@ fun WordScreen(
                 title = stringResource(id = R.string.my_words),
                 searchValue = viewModel.searchValue,
                 onSearchValueChange = viewModel::updateSearchValueAndSearch,
-                onMenuItemClick = viewModel::handleOnMenuItemClick
+                onMenuItemClick = remember {
+                    { sortType ->
+                        coroutineScope.launch {
+                            viewModel.handleOnMenuItemClick(sortType)
+                            lazyListState.animateScrollToItem(0)
+                        }
+                    }
+                }
             )
         },
         floatingActionButton = {
@@ -88,7 +95,7 @@ fun WordScreen(
                 exit = scaleOut()
 
             ) {
-                FloatingActionButton(onClick = { showAddWordSheet = true }) {
+                FloatingActionButton(onClick = viewModel::showAddWordDialog) {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = null
@@ -119,20 +126,14 @@ fun WordScreen(
             }
         }
 
-        if (showAddWordSheet) {
+        if (uiState.showAddWordDialog) {
             AddWordSheet(
                 foreignWordValue = viewModel.foreignWord,
                 onForeignWordValueChange = viewModel::updateForeignWord,
                 meaningWordValue = viewModel.meaningWord,
                 onMeaningWordValueChange = viewModel::updateMeaningWord,
-                onAddWordClick = {
-                    showAddWordSheet = false
-                    viewModel.addWord()
-                },
-                onDismissRequest = {
-                    showAddWordSheet = false
-                    viewModel.clearAddWordVars()
-                }
+                onAddWordClick = viewModel::addWord,
+                onDismissRequest = viewModel::handleDismissAddWordDialog
             )
         }
     }

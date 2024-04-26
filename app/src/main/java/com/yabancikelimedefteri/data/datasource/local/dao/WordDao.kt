@@ -23,4 +23,7 @@ interface WordDao {
 
     @Query("DELETE FROM word_table WHERE id = :wordId")
     suspend fun deleteWord(wordId: Int)
+
+    @Query("SELECT * FROM word_table")
+    suspend fun getAllWords(): List<WordEntity>
 }

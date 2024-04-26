@@ -64,7 +64,7 @@
 
     <string name="pairing_game_end">Oyunu tamamladınız! Tebrikler! Dinlenmeye değer bir mola hak ettiniz! İyi iş! 🎉</string>
 
-    <string name="min_word_warning">In order to play the word guessing game, there must be at least %d words in the word book.</string>
+    <string name="min_word_warning">Kelime oyununu oynayabilmek için kelime defterinizde en az %d kelime bulunmalıdır.</string>
 
     <string name="settings">Ayarlar</string>
     <string name="dark_theme">Karanlık Tema</string>
@@ -86,4 +86,8 @@
 
     <string name="add">Ekle</string>
     <string name="cancel">İptal</string>
+
+    <string name="word_exist">Bu kelime zaten eklenmiş.</string>
+
+    <string name="writing_game_description">Verilen kelimenin karşılığını yazın. Oyunu bitirmek istiyorsanız, ekranın sağ üst köşesindeki düğmeye basın.</string>
 </resources>

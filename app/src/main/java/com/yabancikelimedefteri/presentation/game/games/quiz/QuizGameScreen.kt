@@ -57,7 +57,8 @@ fun QuizGameScreen(
         isCategorySelected = viewModel::isCategorySelected,
         upPress = upPress,
         onFinishGameClicked = viewModel::setGameIsOver,
-        topBarTitle = stringResource(id = R.string.quiz_game)
+        topBarTitle = stringResource(id = R.string.quiz_game),
+        showFinishGameButton = viewModel.showFinishGameBtn
     ) { paddingValues ->
         if (uiState.words.size < 5) {
             MinWordWarning()

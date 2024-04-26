@@ -67,12 +67,12 @@ class DictionaryViewModel @Inject constructor(
             _uiState.update { state ->
                 state.copy(
                     searchResults = wordsList.filter { word ->
-                        word.foreignWord.contains(_uiState.value.searchText.lowercase())
+                        word.foreignWord.contains(_uiState.value.searchText.trim(), true)
                             .also { result ->
                                 if (result) {
                                     _uiState.update { state.copy(searchType = SearchType.FOREIGN_WORD) }
                                 }
-                            } || word.meaning.contains(_uiState.value.searchText.lowercase())
+                            } || word.meaning.contains(_uiState.value.searchText.trim(), true)
                             .also { result ->
                                 if (result) {
                                     _uiState.update { state.copy(searchType = SearchType.MEANING_OF_WORD) }

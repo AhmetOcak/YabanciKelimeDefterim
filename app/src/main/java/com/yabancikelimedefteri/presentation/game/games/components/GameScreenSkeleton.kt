@@ -1,9 +1,16 @@
 package com.yabancikelimedefteri.presentation.game.games.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -13,7 +20,6 @@ import com.yabancikelimedefteri.core.helpers.Answer
 import com.yabancikelimedefteri.core.helpers.GameResultEmote
 import com.yabancikelimedefteri.core.helpers.GameStatus
 import com.yabancikelimedefteri.core.ui.component.BackButton
-import com.yabancikelimedefteri.core.ui.component.FinishGameButton
 import com.yabancikelimedefteri.domain.model.word.CategoryWithId
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,6 +40,7 @@ fun GameScreenSkeleton(
     upPress: () -> Unit,
     onFinishGameClicked: () -> Unit,
     topBarTitle: String,
+    showFinishGameButton: Boolean = true,
     gameEndContent: @Composable ((paddingValues: PaddingValues) -> Unit)? = null,
     gameStartContent: @Composable ((paddingValues: PaddingValues) -> Unit)? = null,
     gameContent: @Composable ((paddingValues: PaddingValues) -> Unit)
@@ -49,8 +56,14 @@ fun GameScreenSkeleton(
                     BackButton(onClick = upPress)
                 },
                 actions = {
-                    if (gameStatus == GameStatus.STARTED) {
-                        FinishGameButton(onClick = onFinishGameClicked)
+                    AnimatedVisibility(
+                        visible = gameStatus == GameStatus.STARTED && showFinishGameButton,
+                        enter = scaleIn(),
+                        exit = scaleOut()
+                    ) {
+                        IconButton(onClick = onFinishGameClicked) {
+                            Icon(imageVector = Icons.Filled.CheckCircle, contentDescription = null)
+                        }
                     }
                 }
             )

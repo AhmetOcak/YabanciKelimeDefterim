@@ -37,6 +37,9 @@ class QuizGameViewModel @Inject constructor(
     var question by mutableStateOf("")
         private set
 
+    var showFinishGameBtn by mutableStateOf(false)
+        private set
+
     private var options = mutableStateListOf<String>()
 
     private val allOptions = mutableListOf<String>()
@@ -67,6 +70,8 @@ class QuizGameViewModel @Inject constructor(
                 correctAnswer = correctAnswer
             )
         )
+
+        showFinishGameBtn = true
         playTheGame()
     }
 

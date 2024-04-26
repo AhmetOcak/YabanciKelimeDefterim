@@ -11,6 +11,7 @@ import com.yabancikelimedefteri.core.helpers.GameResultEmote
 import com.yabancikelimedefteri.core.helpers.GameStatus
 import com.yabancikelimedefteri.core.helpers.GameUiState
 import com.yabancikelimedefteri.core.helpers.UiText
+import com.yabancikelimedefteri.core.helpers.plain
 import com.yabancikelimedefteri.domain.model.word.WordWithId
 import com.yabancikelimedefteri.domain.usecase.category.ObserveCategoriesUseCase
 import com.yabancikelimedefteri.domain.usecase.word.GetSpecificWordsUseCase
@@ -28,11 +29,14 @@ import javax.inject.Inject
 class WritingGameViewModel @Inject constructor(
     observeCategoriesUseCase: ObserveCategoriesUseCase,
     private val getSpecificWordsUseCase: GetSpecificWordsUseCase,
-): BaseGameViewModel(observeCategoriesUseCase) {
+) : BaseGameViewModel(observeCategoriesUseCase) {
 
     val writingGameUiState: StateFlow<GameUiState> = super.uiState.asStateFlow()
 
     private var wordIndex = 0
+
+    var showFinishGameBtn by mutableStateOf(false)
+        private set
 
     var answerValue by mutableStateOf("")
         private set
@@ -80,8 +84,10 @@ class WritingGameViewModel @Inject constructor(
         viewModelScope.launch {
             val words = uiState.value.words
 
+            showFinishGameBtn = true
+
             showCorrectAnswer = true
-            correctAnswer = uiState.value.words.find { it.meaning == question }?.foreignWord ?: ""
+            correctAnswer = uiState.value.words.find { it.meaning.plain() == question.plain() }?.foreignWord ?: ""
             delay(1000)
             showCorrectAnswer = false
             delay(500)
@@ -117,7 +123,7 @@ class WritingGameViewModel @Inject constructor(
 
     override fun calculateResult() {
         userAnswers.forEach { result ->
-            if (result.correctAnswer.lowercase() == result.userAnswer.lowercase()) {
+            if (result.correctAnswer.plain() == result.userAnswer.plain()) {
                 correctAnswerCount++
             } else {
                 wrongAnswerCount++

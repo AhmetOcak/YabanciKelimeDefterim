@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -66,7 +65,8 @@ fun WritingGameScreen(
         isCategorySelected = viewModel::isCategorySelected,
         onFinishGameClicked = viewModel::setGameIsOver,
         upPress = upPress,
-        topBarTitle = stringResource(id = R.string.word_writing)
+        topBarTitle = stringResource(id = R.string.word_writing),
+        showFinishGameButton = viewModel.showFinishGameBtn
     ) { paddingValues ->
         if (uiState.words.size < 5) {
             MinWordWarning()
@@ -97,51 +97,58 @@ private fun WritingGame(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
-            .padding(top = LocalConfiguration.current.screenHeightDp.dp / 2),
-        verticalArrangement = Arrangement.spacedBy(32.dp)
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.Center
     ) {
-        GameWordItem(word = question)
-        AnimatedVisibility(
-            visible = showCorrectAnswer,
-            exit = slideOutVertically()
-        ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+        Text(
+            text = stringResource(id = R.string.writing_game_description),
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(32.dp))
+        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            GameWordItem(word = question)
+            AnimatedVisibility(
+                visible = showCorrectAnswer,
+                exit = slideOutVertically()
             ) {
-                HorizontalDivider(
-                    color = if (answerValue.trim() == correctAnswer.trim()) successGreen
-                    else MaterialTheme.colorScheme.error,
-                    thickness = 2.dp
-                )
-                Text(text = correctAnswer, textAlign = TextAlign.Center)
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    HorizontalDivider(
+                        color = if (answerValue.lowercase().trim() == correctAnswer.lowercase().trim()) successGreen
+                        else MaterialTheme.colorScheme.error,
+                        thickness = 2.dp
+                    )
+                    Text(text = correctAnswer, textAlign = TextAlign.Center)
+                }
             }
-        }
-        Column(
-            verticalArrangement = Arrangement.Bottom,
-            horizontalAlignment = Alignment.End
-        ) {
-            TextField(
-                modifier = Modifier.fillMaxWidth(),
-                value = answerValue,
-                onValueChange = onAnswerValueChange,
-                maxLines = 1,
-                singleLine = true,
-                keyboardActions = KeyboardActions(
-                    onDone = if (answerValue.isNotBlank()) {
-                        { onSubmitClick() }
-                    } else null
-                ),
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
-            )
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onSubmitClick,
-                enabled = answerValue.isNotBlank()
+            Column(
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.End
             ) {
-                Text(text = stringResource(id = R.string.submit_answer))
+                TextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = answerValue,
+                    onValueChange = onAnswerValueChange,
+                    maxLines = 1,
+                    singleLine = true,
+                    keyboardActions = KeyboardActions(
+                        onDone = if (answerValue.isNotBlank()) {
+                            { onSubmitClick() }
+                        } else null
+                    ),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Button(
+                    onClick = onSubmitClick,
+                    enabled = answerValue.isNotBlank()
+                ) {
+                    Text(text = stringResource(id = R.string.submit_answer))
+                }
             }
         }
     }
