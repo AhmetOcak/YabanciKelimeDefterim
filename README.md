@@ -19,6 +19,11 @@ Anlamını bilmediğin kelimeleri kategorize ederek sakla. Kategoriler oluştur 
 
 ## Outputs 🖼
 
+### Preview
+
+https://github.com/AhmetOcak/YabanciKelimeDefterim/assets/73544434/7b48a9a7-b104-4315-b67c-d5cd15443b09
+
+
 | Name            | Screenshot | Name        | Screenshot |
 |-----------------|------------|-------------|------------|
 | Word Categories | <img src="https://github.com/AhmetOcak/YabanciKelimeDefterim/assets/73544434/d4f778ac-4a6d-4638-88dc-feeea0626af0" width="240" height="500"/>           | Words       |  <img src="https://github.com/AhmetOcak/YabanciKelimeDefterim/assets/73544434/9a10be9f-7a55-42d1-917d-c0629613bfbb" width="240" height="500"/>          |
