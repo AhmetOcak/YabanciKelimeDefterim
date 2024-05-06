@@ -105,7 +105,7 @@ abstract class BaseGameViewModel(
         }
     }
 
-    fun setGameIsOver() {
+    fun handleFinishTheGameClick() {
         calculateResult()
         uiState.update {
             it.copy(gameStatus = GameStatus.END)

@@ -64,7 +64,7 @@ fun PairingGameScreen(
         onReturnGamesScreenClick = upPress,
         gameResultEmote = uiState.gameResultEmote,
         isCategorySelected = viewModel::isCategorySelected,
-        onFinishGameClicked = viewModel::setGameIsOver,
+        onFinishGameClicked = viewModel::handleFinishTheGameClick,
         topBarTitle = stringResource(id = R.string.word_pairing),
         upPress = upPress,
         gameEndContent = remember {

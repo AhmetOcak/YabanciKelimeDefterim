@@ -63,7 +63,7 @@ fun WritingGameScreen(
         onReturnGamesScreenClick = upPress,
         gameResultEmote = uiState.gameResultEmote,
         isCategorySelected = viewModel::isCategorySelected,
-        onFinishGameClicked = viewModel::setGameIsOver,
+        onFinishGameClicked = viewModel::handleFinishTheGameClick,
         upPress = upPress,
         topBarTitle = stringResource(id = R.string.word_writing),
         showFinishGameButton = viewModel.showFinishGameBtn

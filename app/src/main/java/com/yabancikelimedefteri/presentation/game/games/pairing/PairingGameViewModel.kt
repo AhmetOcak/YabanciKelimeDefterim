@@ -159,7 +159,7 @@ class PairingGameViewModel @Inject constructor(
             askedWordCount += WORD_COUNT
             shuffleQuestionList()
         } else {
-            setGameIsOver()
+            handleFinishTheGameClick()
         }
     }
 

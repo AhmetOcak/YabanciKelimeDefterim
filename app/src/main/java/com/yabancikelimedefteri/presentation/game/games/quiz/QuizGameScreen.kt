@@ -56,7 +56,7 @@ fun QuizGameScreen(
         gameResultEmote = uiState.gameResultEmote,
         isCategorySelected = viewModel::isCategorySelected,
         upPress = upPress,
-        onFinishGameClicked = viewModel::setGameIsOver,
+        onFinishGameClicked = viewModel::handleFinishTheGameClick,
         topBarTitle = stringResource(id = R.string.quiz_game),
         showFinishGameButton = viewModel.showFinishGameBtn
     ) { paddingValues ->
