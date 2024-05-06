@@ -3,11 +3,13 @@ package com.yabancikelimedefteri.presentation.game.games.pairing
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -26,11 +28,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.R
@@ -64,7 +66,7 @@ fun PairingGameScreen(
         onReturnGamesScreenClick = upPress,
         gameResultEmote = uiState.gameResultEmote,
         isCategorySelected = viewModel::isCategorySelected,
-        onFinishGameClicked = viewModel::setGameIsOver,
+        onFinishGameClicked = viewModel::handleFinishTheGameClick,
         topBarTitle = stringResource(id = R.string.word_pairing),
         upPress = upPress,
         gameEndContent = remember {
@@ -202,7 +204,13 @@ private fun EndGameMessage(modifier: Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "😍", fontSize = 100.sp)
+        Image(
+            modifier = Modifier
+                .width(LocalConfiguration.current.screenWidthDp.dp / 3)
+                .aspectRatio(1f),
+            painter = painterResource(id = R.drawable.ic_very_good),
+            contentDescription = null
+        )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             modifier = Modifier.padding(horizontal = 32.dp),

@@ -22,7 +22,7 @@
     <string name="add_word_success">You have added a new word to the vocabulary book.</string>
     <string name="category_removed">The category has been removed.</string>
     <string name="word_removed">The word has been removed.</string>
-    <string name="at_least_five_word_warning">In order to play the word guessing game, there must be at least 5 words in the word book.</string>
+    <string name="at_least_five_word_warning">In order to play the word games, there must be at least 5 words in the word book.</string>
     <string name="empty_category_message">There are no categories in the vocabulary book 😥</string>
     <string name="empty_word_message">There are no words in the vocabulary book 😥</string>
     <string name="user_answer">Your Answer</string>

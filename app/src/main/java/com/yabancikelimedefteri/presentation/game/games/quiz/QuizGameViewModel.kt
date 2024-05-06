@@ -16,6 +16,7 @@ import com.yabancikelimedefteri.core.helpers.UiText
 import com.yabancikelimedefteri.domain.model.word.WordWithId
 import com.yabancikelimedefteri.domain.usecase.category.ObserveCategoriesUseCase
 import com.yabancikelimedefteri.domain.usecase.word.GetSpecificWordsUseCase
+import com.yabancikelimedefteri.presentation.game.utils.calculateCorrectRate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -126,7 +127,7 @@ class QuizGameViewModel @Inject constructor(
     }
 
     override fun calculateResult() {
-        val correctRate = (correctAnswerCount.toDouble() / index) * 100
+        val correctRate = calculateCorrectRate(correctAnswerCount, wrongAnswerCount)
         successRate = "%${DecimalFormat("#.##").format(correctRate)}"
 
         uiState.update {

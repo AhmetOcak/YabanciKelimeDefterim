@@ -15,6 +15,7 @@ import com.yabancikelimedefteri.core.helpers.plain
 import com.yabancikelimedefteri.domain.model.word.WordWithId
 import com.yabancikelimedefteri.domain.usecase.category.ObserveCategoriesUseCase
 import com.yabancikelimedefteri.domain.usecase.word.GetSpecificWordsUseCase
+import com.yabancikelimedefteri.presentation.game.utils.calculateCorrectRate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -130,7 +131,7 @@ class WritingGameViewModel @Inject constructor(
             }
         }
 
-        val correctRate = (correctAnswerCount.toDouble() / (correctAnswerCount + wrongAnswerCount)) * 100
+        val correctRate = calculateCorrectRate(correctAnswerCount, wrongAnswerCount)
         successRate = "%${DecimalFormat("#.##").format(correctRate)}"
 
         uiState.update {

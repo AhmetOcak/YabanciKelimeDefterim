@@ -71,8 +71,8 @@ class WordViewModel @Inject constructor(
                 it.copy(
                     uiEvent = UiEvent.SEARCHING,
                     searchResults = words.filter { word ->
-                        word.foreignWord.contains(searchValue.lowercase())
-                                || word.meaning.contains(searchValue.lowercase())
+                        word.foreignWord.contains(searchValue, true)
+                                || word.meaning.contains(searchValue, true)
                     }
                 )
             }
@@ -191,7 +191,7 @@ class WordViewModel @Inject constructor(
         }
     }
 
-    fun dismissAddWordDialog() {
+    private fun dismissAddWordDialog() {
         _uiState.update {
             it.copy(showAddWordDialog = false)
         }
