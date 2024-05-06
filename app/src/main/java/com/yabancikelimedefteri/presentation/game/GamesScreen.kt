@@ -1,6 +1,7 @@
 package com.yabancikelimedefteri.presentation.game
 
 import android.widget.Toast
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -33,7 +34,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.R
@@ -168,7 +168,13 @@ private fun AtLeastFiveWordMessage(modifier: Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "🙃", fontSize = 96.sp)
+        Image(
+            modifier = Modifier
+                .width(LocalConfiguration.current.screenWidthDp.dp / 3)
+                .aspectRatio(1f),
+            painter = painterResource(id = R.drawable.ic_angel),
+            contentDescription = null
+        )
         Text(
             modifier = Modifier
                 .fillMaxWidth()

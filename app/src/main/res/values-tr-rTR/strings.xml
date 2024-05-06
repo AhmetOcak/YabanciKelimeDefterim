@@ -23,7 +23,7 @@
     <string name="add_word_success">Kelime defterine yeni bir kelime ekledin.</string>
     <string name="category_removed">Kategori kaldırıldı.</string>
     <string name="word_removed">Kelime kaldırıldı.</string>
-    <string name="at_least_five_word_warning">Kelime tahmin oyununu oynayabilmen için kelime defterinde en az 5 kelime bulunmalı.</string>
+    <string name="at_least_five_word_warning">Kelime oyunlarını oynayabilmen için kelime defterinde en az 5 kelime bulunmalı.</string>
     <string name="empty_category_message">Kelime defterinde hiç kategori yok 😥</string>
     <string name="empty_word_message">Kelime defterinde hiç kelime yok 😥</string>
     <string name="user_answer">Senin Cevabın</string>
