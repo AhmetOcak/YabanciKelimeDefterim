@@ -90,4 +90,7 @@
     <string name="word_exist">Bu kelime zaten eklenmiş.</string>
 
     <string name="writing_game_description">Verilen kelimenin karşılığını yazın. Oyunu bitirmek istiyorsanız, ekranın sağ üst köşesindeki düğmeye basın.</string>
+
+    <string name="update_category_name">Kategori İsmini Güncelle</string>
+    <string name="update">Güncelle</string>
 </resources>

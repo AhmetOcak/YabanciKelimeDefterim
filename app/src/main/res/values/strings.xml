@@ -90,4 +90,7 @@
     <string name="word_exist">This word is already added.</string>
 
     <string name="writing_game_description">Write down the equivalent of the given word. If you want to finish the game, press the button at the top right of the screen.</string>
+
+    <string name="update_category_name">Update Category Name</string>
+    <string name="update">Update</string>
 </resources>
