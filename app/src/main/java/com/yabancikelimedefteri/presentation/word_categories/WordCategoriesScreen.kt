@@ -101,9 +101,11 @@ fun WordCategoriesScreen(
             modifier = Modifier.padding(paddingValues),
             onDeleteClick = viewModel::deleteCategory,
             onCategoryCardClick = onCategoryClick,
-            onEditClick = { categoryId ->
-                viewModel.updateSelectedCaId(categoryId)
-                showUpdateCategoryDialog = true
+            onEditClick = remember {
+                { categoryId ->
+                    viewModel.updateSelectedCaId(categoryId)
+                    showUpdateCategoryDialog = true
+                }
             },
             categories = uiState.categories,
             isLoading = uiState.isLoading,

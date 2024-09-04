@@ -27,8 +27,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.core.ui.component.DeleteWarning
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -42,6 +45,22 @@ fun WordCard(
 ) {
     val scope = rememberCoroutineScope()
     var visible by remember { mutableStateOf(true) }
+    var showDeleteWarning by remember { mutableStateOf(false) }
+
+    if (showDeleteWarning) {
+        DeleteWarning(
+            title = stringResource(id = R.string.category),
+            onDismissRequest = { showDeleteWarning = false },
+            onConfirm = remember { {
+                scope.launch {
+                    showDeleteWarning = false
+                    visible = false
+                    delay(1000)
+                    onDeleteClick(wordId)
+                }
+            } }
+        )
+    }
 
     AnimatedVisibility(
         visible = visible,
@@ -59,15 +78,7 @@ fun WordCard(
                 verticalArrangement = Arrangement.SpaceAround
             ) {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
-                    IconButton(
-                        onClick = {
-                            scope.launch {
-                                visible = false
-                                delay(1000)
-                                onDeleteClick(wordId)
-                            }
-                        }
-                    ) {
+                    IconButton(onClick = remember { { showDeleteWarning = true } }) {
                         Icon(
                             imageVector = Icons.Filled.DeleteForever,
                             contentDescription = null,

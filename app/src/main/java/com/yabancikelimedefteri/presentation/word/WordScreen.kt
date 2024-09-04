@@ -127,7 +127,7 @@ fun WordScreen(
         }
 
         if (uiState.showAddWordDialog) {
-            AddWordSheet(
+            AddWordDialog(
                 foreignWordValue = viewModel.foreignWord,
                 onForeignWordValueChange = viewModel::updateForeignWord,
                 meaningWordValue = viewModel.meaningWord,
@@ -213,7 +213,7 @@ private fun SearchWordContent(
 }
 
 @Composable
-private fun AddWordSheet(
+private fun AddWordDialog(
     foreignWordValue: String,
     onForeignWordValueChange: (String) -> Unit,
     meaningWordValue: String,

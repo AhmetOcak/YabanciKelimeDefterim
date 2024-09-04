@@ -93,4 +93,9 @@
 
     <string name="update_category_name">Kategori İsmini Güncelle</string>
     <string name="update">Güncelle</string>
+
+    <string name="delete">Sil</string>
+    <string name="delete_warning">Silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
+    <string name="word">Kelime</string>
+    <string name="category">Kategori</string>
 </resources>

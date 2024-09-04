@@ -93,4 +93,9 @@
 
     <string name="update_category_name">Update Category Name</string>
     <string name="update">Update</string>
+
+    <string name="delete">Delete</string>
+    <string name="delete_warning">Are you sure you want to delete? This action cannot be undone.</string>
+    <string name="word">Word</string>
+    <string name="category">Category</string>
 </resources>

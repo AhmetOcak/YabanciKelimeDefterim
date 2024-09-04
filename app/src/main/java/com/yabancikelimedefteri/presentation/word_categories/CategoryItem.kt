@@ -18,8 +18,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.core.ui.component.DeleteWarning
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -33,6 +36,22 @@ fun CategoryCard(
 ) {
     val scope = rememberCoroutineScope()
     var visible by remember { mutableStateOf(true) }
+    var showDeleteWarning by remember { mutableStateOf(false) }
+
+    if (showDeleteWarning) {
+        DeleteWarning(
+            title = stringResource(id = R.string.category),
+            onDismissRequest = { showDeleteWarning = false },
+            onConfirm = remember { {
+                scope.launch {
+                    showDeleteWarning = false
+                    visible = false
+                    delay(1000)
+                    onDeleteClick(categoryId)
+                }
+            } }
+        )
+    }
 
     AnimatedVisibility(
         visible = visible,
@@ -47,15 +66,7 @@ fun CategoryCard(
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 CardFeatures(
-                    onDeleteClick = remember {
-                        {
-                            scope.launch {
-                                visible = false
-                                delay(1000)
-                                onDeleteClick(categoryId)
-                            }
-                        }
-                    },
+                    onDeleteClick = remember { { showDeleteWarning = true } },
                     onEditClick = remember { { onEditClick(categoryId) } }
                 )
                 Text(
