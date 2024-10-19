@@ -3,6 +3,7 @@ package com.yabancikelimedefteri.core.di
 import android.content.Context
 import androidx.room.Room
 import com.yabancikelimedefteri.data.datasource.local.db.ForeignWordsDatabase
+import com.yabancikelimedefteri.data.datasource.local.db.MIGRATION_1_2
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,6 +22,7 @@ object RoomModule {
             context,
             ForeignWordsDatabase::class.java,
             "app_database"
-        ).build()
+        ).addMigrations(MIGRATION_1_2)
+            .build()
     }
 }

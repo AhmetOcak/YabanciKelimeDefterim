@@ -27,4 +27,6 @@ interface WordsRepository {
     suspend fun getSpecificWords(categoryId: Int): List<WordWithId>
 
     suspend fun getAllWords(): List<WordWithId>
+
+    suspend fun updateWord(wordWithId: WordWithId)
 }

@@ -98,4 +98,12 @@
     <string name="delete_warning">Silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</string>
     <string name="word">Kelime</string>
     <string name="category">Kategori</string>
+    <string name="word_importance_level">Kelime Önem Derecesi</string>
+    <string name="low">Düşük</string>
+    <string name="medium">Orta</string>
+    <string name="high">Yüksek</string>
+    <string name="sort_importance_level">Önem Derecesine Göre Sırala</string>
+    <string name="update_word">Kelimeyi Güncelle</string>
+    <string name="delete_word">Kelimeyi Sil</string>
+    <string name="delete_category">Kategoriyi Sil</string>
 </resources>

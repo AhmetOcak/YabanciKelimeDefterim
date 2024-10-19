@@ -4,48 +4,38 @@ import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.helpers.isScrollingUp
+import com.yabancikelimedefteri.core.ui.component.AddOrUpdateWordDialog
 import com.yabancikelimedefteri.core.ui.component.EmptyListMessage
 import com.yabancikelimedefteri.core.ui.component.MultiActionBar
+import com.yabancikelimedefteri.domain.model.DialogType
 import com.yabancikelimedefteri.domain.model.word.WordWithId
 import kotlinx.coroutines.launch
 
@@ -56,9 +46,7 @@ fun WordScreen(
     isWordListTypeThin: Boolean
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     val lazyListState = rememberLazyListState()
-
     val coroutineScope = rememberCoroutineScope()
 
     if (uiState.errorMessages.isNotEmpty()) {
@@ -95,7 +83,7 @@ fun WordScreen(
                 exit = scaleOut()
 
             ) {
-                FloatingActionButton(onClick = viewModel::showAddWordDialog) {
+                FloatingActionButton(onClick = remember { { viewModel.showAddOrUpdateWordDialog(DialogType.Add) } }) {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = null
@@ -112,7 +100,8 @@ fun WordScreen(
                     words = uiState.words,
                     isLoading = uiState.isLoading,
                     isWordListTypeThin = isWordListTypeThin,
-                    lazyListState = lazyListState
+                    lazyListState = lazyListState,
+                    onEditWordClick = viewModel::setInitialValuesForUpdateWord
                 )
             }
 
@@ -121,19 +110,23 @@ fun WordScreen(
                     modifier = Modifier.padding(paddingValues),
                     searchResults = uiState.searchResults,
                     onDeleteClick = viewModel::deleteWord,
-                    isWordListTypeThin = isWordListTypeThin
+                    isWordListTypeThin = isWordListTypeThin,
+                    onEditWordClick = viewModel::setInitialValuesForUpdateWord
                 )
             }
         }
 
-        if (uiState.showAddWordDialog) {
-            AddWordDialog(
+        if (uiState.showAddOrUpdateWordDialog) {
+            AddOrUpdateWordDialog(
                 foreignWordValue = viewModel.foreignWord,
                 onForeignWordValueChange = viewModel::updateForeignWord,
                 meaningWordValue = viewModel.meaningWord,
                 onMeaningWordValueChange = viewModel::updateMeaningWord,
-                onAddWordClick = viewModel::addWord,
-                onDismissRequest = viewModel::handleDismissAddWordDialog
+                onApply = viewModel::handleAddOrUpdateWordApplyClick,
+                onDismissRequest = viewModel::handleDismissAddWordDialog,
+                onImportanceLevelClick = viewModel::setImportanceLevel,
+                importanceLevel = viewModel.importanceLevel.ordinal,
+                dialogType = viewModel.dialogType
             )
         }
     }
@@ -146,7 +139,8 @@ private fun WordScreenContent(
     onDeleteClick: (Int) -> Unit,
     isLoading: Boolean,
     isWordListTypeThin: Boolean,
-    lazyListState: LazyListState
+    lazyListState: LazyListState,
+    onEditWordClick: (Int) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -171,7 +165,9 @@ private fun WordScreenContent(
                             meaning = it.meaning,
                             wordId = it.wordId,
                             onDeleteClick = onDeleteClick,
-                            isWordListTypeThin = isWordListTypeThin
+                            isWordListTypeThin = isWordListTypeThin,
+                            importanceLevel = it.importanceLevel,
+                            onEditClick = onEditWordClick
                         )
                     }
                 }
@@ -185,7 +181,8 @@ private fun SearchWordContent(
     modifier: Modifier,
     searchResults: List<WordWithId>,
     onDeleteClick: (Int) -> Unit,
-    isWordListTypeThin: Boolean
+    isWordListTypeThin: Boolean,
+    onEditWordClick: (Int) -> Unit
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
@@ -204,80 +201,12 @@ private fun SearchWordContent(
                         meaning = it.meaning,
                         wordId = it.wordId,
                         onDeleteClick = onDeleteClick,
-                        isWordListTypeThin = isWordListTypeThin
+                        isWordListTypeThin = isWordListTypeThin,
+                        importanceLevel = it.importanceLevel,
+                        onEditClick = onEditWordClick
                     )
                 }
             }
         }
     }
-}
-
-@Composable
-private fun AddWordDialog(
-    foreignWordValue: String,
-    onForeignWordValueChange: (String) -> Unit,
-    meaningWordValue: String,
-    onMeaningWordValueChange: (String) -> Unit,
-    onAddWordClick: () -> Unit,
-    onDismissRequest: () -> Unit
-) {
-    val focusManager = LocalFocusManager.current
-
-    AlertDialog(
-        onDismissRequest = onDismissRequest,
-        confirmButton = {
-            TextButton(
-                onClick = onAddWordClick,
-                enabled = foreignWordValue.isNotBlank() && meaningWordValue.isNotBlank()
-            ) {
-                Text(text = stringResource(id = R.string.add))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(text = stringResource(id = R.string.cancel))
-            }
-        },
-        title = {
-            Text(
-                text = stringResource(id = R.string.add_word),
-                style = MaterialTheme.typography.titleLarge
-            )
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = foreignWordValue,
-                    onValueChange = onForeignWordValueChange,
-                    label = {
-                        Text(text = stringResource(id = R.string.foreign_word))
-                    },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-                    keyboardActions = KeyboardActions(
-                        onNext = {
-                            focusManager.moveFocus(FocusDirection.Down)
-                        }
-                    )
-                )
-                OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = meaningWordValue,
-                    onValueChange = onMeaningWordValueChange,
-                    label = {
-                        Text(text = stringResource(id = R.string.meaning))
-                    },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    keyboardActions = KeyboardActions(
-                        onDone = if (foreignWordValue.isNotBlank() && meaningWordValue.isNotBlank()) {
-                            { onAddWordClick() }
-                        } else null
-                    ),
-                    supportingText = {
-                        Text(text = stringResource(id = R.string.add_word_info))
-                    }
-                )
-            }
-        }
-    )
 }

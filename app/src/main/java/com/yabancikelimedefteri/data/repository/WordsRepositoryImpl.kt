@@ -45,4 +45,7 @@ class WordsRepositoryImpl @Inject constructor(
 
     override suspend fun getAllWords(): List<WordWithId> =
         localDataSource.getAllWords().toListWord()
+
+    override suspend fun updateWord(wordWithId: WordWithId) =
+        localDataSource.updateWord(wordWithId.toWordEntity())
 }

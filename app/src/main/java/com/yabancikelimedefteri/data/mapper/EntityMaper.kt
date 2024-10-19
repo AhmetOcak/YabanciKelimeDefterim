@@ -27,7 +27,18 @@ fun Word.toWordEntity(): WordEntity {
     return WordEntity(
         categoryId = categoryId,
         foreignWord = foreignWord,
-        meaning = meaning
+        meaning = meaning,
+        importanceLevel = importanceLevel
+    )
+}
+
+fun WordWithId.toWordEntity(): WordEntity {
+    return WordEntity(
+        id = wordId,
+        categoryId = categoryId,
+        foreignWord = foreignWord,
+        meaning = meaning,
+        importanceLevel = importanceLevel
     )
 }
 
@@ -40,7 +51,8 @@ fun List<WordEntity>.toListWord(): List<WordWithId> {
                 wordId = it.id,
                 categoryId = it.categoryId,
                 foreignWord = it.foreignWord,
-                meaning = it.meaning
+                meaning = it.meaning,
+                importanceLevel = it.importanceLevel
             )
         )
     }

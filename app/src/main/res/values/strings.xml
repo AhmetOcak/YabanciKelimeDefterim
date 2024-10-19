@@ -98,4 +98,12 @@
     <string name="delete_warning">Are you sure you want to delete? This action cannot be undone.</string>
     <string name="word">Word</string>
     <string name="category">Category</string>
+    <string name="word_importance_level">Word Importance Level</string>
+    <string name="low">Low</string>
+    <string name="medium">Medium</string>
+    <string name="high">High</string>
+    <string name="sort_importance_level">Sort Importance Level</string>
+    <string name="update_word">Update Word</string>
+    <string name="delete_word">Delete Word</string>
+    <string name="delete_category">Delete Category</string>
 </resources>

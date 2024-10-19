@@ -3,6 +3,7 @@ package com.yabancikelimedefteri.data.datasource.local.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import com.yabancikelimedefteri.data.datasource.local.entity.WordEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -26,4 +27,7 @@ interface WordDao {
 
     @Query("SELECT * FROM word_table")
     suspend fun getAllWords(): List<WordEntity>
+
+    @Update
+    suspend fun updateWord(wordEntity: WordEntity)
 }

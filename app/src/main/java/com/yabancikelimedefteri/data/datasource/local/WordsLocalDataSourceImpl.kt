@@ -35,4 +35,6 @@ class WordsLocalDataSourceImpl @Inject constructor(
         wordDao.getSpecificWords(categoryId)
 
     override suspend fun getAllWords(): List<WordEntity> = wordDao.getAllWords()
+
+    override suspend fun updateWord(wordEntity: WordEntity) = wordDao.updateWord(wordEntity)
 }

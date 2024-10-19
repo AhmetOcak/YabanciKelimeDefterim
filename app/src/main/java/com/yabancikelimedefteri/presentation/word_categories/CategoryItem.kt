@@ -2,13 +2,12 @@ package com.yabancikelimedefteri.presentation.word_categories
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DeleteForever
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,10 +17,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.yabancikelimedefteri.R
+import com.yabancikelimedefteri.core.ui.component.CardFeatures
 import com.yabancikelimedefteri.core.ui.component.DeleteWarning
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -40,7 +38,6 @@ fun CategoryCard(
 
     if (showDeleteWarning) {
         DeleteWarning(
-            title = stringResource(id = R.string.category),
             onDismissRequest = { showDeleteWarning = false },
             onConfirm = remember { {
                 scope.launch {
@@ -78,33 +75,6 @@ fun CategoryCard(
                     style = MaterialTheme.typography.titleLarge
                 )
             }
-        }
-    }
-}
-
-
-@Composable
-private fun CardFeatures(
-    onDeleteClick: () -> Unit,
-    onEditClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
-    ) {
-        IconButton(onClick = onEditClick) {
-            Icon(
-                imageVector = Icons.Filled.Edit,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.secondary
-            )
-        }
-        IconButton(onClick = onDeleteClick) {
-            Icon(
-                imageVector = Icons.Filled.DeleteForever,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.secondary
-            )
         }
     }
 }

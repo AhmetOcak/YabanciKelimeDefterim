@@ -146,9 +146,18 @@ private fun SortMenu(
                 onMenuItemClick(SortType.ALPHABETICALLY)
             }
         )
+        DropdownMenuItem(
+            text = {
+                Text(text = stringResource(id = R.string.sort_importance_level))
+            },
+            onClick = {
+                onMenuItemClick(SortType.IMPORTANCE_LEVEL)
+            }
+        )
     }
 }
 
 enum class SortType {
-    ALPHABETICALLY
+    ALPHABETICALLY,
+    IMPORTANCE_LEVEL
 }

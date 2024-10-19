@@ -30,5 +30,8 @@ data class WordEntity(
     var foreignWord: String,
 
     @ColumnInfo(name = "meaning")
-    var meaning: String
+    var meaning: String,
+
+    @ColumnInfo(name = "importance_level")
+    var importanceLevel: Int
 )

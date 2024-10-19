@@ -25,4 +25,6 @@ interface WordsLocalDataSource {
     suspend fun getSpecificWords(categoryId: Int): List<WordEntity>
 
     suspend fun getAllWords(): List<WordEntity>
+
+    suspend fun updateWord(wordEntity: WordEntity)
 }

@@ -10,12 +10,16 @@ import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.helpers.UiText
 import com.yabancikelimedefteri.core.navigation.MainDestinations
 import com.yabancikelimedefteri.core.ui.component.SortType
+import com.yabancikelimedefteri.domain.model.DialogType
+import com.yabancikelimedefteri.domain.model.ImportanceLevel
 import com.yabancikelimedefteri.domain.model.word.Word
 import com.yabancikelimedefteri.domain.model.word.WordWithId
 import com.yabancikelimedefteri.domain.usecase.word.AddWordUseCase
 import com.yabancikelimedefteri.domain.usecase.word.DeleteWordUseCase
 import com.yabancikelimedefteri.domain.usecase.word.IsWordExistUseCase
 import com.yabancikelimedefteri.domain.usecase.word.ObserveSpecificWordsUseCase
+import com.yabancikelimedefteri.domain.usecase.word.UpdateWordUseCase
+import com.yabancikelimedefteri.domain.utils.convertImportanceLevel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,6 +35,7 @@ class WordViewModel @Inject constructor(
     private val deleteWordUseCase: DeleteWordUseCase,
     private val addWordUseCase: AddWordUseCase,
     private val isWordExistUseCase: IsWordExistUseCase,
+    private val updateWordUseCase: UpdateWordUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -39,6 +44,7 @@ class WordViewModel @Inject constructor(
 
     var categoryId: String? = null
         private set
+    private var wordId: Int? = null
 
     init {
         categoryId = savedStateHandle[MainDestinations.WORD_ID_KEY]
@@ -49,8 +55,13 @@ class WordViewModel @Inject constructor(
         private set
     var meaningWord by mutableStateOf("")
         private set
+    var importanceLevel by mutableStateOf(ImportanceLevel.Green)
+        private set
 
     var searchValue by mutableStateOf("")
+        private set
+
+    var dialogType by mutableStateOf(DialogType.Add)
         private set
 
     fun updateForeignWord(newValue: String) {
@@ -59,6 +70,20 @@ class WordViewModel @Inject constructor(
 
     fun updateMeaningWord(newValue: String) {
         meaningWord = newValue
+    }
+
+    fun setImportanceLevel(level: Int) {
+        importanceLevel = level.convertImportanceLevel()
+    }
+
+    fun setInitialValuesForUpdateWord(wordId: Int) {
+        val selectedWord = _uiState.value.words.find { it.wordId == wordId } ?: return
+        updateForeignWord(selectedWord.foreignWord)
+        updateMeaningWord(selectedWord.meaning)
+        setImportanceLevel(selectedWord.importanceLevel)
+        this.wordId = wordId
+        dialogType = DialogType.Edit
+        showAddOrUpdateWordDialog(DialogType.Edit)
     }
 
     fun updateSearchValueAndSearch(newValue: String) {
@@ -117,7 +142,38 @@ class WordViewModel @Inject constructor(
         }
     }
 
-    fun addWord() {
+    fun handleAddOrUpdateWordApplyClick() {
+        if (dialogType == DialogType.Add) {
+            addWord()
+        } else {
+            wordId?.let { updateWord(it) }
+        }
+    }
+
+    private fun updateWord(wordId: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                categoryId?.let {
+                    updateWordUseCase(
+                        WordWithId(
+                            wordId = wordId,
+                            categoryId = it.toInt(),
+                            importanceLevel = importanceLevel.ordinal,
+                            foreignWord = foreignWord,
+                            meaning = meaningWord
+                        )
+                    )
+                    dismissAddOrUpdateWordDialog()
+                }
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(errorMessages = listOf(UiText.StringResource(R.string.error)))
+                }
+            }
+        }
+    }
+
+    private fun addWord() {
         if (foreignWord.isNotBlank() && meaningWord.isNotBlank() && categoryId != null) {
             viewModelScope.launch(Dispatchers.IO) {
                 try {
@@ -125,14 +181,15 @@ class WordViewModel @Inject constructor(
                         _uiState.update {
                             it.copy(errorMessages = listOf(UiText.StringResource(R.string.word_exist)))
                         }
-                        showAddWordDialog()
+                        showAddOrUpdateWordDialog(DialogType.Add)
                     } else {
                         categoryId?.let { categoryId ->
                             addWordUseCase(
                                 word = Word(
                                     categoryId = categoryId.toInt(),
                                     foreignWord = foreignWord,
-                                    meaning = meaningWord
+                                    meaning = meaningWord,
+                                    importanceLevel = importanceLevel.ordinal
                                 )
                             )
                         } ?: {
@@ -141,10 +198,7 @@ class WordViewModel @Inject constructor(
                             }
                         }
 
-                        dismissAddWordDialog()
-
-                        foreignWord = ""
-                        meaningWord = ""
+                        dismissAddOrUpdateWordDialog()
                     }
                 } catch (e: Exception) {
                     _uiState.update {
@@ -159,7 +213,7 @@ class WordViewModel @Inject constructor(
         foreignWord = ""
         meaningWord = ""
 
-        dismissAddWordDialog()
+        dismissAddOrUpdateWordDialog()
     }
 
     fun consumedErrorMessage() {
@@ -182,19 +236,35 @@ class WordViewModel @Inject constructor(
                     )
                 }
             }
+
+            SortType.IMPORTANCE_LEVEL -> {
+                _uiState.update {
+                    it.copy(
+                        words = _uiState.value.words.sortedBy {
+                            word -> word.importanceLevel
+                        }.reversed()
+                    )
+                }
+            }
         }
     }
 
-    fun showAddWordDialog() {
+    fun showAddOrUpdateWordDialog(dialogType: DialogType) {
+        this.dialogType = dialogType
         _uiState.update {
-            it.copy(showAddWordDialog = true)
+            it.copy(showAddOrUpdateWordDialog = true)
         }
     }
 
-    private fun dismissAddWordDialog() {
+    private fun dismissAddOrUpdateWordDialog() {
         _uiState.update {
-            it.copy(showAddWordDialog = false)
+            it.copy(showAddOrUpdateWordDialog = false)
         }
+        updateForeignWord("")
+        updateMeaningWord("")
+        setImportanceLevel(ImportanceLevel.Green.ordinal)
+        wordId = null
+        dialogType = DialogType.Add
     }
 }
 
@@ -204,7 +274,7 @@ data class WordsUiState(
     val errorMessages: List<UiText> = emptyList(),
     val uiEvent: UiEvent = UiEvent.WORDS,
     val searchResults: List<WordWithId> = emptyList(),
-    val showAddWordDialog: Boolean = false
+    val showAddOrUpdateWordDialog: Boolean = false
 )
 
 enum class UiEvent {
