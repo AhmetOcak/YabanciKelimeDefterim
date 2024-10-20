@@ -12,7 +12,7 @@ android {
         applicationId = "com.yabancikelimedefteri"
         minSdk = 23
         targetSdk = 34
-        versionCode = 8
+        versionCode = 9
         versionName = "1.4.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
