@@ -30,8 +30,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.ui.component.CardFeatures
 import com.yabancikelimedefteri.core.ui.component.DeleteWarning
 import com.yabancikelimedefteri.domain.utils.setImportanceLevel
@@ -54,6 +56,7 @@ fun WordCard(
 
     if (showDeleteWarning) {
         DeleteWarning(
+            title = stringResource(id = R.string.delete_word),
             onDismissRequest = { showDeleteWarning = false },
             onConfirm = remember {
                 {

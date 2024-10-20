@@ -12,7 +12,7 @@ import androidx.compose.ui.res.stringResource
 import com.yabancikelimedefteri.R
 
 @Composable
-fun DeleteWarning(onDismissRequest: () -> Unit, onConfirm: () -> Unit) {
+fun DeleteWarning(title: String, onDismissRequest: () -> Unit, onConfirm: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismissRequest,
         confirmButton = {
@@ -29,7 +29,7 @@ fun DeleteWarning(onDismissRequest: () -> Unit, onConfirm: () -> Unit) {
             }
         },
         title = {
-            Text(text = stringResource(id = R.string.delete_category))
+            Text(text = title)
         },
         text = {
             Text(text = stringResource(id = R.string.delete_warning))

@@ -17,8 +17,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.yabancikelimedefteri.R
 import com.yabancikelimedefteri.core.ui.component.CardFeatures
 import com.yabancikelimedefteri.core.ui.component.DeleteWarning
 import kotlinx.coroutines.delay
@@ -38,6 +40,7 @@ fun CategoryCard(
 
     if (showDeleteWarning) {
         DeleteWarning(
+            title = stringResource(id = R.string.delete_category),
             onDismissRequest = { showDeleteWarning = false },
             onConfirm = remember { {
                 scope.launch {
