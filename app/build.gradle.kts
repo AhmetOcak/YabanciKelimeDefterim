@@ -6,14 +6,14 @@ plugins {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.yabancikelimedefteri"
         minSdk = 23
-        targetSdk = 34
-        versionCode = 9
-        versionName = "1.4.3"
+        targetSdk = 35
+        versionCode = 10
+        versionName = "1.4.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
